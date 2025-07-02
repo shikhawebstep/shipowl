@@ -1,0 +1,375 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import "tailwindcss";
+
+.font-lato {
+  font-family: var(--font-lato), sans-serif;
+}
+
+.font-dm-sans {
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+
+th.text-left {
+  text-align: left !important;
+}
+
+/* Target all scrollable containers */
+/* Applies to all elements with any overflow auto */
+.overflow-auto::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.overflow-auto::-webkit-scrollbar-track,
+.overflow-x-auto::-webkit-scrollbar-track,
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+  /* optional: add #f0f0f0 if needed */
+}
+
+.overflow-auto::-webkit-scrollbar-thumb,
+.overflow-x-auto::-webkit-scrollbar-thumb,
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: #131a46;
+  border-radius: 4px;
+  border: 1 solid white;
+}
+.blur-text {
+  filter: blur(3px);
+  opacity: 0.5;
+  user-select: none;
+}
+
+/* Firefox support */
+.overflow-auto,
+.overflow-x-auto,
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #131a46 transparent;
+}
+
+/* Optional: Hover effect */
+.overflow-auto::-webkit-scrollbar-thumb:hover,
+.overflow-x-auto::-webkit-scrollbar-thumb:hover,
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background-color:  #131a46;
+}
+
+.custom-swal-zindex {
+  z-index: 9999 !important;
+}
+.swal2-container {
+  z-index: 9999 !important;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #131a46 transparent;
+}
+
+*::-webkit-scrollbar {
+  height: 2px;
+  width: 2px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #131a46;
+  border-radius: 4px;
+  border: 2px solid white;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #131a46;
+}
+
+
+td.text-left {
+  text-align: left !important;
+}
+
+body {
+  font-family: 'Public Sans', sans-serif;
+  background: #F1F5F9 !important;
+}
+
+.container {
+  width: 100%;
+  max-width: 100% !important;
+}
+
+.react-select__control.css-13cymwt-control {
+  border: 1px solid #dfeaf2;
+}
+
+.dm {
+  font-family: "DM Sans", sans-serif;
+}
+
+table tr th i {
+  position: relative;
+}
+
+
+
+
+@media(min-width:380px) and (max-width:600px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 47.5%);
+    gap: 15px;
+  }
+}
+
+@media(min-width:601px) and (max-width:900px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 31.5%);
+    gap: 15px;
+  }
+}
+
+@media(min-width:901px) and (max-width:1030px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 23.5%);
+    gap: 15px;
+  }
+}
+
+table tr th:last-child i::after {
+  right: 5px;
+  top: 15px;
+}
+
+table tr th:last-child i {
+  position: static;
+}
+
+table tr th:last-child {
+  position: relative;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+body {
+  background: #F4F7FE;
+  color: var(--foreground);
+  font-family: "DM Sans", sans-serif;
+}
+
+button,
+a {
+  cursor: pointer;
+}
+
+@media(min-width:2000px) {
+  .container {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+}
+
+.nunito {
+  font-family: "Nunito Sans", sans-serif;
+}
+
+table tr th i {
+  position: relative;
+}
+
+
+
+@media(max-width:767px) {
+  .container {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+input,
+select {
+  outline: none;
+}
+
+@media(min-width:1024px) and (max-width:1580px) {
+
+  .sidebar nav ul li button span,
+  .sidebar nav ul li a {
+    font-size: 14px !important;
+  }
+
+  .sidebar nav ul li button img {
+    max-width: 16px;
+  }
+}
+
+table tr td,
+table tr th {
+  font-size: 15px;
+}
+
+table tr th:last-child i::after {
+  right: 5px;
+  top: 15px;
+}
+
+table tr th:last-child i {
+  position: static;
+}
+
+table tr th:last-child {
+  position: relative;
+  text-align: center !important;
+}
+
+@media(min-width:2000px) {
+  .main-wrapper {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+}
+
+@media(min-width:1224px) and (max-width:1380px) {
+
+  .leftbar {
+    width: 22%;
+  }
+
+  .main-outlet {
+    width: 78%;
+  }
+}
+
+/* Remove background, borders, and hover styles */
+.main-outer-wrapper .dt-length label {
+  text-transform: capitalize;
+  color: #2b3674;
+  font-weight: 500;
+}
+
+.main-outer-wrapper .dt-info {
+  color: #2b3674;
+  font-weight: 500;
+}
+
+.main-tables {
+  border: none !important;
+  background: transparent !important;
+}
+
+.main-outer-wrapper .dt-paging.paging_full_numbers button.dt-paging-button.current {
+  box-shadow: none;
+  background-color: #2B3674 !important;
+  color: #fff !important;
+  border-radius: 7px !important;
+}
+
+
+
+/* Optional: remove pagination button styles */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: none !important;
+  border: none !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+
+.mySwiper {
+  margin-left: 1px !important;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: orange !important;
+}
+
+.swiper-button-prev:after,
+.swiper-button-next:after {
+  font-size: 17px !important;
+}
+
+td:hover,
+th:hover {
+  outline: none !important;
+}
+
+.css-hlgwow {
+  padding: 8px !important;
+}
+
+a,
+button,
+li,
+img {
+  cursor: pointer;
+}
+
+@media(max-width:767px){
+  .main-outer-wrapper div.dt-container div.dt-layout-row .dt-length,.dt-info {
+   display: none !important;
+}
+.dt-paging.paging_simple_numbers {
+    text-align: left !important;
+}
+}
+.dt-search {
+    text-align: left;
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 10px;
+    align-items: center;
+}
+.dt-search input {
+  width:100%;
+}
+.dt-search label {
+    background-color: #ff6900;
+    padding: 7px 13px;
+    border-radius: 10px;
+    color: #fff;
+}
+button.dt-paging-button.current {
+    background: #ff6900 !important;
+    color:#fff;
+    
+}
+button.dt-paging-button {
+    padding: 3px 10px !important;
+}
+.dt-paging.paging_simple {
+    text-align: left;
+}
+.prose  p ,.prose p em{
+ padding: 4px 0;
+}
+
+
+.main-tables thead th,
+.main-tables tbody td {
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  outline: none;
+}
+.main-tables .popup-boxes thead th,
+.main-tables .popup-boxes tbody td {
+  border: 1px solid !important; 
+}
+.profilePage p {
+    font-size: 17px;
+    padding: 3px 0;
+}

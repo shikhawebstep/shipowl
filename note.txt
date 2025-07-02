@@ -1,0 +1,37 @@
+postman pass:Lu6Y%CBfArhxd?+
+render url:/
+localhost url: /
+shopify url :webproductstore.myshopify.com:
+
+
+_____________________________________
+
+Short Brand Name
+remove star also when no validations
+______________________________________________
+
+
+//
+single model -> multi variant 
+    1. model (no show)
+    2. show variants
+    3. push to shopify -> (dropshipper will add price for multi variants -> click button -> send data)
+
+multiple model -> multi variant 
+    1. model (tab show)
+    2. show variants (according to tab model)
+    3. push to shopify (active model tab) -> (dropshipper will add price for multi variants -> click button -> send data)
+
+single model - single variant
+    1. model (note model)
+    3. push to shopify -> (dropshipper will add price for multi variants -> click button -> send data)
+
+
+multi model - single variant
+    1. model (radios)
+    2. show variants (but model radio)
+    3. push to shopify -> (dropshipper will add price for multi variants (selected radio) -> click button -> send data)
+
+
+This product is availbele in (model name)
+
