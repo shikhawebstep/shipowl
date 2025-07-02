@@ -214,7 +214,7 @@ export default function NewProducts() {
     <>
       <div>
         {productsRequest.length > 0 ? (
-          <div className="grid xl:grid-cols-5 md:grid-cols-2 sm:grid-cols-1 gap-3">
+          <div className="grid xl:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-3 productsSection">
             {productsRequest.map((product) => {
               const imageUrl = product.variants?.[0]?.image?.split(',') || [];
 

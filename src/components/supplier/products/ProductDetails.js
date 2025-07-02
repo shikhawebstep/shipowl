@@ -832,7 +832,7 @@ const ProductDetails = () => {
                     </button>
 
                   )}
-                  {canUpdate && type !== "notmy" && (
+                  {canUpdate && type !== "notmy" &&(
                     <button onClick={() => {
                       setShowPopup(true);
                       setInventoryData({
@@ -1191,7 +1191,7 @@ const ProductDetails = () => {
                         </button>
                       )}
 
-                      {canUpdate && activeTab === "my" && (
+                     {canUpdate && activeTab === "my" && (
                         <button
                           onClick={() => {
                             setShowPopup(true);
@@ -1224,3 +1224,5 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+
+

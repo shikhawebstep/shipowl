@@ -91,7 +91,7 @@ export default function Sidebar() {
       <aside
         className={`fixed top-0 left-0 w-72 sidebar rounded-md bg-white z-50 shadow-lg transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? "translate-x-0 h-[500px] overflow-auto" : "-translate-x-full"} 
-        lg:translate-x-0 lg:relative lg:h-full`}
+        lg:translate-x-0 lg:relative lg:h-full lg:w-full`}
       >
         <div className="flex items-center justify-between lg:justify-center p-5 border-b border-[#F4F7FE]">
           <Image src={logo} alt="ShipOwl Logo" className="max-w-[150px]" />

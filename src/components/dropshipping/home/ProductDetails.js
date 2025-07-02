@@ -1163,7 +1163,7 @@ export default function ProductDetails() {
                   }
                 }
               `}
-                </style>
+              </style>
               </div>
 
             </div>
