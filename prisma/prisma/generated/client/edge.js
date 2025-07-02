@@ -1387,7 +1387,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\Webstep2\\shipowl-merge\\prisma\\prisma\\generated\\client",
+      "value": "D:\\Webstep2\\shipowl-development\\prisma\\prisma\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -1401,7 +1401,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\Webstep2\\shipowl-merge\\prisma\\schema.prisma",
+    "sourceFilePath": "D:\\Webstep2\\shipowl-development\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
