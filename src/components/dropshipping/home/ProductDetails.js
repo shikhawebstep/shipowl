@@ -1121,7 +1121,7 @@ export default function ProductDetails() {
               >
                 <div className="flex gap-3 justify-center">
                   {/* Push to Shopify */}
-                  {canPushToShopify && type === 'notmy'(
+                  {canPushToShopify && type === 'notmy' && (
                     <button
                       onClick={() => {
                         setShowPopup(true);
@@ -1139,7 +1139,7 @@ export default function ProductDetails() {
                       <ArrowUpRight /> Push To Shopify
                     </button>
                   )}
-                  {canEditFromShopify && type !== 'notmy'(
+                  {canEditFromShopify && type !== 'notmy' && (
                     <button
                       onClick={() => handleEdit(product.id)}
                       className="p-20 py-5 rounded-md mt-2 text-white md:text-sm text-xs bg-black hover:bg-gray-800 transition duration-300 ease-in-out hover:scale-[1.02]"
@@ -1163,7 +1163,7 @@ export default function ProductDetails() {
                   }
                 }
               `}
-              </style>
+                </style>
               </div>
 
             </div>
