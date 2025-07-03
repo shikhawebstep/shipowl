@@ -112,39 +112,61 @@ export async function GET(req: NextRequest) {
         const token = product.shopifyStore.accessToken;
         const productIdPath = product.shopifyProductId?.split('/').pop();
 
+        // Validate product ID
         if (!shop || !token || !productIdPath || !/^\d+$/.test(productIdPath)) continue;
 
-        const productId = productIdPath;
+        const graphqlEndpoint = `https://${shop}/admin/api/${apiVersion}/graphql.json`;
+
+        const graphqlQuery = {
+          query: `
+                  query getProduct($id: ID!) {
+                    product(id: $id) {
+                      id
+                    }
+                  }
+                `,
+          variables: {
+            id: product.shopifyProductId
+          }
+        };
 
         try {
-          await axios.get(
-            `https://${shop}/admin/api/${apiVersion}/products/${productId}.json`,
-            {
-              headers: {
-                'X-Shopify-Access-Token': token,
-                'Content-Type': 'application/json',
-              },
+          const response = await axios.post(graphqlEndpoint, graphqlQuery, {
+            headers: {
+              'X-Shopify-Access-Token': token,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          // If product is null, consider it not found
+          if (!response.data?.data?.product) {
+            const deleteResult = await deleteDropshipperProduct(product.id);
+            if (deleteResult?.status) {
+              logMessage('info', `Deleted Shopify product & removed from system: ${product.id}`, {
+                mainDropshipperId,
+              });
+              deletedProductIds.push(product.id);
             }
-          );
+          }
         } catch (error) {
           if (axios.isAxiosError(error)) {
             const errorMsg = typeof error.response?.data?.errors === 'string'
               ? error.response.data.errors
               : JSON.stringify(error.response?.data?.errors || error.message);
 
-            if (errorMsg.toLowerCase() === 'not found') {
-              const deleteResult = await deleteDropshipperProduct(product.id);
-              if (deleteResult?.status) {
-                logMessage('info', `Deleted Shopify product & removed from system: ${product.id}`, { mainDropshipperId });
-                deletedProductIds.push(product.id);
-              }
-            }
+            logMessage('error', `GraphQL error while syncing product [${productIdPath}]: ${errorMsg}`, {
+              productId: product.id,
+              mainDropshipperId,
+            });
           } else {
-            logMessage('error', `Unexpected error syncing Shopify product [${productId}]`, { error });
+            logMessage('error', `Unexpected error syncing Shopify product [${productIdPath}]`, {
+              error,
+            });
           }
         }
       }
     }
+
 
     const finalProducts =
       deletedProductIds.length > 0
