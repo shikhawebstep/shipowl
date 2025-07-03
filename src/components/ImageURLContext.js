@@ -6,11 +6,11 @@ const ImageURLContext = createContext();
 
 export const ImageURLProvider = ({ children }) => {
   function fetchImages(rawUrl) {
-    const url = typeof rawUrl === 'string' ? rawUrl.trim() : '';
-
-    if (!url) {
+    if (!rawUrl) {
       return 'https://placehold.co/400';
     }
+
+    const url = typeof rawUrl === 'string' ? rawUrl.trim() : '';
 
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
