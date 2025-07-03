@@ -124,7 +124,7 @@ const CategorySection = () => {
                       {category.name}
                     </p>
                   </div>
-                </div>       
+                </div>
               ))}
             </div>
 

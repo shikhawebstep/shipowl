@@ -407,6 +407,8 @@ const handleSubmit = async (e) => {
         ))}
 
         {/* Move the Status dropdown outside the loop */}
+
+      </div>
         <div className="">
           <label className="block text-[#232323] font-bold mb-1">
             Status
@@ -423,11 +425,9 @@ const handleSubmit = async (e) => {
           </select>
         </div>
 
-      </div>
 
 
-
-      <div className="grid lg:grid-cols-3 md:grid-cols-2gap-4 mt-3">
+      <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4 mt-3">
         {["permanentCountry", "permanentState", "permanentCity"].map((field) => (
           <div key={field} className="relative">
             <label className="block text-[#232323] font-bold mb-1 capitalize">

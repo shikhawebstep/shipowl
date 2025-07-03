@@ -692,7 +692,7 @@ const BusinessInfo = () => {
               slidesPerView={2}
               loop={formData.companyPanCardImage?.split(',').length > 1}
               navigation={true}
-              className="mySwiper w-full lg:w-[300px] md:w-[200px] w-[60px] ms-2 md:h-[200px] h-[60px]"
+              className="mySwiper w-full lg:w-[300px] md:w-[200px]  ms-2 md:h-[200px] "
             >
               {formData.companyPanCardImage?.split(',').map((img, index) => (
                 <SwiperSlide key={index} className="relative gap-3">
