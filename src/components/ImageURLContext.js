@@ -5,7 +5,8 @@ import React, { createContext, useContext } from 'react';
 const ImageURLContext = createContext();
 
 export const ImageURLProvider = ({ children }) => {
-  function fetchImages(url) {
+  function fetchImages(rawUrl) {
+    const url = rawUrl.trim();
     if (!url || typeof url !== 'string') {
       return 'https://placehold.co/400';
     }

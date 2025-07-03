@@ -367,7 +367,7 @@ const handleSubmit = async (e) => {
               slidesPerView={2}
               loop={formData.image?.split(',').length > 1}
               navigation={true}
-              className="mySwiper w-full ms-2"
+              className="mySwiper w-full lg:w-[300px] md:w-[200px] w-[60px] ms-2 md:h-[200px] h-[60px]"
             >
               {formData.image?.split(',').map((img, index) => (
                 <SwiperSlide key={index} className="relative gap-3">
@@ -375,7 +375,7 @@ const handleSubmit = async (e) => {
                     src={fetchImages(img)} alt={`Image ${index + 1}`}
                     width={500}
                     height={500}
-                    className="me-3 p-2 object-cover rounded"
+                    className="me-3 p-2 object-cover h-full w-full rounded"
                   />
                 </SwiperSlide>
               ))}

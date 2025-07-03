@@ -210,34 +210,24 @@ export default function List() {
                                                                 <FaCheck className="peer-checked:block text-white w-3 h-3" />
                                                             </div>
 
-                                                            {item.image ? (<Swiper
+                                                            <Swiper
                                                                 key={item.id}
                                                                 modules={[Navigation]}
                                                                 slidesPerView={1}
                                                                 loop={item.image?.split(',').length > 1}
                                                                 navigation={true}
-                                                                className="mySwiper xl:w-[250px] md:w-[100px] w-[50px] ms-2"
-                                                            >
-                                                                {item.image?.split(',').map((img, index) => (
+                                                                className="mySwiper xl:w-[250px] md:w-[100px] md:h-[200px] w-[50px] ms-2 h-[50px]"  >                                                              {item.image?.split(',').map((img, index) => (
                                                                     <SwiperSlide key={index}>
                                                                         <Image
                                                                             src={fetchImages(img)}
                                                                             alt={`Image ${index + 1}`}
                                                                             width={200}
                                                                             height={200}
-                                                                            className="me-3 text-center object-cover rounded"
+                                                                            className="me-3 w-full h-full text-center object-cover rounded"
                                                                         />
                                                                     </SwiperSlide>
                                                                 ))}
-                                                            </Swiper>) : (
-                                                                <Image
-                                                                    src={`https://placehold.co/400`}
-                                                                    alt={`Image`}
-                                                                    width={200}
-                                                                    height={200}
-                                                                    className="me-3 w-[50px] md:w-full text-center object-cover rounded"
-                                                                />
-                                                            )}
+                                                            </Swiper>
 
                                                         </label>
                                                     </div>

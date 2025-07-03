@@ -409,7 +409,7 @@ const AccountInfo = () => {
                         alt={`Image ${imgIndex + 1}`}
                         width={500}
                         height={500}
-                        className="me-3 p-2 object-cover rounded"
+                        className="me-3 p-2 object-cover h-full w-full rounded"
                       />
                     </div>
                   </SwiperSlide>

@@ -105,23 +105,23 @@ export default function List() {
         const table = $('#categoryTable').DataTable();
         table.button('.buttons-csv').trigger();
     };
-   const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
 
-const hasPermission = (action) =>
-  !shouldCheckPermissions ||
-  extractedPermissions.some(
-    (perm) =>
-      perm.module === "Category" &&
-      perm.action === action &&
-      perm.status === true
-  );
+    const hasPermission = (action) =>
+        !shouldCheckPermissions ||
+        extractedPermissions.some(
+            (perm) =>
+                perm.module === "Category" &&
+                perm.action === action &&
+                perm.status === true
+        );
 
-const canViewTrashed = hasPermission("Trash Listing");
-const canAdd = hasPermission("Create");
-const canDelete = hasPermission("Permanent Delete");
-const canEdit = hasPermission("Update");
-const canSoftDelete = hasPermission("Soft Delete");
-const canRestore = hasPermission("Restore");
+    const canViewTrashed = hasPermission("Trash Listing");
+    const canAdd = hasPermission("Create");
+    const canDelete = hasPermission("Permanent Delete");
+    const canEdit = hasPermission("Update");
+    const canSoftDelete = hasPermission("Soft Delete");
+    const canRestore = hasPermission("Restore");
 
 
     return (
@@ -193,7 +193,7 @@ const canRestore = hasPermission("Restore");
                                 <tbody>
                                     {categoryData.map((item) => {
 
-                                      
+
 
                                         return (
                                             <tr
@@ -220,7 +220,7 @@ const canRestore = hasPermission("Restore");
                                                                     slidesPerView={1}
                                                                     loop={item.image?.split(",").length > 1}
                                                                     navigation={true}
-                                                                    className="mySwiper xl:w-[250px] md:w-[100px] w-[50px] ms-2"
+                                                                    className="mySwiper xl:w-[250px] md:w-[100px] md:h-[200px] w-[50px] ms-2 h-[50px]"
                                                                 >
                                                                     {item.image?.split(",").map((img, index) => (
                                                                         <SwiperSlide key={index}>
@@ -228,7 +228,7 @@ const canRestore = hasPermission("Restore");
                                                                                 src={fetchImages(img)} alt={`Image ${index + 1}`}
                                                                                 width={200}
                                                                                 height={200}
-                                                                                className="me-3 object-cover rounded"
+                                                                                className="me-3 h-full w-full object-cover rounded"
                                                                             />
                                                                         </SwiperSlide>
                                                                     ))}
@@ -238,8 +238,8 @@ const canRestore = hasPermission("Restore");
                                                     </div>
                                                 </td>
                                                 <td className="p-2 bg-transparent whitespace-nowrap border-0 pe-5">
-                                                      
-                                                        {item.name}
+
+                                                    {item.name}
                                                 </td>
 
                                                 <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
