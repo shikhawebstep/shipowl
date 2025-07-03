@@ -6,17 +6,16 @@ const ImageURLContext = createContext();
 
 export const ImageURLProvider = ({ children }) => {
   function fetchImages(rawUrl) {
-    const url = rawUrl.trim();
-    if (!url || typeof url !== 'string') {
+    const url = typeof rawUrl === 'string' ? rawUrl.trim() : '';
+
+    if (!url) {
       return 'https://placehold.co/400';
     }
 
-    // If it's already a valid absolute URL (http or https), return it
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
 
-    // If the URL contains 'tmp', transform it
     const splitPart = url.split('tmp');
 
     if (splitPart.length < 2) {
@@ -25,10 +24,8 @@ export const ImageURLProvider = ({ children }) => {
 
     let imagePath = splitPart[1].replace(/^\/+/, ''); // remove leading slashes
 
-    const finalURL = `https://sleeping-owl-we0m.onrender.com/api/images/tmp/${imagePath}`;
-    return finalURL;
+    return `https://sleeping-owl-we0m.onrender.com/api/images/tmp/${imagePath}`;
   }
-
 
   return (
     <ImageURLContext.Provider value={{ fetchImages }}>
