@@ -39,6 +39,7 @@ export default function ProductDetails() {
   const [variantDetails, setVariantDetails] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [productDetails, setProductDetails] = useState({});
+  const [dropshipperProduct, setDropshipperProduct] = useState({});
   const [loading, setLoading] = useState(false);
   const [shipCost, setShipCost] = useState([]);
   const [otherSuppliers, setOtherSuppliers] = useState([]);
@@ -57,16 +58,18 @@ export default function ProductDetails() {
     isVarientExists: '',
     shopifyStore: '',
   });
+  console.log('selectedImage', selectedImage)
 
   const [tooltipIndex, setTooltipIndex] = useState(null);
 
   const handleTooltipToggle = (index) => {
     setTooltipIndex(prev => (prev === index ? null : index));
   };
+  console.log('selectedVariant', selectedVariant)
   useEffect(() => {
     const images =
+      selectedVariant?.supplierProductVariant?.variant?.image?.split(",") ||
       selectedVariant?.variant?.image?.split(",") ||
-      selectedVariant?.image?.split(",") ||
       [];
 
     setSelectedImage(images[0] ?? "");
@@ -318,6 +321,7 @@ export default function ProductDetails() {
       }
       else {
         const ProductDataDrop = result?.dropshipperProduct;
+        setDropshipperProduct(ProductDataDrop || {});
         setProductDetails(ProductDataDrop?.product || {});
         const sortedVariants = (ProductDataDrop?.variants || []).slice().sort(
           (a, b) => a.price - b.price
@@ -1141,7 +1145,7 @@ export default function ProductDetails() {
                   )}
                   {canEditFromShopify && type !== 'notmy' && (
                     <button
-                      onClick={() => handleEdit(product.id)}
+                      onClick={() => window.open(`https://${dropshipperProduct.shopifyStore.shop}/admin/products/${dropshipperProduct.shopifyProductId?.split('/').pop()}`, '_blank')}
                       className="p-20 py-5 rounded-md mt-2 text-white md:text-sm text-xs bg-black hover:bg-gray-800 transition duration-300 ease-in-out hover:scale-[1.02]"
                     >
                       Edit From Shopify
@@ -1163,7 +1167,7 @@ export default function ProductDetails() {
                   }
                 }
               `}
-              </style>
+                </style>
               </div>
 
             </div>
@@ -1377,10 +1381,18 @@ export default function ProductDetails() {
         {relatedProducts.length === 0 ? (
           <p className="text-center font-bold text-3xl mt-8">No Related Products Found</p>
         ) : (
-          <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-2 md:gap-3 gap-2 xl:gap-10">
+          <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-2 md:gap-3 gap-2 xl:gap-3">
             {relatedProducts.map((item, index) => {
               const product = item.product || {};
               const variants = item.variants || [];
+
+              const firstVariantImageString =
+                variants[0]?.supplierProductVariant?.variant?.image || // case 1
+                variants[0]?.variant?.image ||                         // case 2
+                "";
+
+              const imageUrl = firstVariantImageString.split(",")[0]?.trim() || "/default-image.jpg";
+
               const prices = variants.map(v => v.price).filter(p => typeof p === "number");
               const lowestPrice = prices.length > 0 ? Math.min(...prices) : "-";
 
@@ -1396,7 +1408,7 @@ export default function ProductDetails() {
                       <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                         {/* FRONT */}
                         <Image
-                          src={fetchImages(item?.variants?.[0]?.variant?.image[0] || '')}
+                          src={fetchImages(imageUrl || '')}
                           alt={product.name}
                           height={200}
                           width={100}
@@ -1463,7 +1475,7 @@ export default function ProductDetails() {
 
                       {canEditFromShopify && activeTab === "my" && (
                         <button
-                          onClick={() => handleEdit(product.id)}
+                          onClick={() => window.open(`https://${item.shopifyStore.shop}/admin/products/${item.shopifyProductId?.split('/').pop()}`, '_blank')}
                           className="py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs  bg-black hover:bg-gray-800 transition duration-300 ease-in-out"
                         >
                           Edit From Shopify

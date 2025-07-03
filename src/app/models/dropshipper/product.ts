@@ -268,6 +268,7 @@ export const getProductsByFiltersAndStatus = async (
                     ...(filters.brandId ? { product: { brandId: filters.brandId } } : {}),
                 },
                 include: {
+                    shopifyStore: true,
                     product: {
                         include: {
                             category: true,
@@ -597,6 +598,7 @@ export const checkDropshipperProductForDropshipper = async (
                 dropshipperId,
             },
             include: {
+                shopifyStore: true,
                 product: true,
                 dropshipper: true,
                 variants: {

@@ -452,7 +452,7 @@ function ProductsByCategory() {
 
                   {activeTab === "my" && (
                     <button
-                      onClick={() => handleEdit(product.id)}
+                      onClick={() => window.open(`https://${product.shopifyStore.shop}/admin/products/${product.shopifyProductId?.split('/').pop()}`, '_blank')}
                       className="w-full py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs  bg-black hover:bg-gray-800 transition-colors duration-200"
                     >
                       Edit From Shopify
