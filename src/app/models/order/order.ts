@@ -729,22 +729,27 @@ export const getOrdersByStatusForSupplierReporting = async (
         const andConditions: Record<string, unknown>[] = [];
 
         if (isValidRange) {
-            if (status === "delivered") {
-                andConditions.push({
-                    deliveredDate: { gte: from, lte: to }
-                });
-            } else if (status === "RTO") {
-                andConditions.push({
-                    rtoDeliveredDate: { gte: from, lte: to }
-                });
-            } else if (status === "deliveredOrRto") {
-                andConditions.push({
-                    OR: [
-                        { deliveredDate: { gte: from, lte: to } },
-                        { rtoDeliveredDate: { gte: from, lte: to } }
-                    ]
-                });
-            }
+            andConditions.push({
+                createdAt: { gte: from, lte: to }
+            });
+            /*
+                if (status === "delivered") {
+                    andConditions.push({
+                        deliveredDate: { gte: from, lte: to }
+                    });
+                } else if (status === "RTO") {
+                    andConditions.push({
+                        rtoDeliveredDate: { gte: from, lte: to }
+                    });
+                } else if (status === "deliveredOrRto") {
+                    andConditions.push({
+                        OR: [
+                            { deliveredDate: { gte: from, lte: to } },
+                            { rtoDeliveredDate: { gte: from, lte: to } }
+                        ]
+                    });
+                }
+            */
         }
 
         // Supplier condition
@@ -835,16 +840,21 @@ export const getOrdersByTypeForSupplierReporting = async (
         const andConditions: Record<string, unknown>[] = [];
 
         if (isValidRange) {
-            if (type === "warehouseCollected") {
-                andConditions.push({
-                    collectedAtWarehouse: { gte: from, lte: to }
-                });
-            } else if (type === "rtoCount") {
-                andConditions.push({
-                    rtoDeliveredDate: { gte: from, lte: to }
-                });
-            }
-            // `needToRaise` has no date filter as per current logic
+            andConditions.push({
+                createdAt: { gte: from, lte: to }
+            });
+            /*
+                if (type === "warehouseCollected") {
+                    andConditions.push({
+                        collectedAtWarehouse: { gte: from, lte: to }
+                    });
+                } else if (type === "rtoCount") {
+                    andConditions.push({
+                        rtoDeliveredDate: { gte: from, lte: to }
+                    });
+                }
+                // `needToRaise` has no date filter as per current logic
+            */
         }
 
         // Add supplier-specific condition
