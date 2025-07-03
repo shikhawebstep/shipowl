@@ -81,16 +81,16 @@ useEffect(() => {
   };
 
   return (
-    <header className="md:flex items-center md:mt-16 mt-10 lg:mt-0 justify-between lg:py-7 px-3 p-2 pt-6">
-      <div className="md:w-4/12">
+    <header className="md:flex items-center md:mt-16 mt-10 lg:mt-0 justify-between lg:py-7 px-3 md:p-2 md:pt-6 mb-4 md:mb-0">
+      <div className="md:w-3/12 lg:w-4/12">
         <p className="text-sm text-[#707EAE]">Pages / {currentPage}</p>
         <h1 className="lg:text-4xl text-xl mt-3 font-bold text-[#2B3674]">
           {currentPage}
         </h1>
       </div>
 
-      <div className="flex items-center mt-5 md:mt-0 justify-end space-x-4 md:w-8/12">
-        <button className="bg-white hidden md:flex px-10 py-4 gap-8 rounded-full font-semibold text-[#2B3674] items-center space-x-2">
+      <div className="flex items-center mt-5 md:mt-0 justify-end space-x-4 lg:w-8/12 md:w-9/12">
+        <button className="bg-white hidden md:flex xl:px-10 p-4 py-4 gap-8 rounded-full font-semibold text-[#2B3674] items-center space-x-2">
           <span>07/26/2024</span>
           <span>
             <FaChevronDown />

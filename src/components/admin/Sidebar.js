@@ -144,15 +144,15 @@ export default function Sidebar() {
       {/* Backdrop */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-30 z-40 lg:hidden"
+          className="fixed inset-0 bg-[#0000007a] bg-opacity-30 z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         ></div>
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 w-72 md:w-full sidebar bg-white z-50 shadow-lg xl:h-screen lg:h-full rounded-lg transition-transform duration-300 ease-in-out 
-        ${isSidebarOpen ? "translate-x-0 h-[500px] overflow-auto" : "-translate-x-full"} 
+        className={`fixed top-0 left-0 w-72 lg:w-full sidebar bg-white z-50 shadow-lg xl:h-screen lg:h-full rounded-lg transition-transform duration-300 ease-in-out 
+        ${isSidebarOpen ? "translate-x-0 h-[500px] w-[300px] overflow-auto" : "-translate-x-full"} 
         lg:translate-x-0 lg:relative lg:h-full`}
       >
         <div className="flex items-center justify-between p-5 lg:justify-center border-b border-[#F4F7FE]">
@@ -183,7 +183,7 @@ export default function Sidebar() {
                   <Link href={section.href}>
                     <div
                       className={`font-medium flex gap-2 border-l-4 items-center w-full p-2 hover:border-orange-500 rounded-lg hover:bg-[#2C3454] hover:text-white
-                      ${pathname === section.href.concat('/') ? "bg-[#131a44de] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44dec9] text-[#2C3454]"}`}
+                      ${pathname === section.href ? "bg-[#131a44de] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44dec9] text-[#2C3454]"}`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
                       <section.icon className="w-4 h-4" />
@@ -228,7 +228,7 @@ export default function Sidebar() {
                             <Link href={subItem.href}>
                               <div
                                 className={`font-medium hover:border-orange-500 flex gap-2 border-l-4 items-center w-full p-2 rounded-lg hover:bg-[#2C3454] hover:text-white
-                                ${pathname === subItem.href.concat('/') ? "bg-[#131a44de] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44dec9] text-[#2C3454]"}`}
+                                ${pathname === subItem.href ? "bg-[#131a44de] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44dec9] text-[#2C3454]"}`}
                                 onClick={() => setIsSidebarOpen(false)}
                               >
                                 <subItem.icon className="w-4 h-4" />

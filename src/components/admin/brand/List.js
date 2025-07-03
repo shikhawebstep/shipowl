@@ -185,6 +185,7 @@ export default function List() {
                             <table id="brandTable" className="display main-tables">
                                 <thead>
                                     <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">Brand Image</th>
                                         <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">Brand Name</th>
                                         <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Description</th>
                                         <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Status</th>
@@ -208,13 +209,14 @@ export default function List() {
                                                             <div className="w-4 me-2 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
                                                                 <FaCheck className="peer-checked:block text-white w-3 h-3" />
                                                             </div>
+
                                                             {item.image ? (<Swiper
                                                                 key={item.id}
                                                                 modules={[Navigation]}
                                                                 slidesPerView={1}
                                                                 loop={item.image?.split(',').length > 1}
                                                                 navigation={true}
-                                                                className="mySwiper w-[250px] ms-2"
+                                                                className="mySwiper xl:w-[250px] md:w-[100px] w-[50px] ms-2"
                                                             >
                                                                 {item.image?.split(',').map((img, index) => (
                                                                     <SwiperSlide key={index}>
@@ -233,13 +235,16 @@ export default function List() {
                                                                     alt={`Image`}
                                                                     width={200}
                                                                     height={200}
-                                                                    className="me-3 text-center object-cover rounded"
+                                                                    className="me-3 w-[50px] md:w-full text-center object-cover rounded"
                                                                 />
                                                             )}
 
                                                         </label>
-                                                        {item.name}
                                                     </div>
+                                                </td>
+                                                <td className="p-2 bg-transparent whitespace-nowrap border-0 pe-5">
+
+                                                    {item.name}
                                                 </td>
 
                                                 <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">{item.description}</td>

@@ -223,7 +223,7 @@ export default function UnverifiedSupplier() {
   return (
     <>
       <div className='bg-white p-4 rounded-md'>
-        <h2 className='text-3xl text-center py-4 font-bold text-orange-500'>Unverified Suppliers List</h2>
+        <h2 className='md:text-3xl text-center py-4 font-bold text-orange-500'>Unverified Suppliers List</h2>
         {suppliers.length > 0 ? (
           <div className="overflow-x-auto w-full relative main-outer-wrapper">
             <table className="display main-tables w-full" id="unverifiedSupplierTable">

@@ -11,7 +11,7 @@ import { HashLoader } from 'react-spinners';
 import { LuArrowUpRight } from "react-icons/lu";
 import { FaTags } from "react-icons/fa";
 import { MdInventory } from "react-icons/md";
-import { Package, Boxes, Archive, Star, Tag, Truck, Weight, Banknote, ShieldCheck, RotateCcw, ArrowUpRight, ArrowLeft, Store, ChevronDown } from 'lucide-react';
+import { Package, Boxes, Archive, Star, Tag, Truck, Weight, Banknote, ShieldCheck, RotateCcw, FileText } from 'lucide-react';
 import { useImageURL } from "@/components/ImageURLContext";
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
 const tabs = [
@@ -20,6 +20,8 @@ const tabs = [
 ];
 const ProductDetails = () => {
   const { fetchImages } = useImageURL();
+  const [openDescriptionId, setOpenDescriptionId] = useState(null);
+
   const router = useRouter();
   const { hasPermission } = useSupplier();
   const searchParams = useSearchParams();
@@ -432,7 +434,7 @@ const ProductDetails = () => {
 
   return (
     <>
-      <section className="productsingal-page pb-[100px]">
+      <section className="productsingal-page ">
         <div className="container">
 
           <div className="mx-auto  gap-4 justify-between  rounded-lg flex flex-col md:flex-row">
@@ -456,19 +458,23 @@ const ProductDetails = () => {
                   modules={[Navigation]}
                   className="mt-4"
                 >
-                  {images.map((image, index) => (
-                    <SwiperSlide key={index}>
-                      <Image
-                        src={fetchImages(image)}
-                        alt={`Thumbnail ${index + 1}`}
-                        width={80}
-                        height={80}
-                        className={`w-20 h-20 object-cover cursor-pointer rounded-lg border-2 ${selectedImage === image ? "border-blue-500" : "border-gray-300"
-                          }`}
-                        onClick={() => setSelectedImage(image)}
-                      />
-                    </SwiperSlide>
-                  ))}
+                  {images.map((image, index) => {
+                    const trimmedImage = image.trim(); // ✅ Remove leading spaces
+                    return (
+                      <SwiperSlide key={index}>
+                        <Image
+                          src={fetchImages(trimmedImage)}
+                          alt={`Thumbnail ${index + 1}`}
+                          width={80}
+                          height={80}
+                          className={`w-20 h-20 object-cover cursor-pointer rounded-lg border-2 ${selectedImage === trimmedImage ? "border-blue-500" : "border-gray-300"
+                            }`}
+                          onClick={() => setSelectedImage(trimmedImage)}
+                        />
+                      </SwiperSlide>
+                    );
+                  })}
+
                 </Swiper>
               </div>
             </div>
@@ -832,7 +838,7 @@ const ProductDetails = () => {
                     </button>
 
                   )}
-                  {canUpdate && type !== "notmy" &&(
+                  {canUpdate && type !== "notmy" && (
                     <button onClick={() => {
                       setShowPopup(true);
                       setInventoryData({
@@ -861,7 +867,7 @@ const ProductDetails = () => {
         </div>
       </section>
       {showPopup && (
-        <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+        <div className="fixed inset-0 p-4 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
           <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
             <h2 className="text-2xl  flex justify-center gap-3 items-center text-center underline font-semibold mb-6 text-orange-500"><MdInventory /> Add To List</h2>
 
@@ -1028,8 +1034,27 @@ const ProductDetails = () => {
           </div>
         </div>
       )}
-
-      <section className="py-5 pb-20">
+      {openDescriptionId && (
+        <div className="fixed p-4 inset-0 z-50 m-auto flex items-center justify-center bg-black/50">
+          <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
+            <button
+              onClick={() => setOpenDescriptionId(null)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+            >
+              &times;
+            </button>
+            {openDescriptionId ? (
+              <div
+                className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                dangerouslySetInnerHTML={{ __html: openDescriptionId }}
+              />
+            ) : (
+              <p className="text-gray-500">NIL</p>
+            )}
+          </div>
+        </div>
+      )}
+      <section className="py-5 pb-[100px]">
         <div className="flex gap-4 bg-white rounded-md p-4 mb-8 font-lato text-sm">
           {tabs.map((tab) => (
             <button
@@ -1051,7 +1076,7 @@ const ProductDetails = () => {
         {relatedProducts.length === 0 ? (
           <p className="text-center font-bold text-3xl mt-8">No Related Products Found</p>
         ) : (
-          <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-2 md:gap-3 gap-2 xl:gap-10">
+          <div className="grid xl:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-3 productsSection">
             {relatedProducts.map((item, index) => {
               const product = type == "notmy" ? item : item || {};
               const variants = item.variants || [];
@@ -1071,7 +1096,7 @@ const ProductDetails = () => {
                 // Case 1: Only 1 model and 1 variant
                 if (modalKeys.length === 1 && modalMap[modalKeys[0]].length === 1) {
                   const price = modalMap[modalKeys[0]][0].suggested_price ?? modalMap[modalKeys[0]][0].price ?? 0;
-                  return <span>{modalKeys[0]}: ₹{price}</span>;
+                  return <span className="block text-sm text-gray-800">{modalKeys[0]}: ₹{price}</span>;
                 }
 
                 // Case 2: 1 model, multiple variants
@@ -1079,7 +1104,7 @@ const ProductDetails = () => {
                   const prices = modalMap[modalKeys[0]].map(v => v?.suggested_price ?? v?.price ?? 0);
                   const min = Math.min(...prices);
                   const max = Math.max(...prices);
-                  return <span>{modalKeys[0]}: ₹{min} - ₹{max}</span>;
+                  return <span className="block text-sm text-gray-800">{modalKeys[0]}: ₹{min} - ₹{max}</span>;
                 }
 
                 // Case 3 or 4: multiple models
@@ -1092,7 +1117,7 @@ const ProductDetails = () => {
                       const max = Math.max(...prices);
                       const priceLabel = (min === max) ? `₹${min}` : `₹${min} - ₹${max}`;
                       return (
-                        <span className='block' key={model}>
+                        <span className="block text-sm text-gray-800" key={model}>
                           {model}: {priceLabel}
                           {idx < modalKeys.length - 1 && <span className="mx-1"></span>}
                         </span>
@@ -1101,6 +1126,7 @@ const ProductDetails = () => {
                   </>
                 );
               };
+              console.log('item?.variants', item?.variants)
 
 
               return (
@@ -1111,16 +1137,24 @@ const ProductDetails = () => {
                 >
                   <div className="p-3">
                     {/* FLIP CARD */}
-                    <div className="relative md:h-[200px] h-[100px] perspective">
+                    <div className="relative h-[200px] perspective">
                       <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                         {/* FRONT */}
                         <Image
-                          src={fetchImages(item?.variants?.[0]?.variant?.image || item?.variants?.[0]?.image || '')}
+                          src={
+                            fetchImages(
+                              item?.variants?.[0]?.variant?.image?.split(',')[0].trim() ||
+                              item?.variants?.[0]?.image?.split(',')[0].trim() ||
+                              ''
+                            )
+                          }
                           alt={product.name}
                           height={200}
                           width={100}
-                          className="w-full h-full  object-cover backface-hidden"
+                          className="w-full h-full object-cover backface-hidden"
                         />
+
+
                         {/* BACK */}
                         <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
                           <span className="text-sm">Back View</span>
@@ -1138,22 +1172,34 @@ const ProductDetails = () => {
                       {product.name}
                     </p>
 
-                    <div className="flex items-center gap-2">
-                      <Tag size={16} />
-                      <span>SKU: {product?.main_sku || "-"}</span>
+                    <div className="flex mt-2 items-center gap-2">
+                      <FileText size={16} />
+                      <span className='text-sm'>
+                        <button
+                          onClick={() => setOpenDescriptionId(product.description)}
+                          className="text-blue-600"
+                        >
+                          View Description
+                        </button>
+
+                      </span>
+                    </div>
+                    <div className="flex my-1 items-center gap-2">
+                      <Tag size={14} />
+                      <span className='text-sm'>SKU: {product?.main_sku || "-"}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <Truck size={16} />
-                      <span>Shipping Time: {product?.shipping_time || "-"}</span>
+                      <Truck size={14} />
+                      <span className='text-sm'>Shipping Time: {product?.shipping_time || "-"}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-gray-700">
-                      <span>{variants?.rating || 4.3}</span>
+                    <div className="flex mt-2 items-center gap-1 text-sm text-gray-700">
+                      <span>{product.variants?.rating || 4.3}</span>
                       <div className="flex gap-[1px] text-orange-500">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-4 h-4 fill-current ${i < Math.round(variants?.rating || 4.3)
+                            className={`w-4 h-4 fill-current ${i < Math.round(product.variants?.rating || 4.3)
                               ? 'fill-orange-500'
                               : 'fill-gray-300'
                               }`}
@@ -1162,6 +1208,7 @@ const ProductDetails = () => {
                       </div>
                       <span className="ml-1 text-gray-500">4,800</span>
                     </div>
+
 
                     {/* SLIDE-IN BUTTON PANEL */}
                     <div
@@ -1191,7 +1238,7 @@ const ProductDetails = () => {
                         </button>
                       )}
 
-                     {canUpdate && activeTab === "my" && (
+                      {canUpdate && activeTab === "my" && (
                         <button
                           onClick={() => {
                             setShowPopup(true);

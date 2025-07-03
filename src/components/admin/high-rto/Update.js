@@ -335,9 +335,9 @@ export default function Update() {
         </div>
 
         <div className="flex gap-3 mt-5">
-          <button type="submit" className="bg-orange-500 text-white px-10 rounded-md p-3">Save</button>
-          <button type="button" className="bg-gray-500 text-white px-10 rounded-md p-3" onClick={() => router.back()}>Cancel</button>
-          <button type="button" className="bg-blue-600 text-white px-10 rounded-md p-3" onClick={() => setShowBulkForm(prev => !prev)}>Bulk Upload</button>
+          <button type="submit" className="bg-orange-500 text-white md:px-10 rounded-md p-3 px-3">Save</button>
+          <button type="button" className="bg-gray-500 text-white md:px-10 rounded-md p-3 px-3" onClick={() => router.back()}>Cancel</button>
+          <button type="button" className="bg-blue-600 text-white md:px-10 rounded-md p-3 px-3" onClick={() => setShowBulkForm(prev => !prev)}>Bulk Upload</button>
         </div>
       </form>
 

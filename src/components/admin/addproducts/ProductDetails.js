@@ -376,7 +376,7 @@ export default function ProductDetails() {
       <div className="flex flex-wrap gap-4 mt-6">
         <button
           onClick={handleSubmit}
-          className="bg-orange-500 text-white px-14 py-2 rounded-md"
+          className="bg-orange-500 text-white md:px-14 py-2 rounded-md px-6"
         >
           Next
         </button>

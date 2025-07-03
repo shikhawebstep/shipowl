@@ -422,9 +422,15 @@ const NewlyLaunched = () => {
               {products.map((product, index) => {
 
                 const productName = product?.product?.name || "NIL";
-                const variants = product?.variants || product?.variants?.supplierProductVariant || [];
-                const firstVariantImageString = variants[0]?.variant?.image || "";
+                const variants = product?.variants || [];
+
+                const firstVariantImageString =
+                  variants[0]?.supplierProductVariant?.variant?.image || // case 1
+                  variants[0]?.variant?.image ||                         // case 2
+                  "";
+
                 const imageUrl = firstVariantImageString.split(",")[0]?.trim() || "/default-image.jpg";
+
 
 
                 return (
@@ -434,7 +440,7 @@ const NewlyLaunched = () => {
                     className="bg-white focus-within:z-10 rounded-xl group overflow-hidden cursor-pointer shadow-sm relative transition-transform duration-300 hover:shadow-lg hover:scale-[1.02] outline-none"
                   >
                     {/* FLIP CARD */}
-                    <div onClick={() => viewProduct(product.id)} className={`relative md:h-[200px] h-[150px] perspective ${showVariantPopup === true ? 'z-20' : 'z-40'}`}>
+                    <div onClick={() => viewProduct(product.id)} className={`relative h-[200px]  perspective ${showVariantPopup === true ? 'z-20' : 'z-40'}`}>
                       <div className="relative overflow-hidden w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                         {/* FRONT */}
                         <Image
@@ -536,7 +542,7 @@ const NewlyLaunched = () => {
                         View Variants
                       </button>
 
-                         {canEditFromShopify && activeTab === "my" && (
+                      {canEditFromShopify && activeTab === "my" && (
                         <button
                           onClick={() => handleEdit(product.id)}
                           className="w-full py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs  bg-black hover:bg-gray-800 transition-colors duration-200"

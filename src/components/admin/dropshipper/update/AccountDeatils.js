@@ -7,7 +7,7 @@ import { DropshipperProfileContext } from '../DropshipperProfileContext';
 import { useImageURL } from "@/components/ImageURLContext";
 
 const AccountDetails = () => {
-  const { formData, setFormData, setFiles, errors, setErrors, validate, setActiveTab } = useContext(DropshipperProfileContext);
+  const { formData, setFormData, setFiles, errors, setErrors, validate2, setActiveTab } = useContext(DropshipperProfileContext);
   const [previewUrl, setPreviewUrl] = useState(null);
   const { fetchImages } = useImageURL();
   const handleChange = (e) => {
@@ -44,7 +44,7 @@ const AccountDetails = () => {
   };
 
   const handleSubmit = () => {
-    if (validate()) {
+    if (validate2()) {
       setActiveTab('address_details');
     }
   };
@@ -61,6 +61,7 @@ const AccountDetails = () => {
     setErrors({});
   };
 
+  console.log('errors',errors)
   return (
     <div className='md:flex gap-4 xl:w-10/12 py-10 bg-white rounded-tl-none rounded-tr-none p-3 xl:p-10 rounded-2xl'>
       <div className='md:w-2/12'>

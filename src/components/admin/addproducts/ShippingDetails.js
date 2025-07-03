@@ -188,7 +188,7 @@ export default function ShippingDetails() {
         </div>
 
         <div className="flex flex-wrap gap-4">
-          <button type="submit" className="bg-orange-500 text-white px-14 py-2 rounded-md">
+          <button type="submit" className="bg-orange-500 text-white md:px-14 py-2 rounded-md px-6">
             Next
           </button>
           <button

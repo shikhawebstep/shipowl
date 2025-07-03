@@ -121,7 +121,7 @@ function OrderPermission() {
                 <div>
                     {permissions.length > 0 ? (
                         permissions.map((perm) => (
-                            <div key={perm.id} className="mb-6 w-6/12 bg-white rounded-md p-4">
+                            <div key={perm.id} className="mb-6 md:w-6/12 bg-white rounded-md p-4">
                                 <h4 className="font-semibold mb-2">Permission ID: {perm.id}</h4>
                                 <table className="w-full border rounded-md border-[#E0E5F2] mb-4">
                                     <thead className="bg-gray-100">

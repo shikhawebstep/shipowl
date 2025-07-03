@@ -673,7 +673,7 @@ const BusinessInfo = () => {
         </div>
         <div className="mt-6">
           <div className="mb-4">
-            {renderLabel('Upload companyPanCardImage ', 'companyPanCardImage')}
+            {renderLabel('Upload company PanCard Image ', 'companyPanCardImage')}
             <input
               type="file"
               name="companyPanCardImage"
@@ -754,133 +754,114 @@ const BusinessInfo = () => {
           </div>
         ))}
       </div>
-      <div className="grid md:grid-cols-2 py-5 gap-3">
+      <div className="grid md:grid-cols-2 py-5 gap-3 w-full overflow-auto">
         {/* PAN Card Image Upload */}
-        <div>
-          {renderLabel('Upload PAN card image', 'panCardImage')}
-          <input
-            type="file"
-            name="panCardImage"
-            multiple
-            onChange={handleChange}
-            className={inputClasses('panCardImage')}
-          />
-          {renderError('panCardImage')}
+        <div className='w-full '> 
           <div className="py-6">
-            {formData.panCardImage?.length > 0 && (
-              <div className="mt-2">
-                <Swiper
-                  key={formData.id}
-                  modules={[Navigation]}
-                  slidesPerView={2}
-                  loop={(formData.panCardImage || '').split(',').length > 1}
-                  navigation={true}
-                  className="mySwiper w-full ms-2"
-                >
-                  {(formData.panCardImage || '').split(',').map((img, index) => (
-                    <SwiperSlide key={index} className="relative gap-3">
-                      {/* Delete Button */}
-                      <button
-                        type="button"
-                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
-                        onClick={() => {
-                          Swal.fire({
-                            title: 'Are you sure?',
-                            text: `Do you want to delete this image?`,
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#d33',
-                            cancelButtonColor: '#3085d6',
-                            confirmButtonText: 'Yes, delete it!'
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              handleImageDelete(index, 'panCardImage'); // Call your delete function
-                            }
-                          });
-                        }}
-                      >
-                        ✕
-                      </button>
-                      {/* Image */}
-                      <Image
-                        src={fetchImages(img)}
-                        alt={`Image ${index + 1}`}
-                        width={500}
-                        height={500}
-                        className="me-3 p-2 object-cover rounded"
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              </div>
-            )}
-
+            {renderLabel('Upload PAN card image', 'panCardImage')}
+            <input
+              type="file"
+              name="panCardImage"
+              multiple
+              onChange={handleChange}
+              className={inputClasses('panCardImage')}
+            />
+            {renderError('panCardImage')}
           </div>
+
+          {formData.panCardImage?.length > 0 && (
+            <div className="flex gap-3 overflow-auto py-2 w-full">
+              {(formData.panCardImage || '').split(',').map((img, index) => (
+                <div key={index} className="relative min-w-[200px]">
+                  {/* Delete Button */}
+                  <button
+                    type="button"
+                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                    onClick={() => {
+                      Swal.fire({
+                        title: 'Are you sure?',
+                        text: `Do you want to delete this image?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          handleImageDelete(index, 'panCardImage');
+                        }
+                      });
+                    }}
+                  >
+                    ✕
+                  </button>
+                  <Image
+                    src={fetchImages(img)}
+                    alt={`Image ${index + 1}`}
+                    width={200}
+                    height={200}
+                    className="p-2 object-cover rounded"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Aadhar Card Image Upload */}
-        <div>
-          {renderLabel('Upload Aadhar card image', 'aadharCardImage')}
-          <input
-            type="file"
-            name="aadharCardImage"
-            multiple
-            onChange={handleChange}
-            className={inputClasses('aadharCardImage')}
-          />
-          {renderError('aadharCardImage')}
-          <div className="py-6">
-            <div className="mt-2">
-              {formData?.aadharCardImage?.length > 0 && (
-
-                <Swiper
-                  key={formData.id}
-                  modules={[Navigation]}
-                  slidesPerView={2}
-                  loop={formData.aadharCardImage?.split(',').length > 1}
-                  navigation={true}
-                  className="mySwiper w-full ms-2"
-                >
-                  {formData.aadharCardImage?.split(',').map((img, index) => (
-                    <SwiperSlide key={index} className="relative gap-3">
-                      {/* Delete Button */}
-                      <button
-                        type="button"
-                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
-                        onClick={() => {
-                          Swal.fire({
-                            title: 'Are you sure?',
-                            text: `Do you want to delete this image?`,
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#d33',
-                            cancelButtonColor: '#3085d6',
-                            confirmButtonText: 'Yes, delete it!'
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              handleImageDelete(index, 'aadharCardImage'); // Call your delete function
-                            }
-                          });
-                        }}
-                      >
-                        ✕
-                      </button>
-                      {/* Image */}
-                      <Image
-                        src={fetchImages(img)}
-                        alt={`Image ${index + 1}`}
-                        width={500}
-                        height={500}
-                        className="me-3 p-2 object-cover rounded"
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              )}
-            </div>
+        <div className="py-6">
+          <div className="mt-2">
+            {renderLabel('Upload Aadhar card image', 'aadharCardImage')}
+            <input
+              type="file"
+              name="aadharCardImage"
+              multiple
+              onChange={handleChange}
+              className={inputClasses('aadharCardImage')}
+            />
+            {renderError('aadharCardImage')}
           </div>
+
+          {formData?.aadharCardImage?.length > 0 && (
+            <div className="flex gap-3 overflow-auto py-2 w-full">
+              {(formData.aadharCardImage || '').split(',').map((img, index) => (
+                <div key={index} className="relative min-w-[200px]">
+                  {/* Delete Button */}
+                  <button
+                    type="button"
+                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                    onClick={() => {
+                      Swal.fire({
+                        title: 'Are you sure?',
+                        text: `Do you want to delete this image?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          handleImageDelete(index, 'aadharCardImage');
+                        }
+                      });
+                    }}
+                  >
+                    ✕
+                  </button>
+                  <Image
+                    src={fetchImages(img)}
+                    alt={`Image ${index + 1}`}
+                    width={200}
+                    height={200}
+                    className="p-2 object-cover rounded"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
+
 
 
       {/* Additional Documents */}
@@ -888,25 +869,27 @@ const BusinessInfo = () => {
         Additional Supporting Document
       </h3>
 
-      <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 pt-3">
+      <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 pt-3 w-full overflow-auto">
         {/* Other fields */}
         {[
           { label: 'Document ID', name: 'documentId' },
           { label: 'Name of document', name: 'documentName' }
         ].map(({ label, name, type = 'text' }) => (
-          <div key={name}>
+          <div key={name} className=' w-full overflow -auto'>
             {renderLabel(label, name)}
             <input
               type={type}
               name={name}
-              {...(type === 'file' ? { multiple: true, onChange: handleChange } : { value: formData[name] || '', onChange: handleChange })}
+              {...(type === 'file'
+                ? { multiple: true, onChange: handleChange }
+                : { value: formData[name] || '', onChange: handleChange })}
               className={inputClasses(name)}
             />
           </div>
         ))}
 
-        {/* Document to upload with Swiper preview */}
-        <div>
+        {/* Additional Document Upload */}
+        <div className="py-6 col-span-2 w-full overflow -auto">
           {renderLabel('Document to upload', 'additionalDocumentUpload')}
           <input
             type="file"
@@ -916,60 +899,47 @@ const BusinessInfo = () => {
             className={inputClasses('additionalDocumentUpload')}
           />
 
-          <div className="py-6">
-            {formData?.additionalDocumentUpload?.length > 0 && (
-              <div className="mt-2">
-                <Swiper
-                  key={formData.id}
-                  modules={[Navigation]}
-                  slidesPerView={2}
-                  loop={formData.additionalDocumentUpload?.split(',').length > 1}
-                  navigation={true}
-                  className="mySwiper w-full ms-2"
-                >
-                  {formData.additionalDocumentUpload?.split(',').map((img, index) => (
-                    <SwiperSlide key={index} className="relative gap-3">
-                      {/* Delete Button */}
-                      <button
-                        type="button"
-                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
-                        onClick={() => {
-                          Swal.fire({
-                            title: 'Are you sure?',
-                            text: `Do you want to delete this image?`,
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#d33',
-                            cancelButtonColor: '#3085d6',
-                            confirmButtonText: 'Yes, delete it!'
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              handleImageDelete(index, 'additionalDocumentUpload'); // Call your delete function
-                            }
-                          });
-                        }}
-                      >
-                        ✕
-                      </button>
-                      {/* Image */}
-                      <Image
-                        src={fetchImages(img)}
-                        alt={`Image ${index + 1}`}
-                        width={500}
-                        height={500}
-                        className="me-3 p-2 object-cover rounded"
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              </div>
-
-            )}
-          </div>
+          {formData?.additionalDocumentUpload?.length > 0 && (
+            <div className="flex gap-3 overflow-auto py-2 w-full">
+              {formData.additionalDocumentUpload.split(',').map((img, index) => (
+                <div key={index} className="relative min-w-[200px]">
+                  {/* Delete Button */}
+                  <button
+                    type="button"
+                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                    onClick={() => {
+                      Swal.fire({
+                        title: 'Are you sure?',
+                        text: `Do you want to delete this image?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          handleImageDelete(index, 'additionalDocumentUpload');
+                        }
+                      });
+                    }}
+                  >
+                    ✕
+                  </button>
+                  <Image
+                    src={fetchImages(img)}
+                    alt={`Image ${index + 1}`}
+                    width={200}
+                    height={200}
+                    className="p-2 object-cover rounded"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Document Image */}
-        <div>
+        {/* Document Image Upload */}
+        <div className="py-6 col-span-2 w-full overflow -auto">
           {renderLabel('Document Image', 'documentImage')}
           <input
             type="file"
@@ -979,58 +949,46 @@ const BusinessInfo = () => {
             className={inputClasses('documentImage')}
           />
 
-          <div className="py-6">
-            {formData?.documentImage?.length > 0 && (
-
-              <div className="mt-2">
-                <Swiper
-                  key={formData.id}
-                  modules={[Navigation]}
-                  slidesPerView={2}
-                  loop={formData.documentImage?.split(',').length > 1}
-                  navigation={true}
-                  className="mySwiper w-full ms-2"
-                >
-                  {formData.documentImage?.split(',').map((img, index) => (
-                    <SwiperSlide key={index} className="relative gap-3">
-                      {/* Delete Button */}
-                      <button
-                        type="button"
-                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
-                        onClick={() => {
-                          Swal.fire({
-                            title: 'Are you sure?',
-                            text: `Do you want to delete this image?`,
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#d33',
-                            cancelButtonColor: '#3085d6',
-                            confirmButtonText: 'Yes, delete it!'
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              handleImageDelete(index, 'documentImage'); // Call your delete function
-                            }
-                          });
-                        }}
-                      >
-                        ✕
-                      </button>
-                      {/* Image */}
-                      <Image
-                        src={fetchImages(img)}
-                        alt={`Image ${index + 1}`}
-                        width={500}
-                        height={500}
-                        className="me-3 p-2 object-cover rounded"
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              </div>
-            )}
-          </div>
+          {formData?.documentImage?.length > 0 && (
+            <div className="flex gap-3 overflow-auto py-2 w-full">
+              {formData.documentImage.split(',').map((img, index) => (
+                <div key={index} className="relative min-w-[200px]">
+                  {/* Delete Button */}
+                  <button
+                    type="button"
+                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                    onClick={() => {
+                      Swal.fire({
+                        title: 'Are you sure?',
+                        text: `Do you want to delete this image?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          handleImageDelete(index, 'documentImage');
+                        }
+                      });
+                    }}
+                  >
+                    ✕
+                  </button>
+                  <Image
+                    src={fetchImages(img)}
+                    alt={`Image ${index + 1}`}
+                    width={200}
+                    height={200}
+                    className="p-2 object-cover rounded"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
+
 
       <div className="py-5">
         <button type="submit" className="px-5 p-2 bg-[#FF702C] text-white py-3 rounded-xl">

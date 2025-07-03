@@ -135,9 +135,9 @@ export default function Login() {
     return (
         <div className="md:flex h-screen w-full">
             {/* Left Section */}
-            <div className="md:w-1/2 relative md:flex md:flex-col justify-center items-center px-3 bg-white lg:px-12">
+            <div className="md:w-1/2 relative md:flex md:flex-col justify-center items-center md:px-3 p-4 rounded-md bg-white lg:px-12">
                 <div className="w-full max-w-sm">
-                    <div className="absolute top-7">
+                    <div className="md:absolute top-7">
                         <Link href="/admin" className="text-[#A3AED0] text-sm mb-6 inline-block">
                             ← Back to dashboard
                         </Link>

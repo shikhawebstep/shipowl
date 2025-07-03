@@ -223,7 +223,7 @@ export default function OtherDetails() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-orange-500 text-white px-14 py-2 rounded-md"
+            className="bg-orange-500 text-white md:px-14 py-2 rounded-md px-6"
           >
             {loading ? 'Saving...' : 'Save'}
           </button>

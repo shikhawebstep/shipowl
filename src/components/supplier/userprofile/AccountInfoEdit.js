@@ -330,8 +330,8 @@ const AccountInfoEdit = () => {
 
     return (
         <div className="bg-white lg:p-10 p-3  rounded-2xl">
-            <div className="grid lg:grid-cols-3 grid-cols-1  gap-4 py-5">
-                <div>
+            <div className="md:grid lg:grid-cols-3 grid-cols-1  gap-4 py-5">
+                <div className='mb-1'>
                     <label className="block text-[#232323] font-bold mb-1">
                         Account Holder Name <span className="text-red-500">*</span>
                     </label>
@@ -349,7 +349,7 @@ const AccountInfoEdit = () => {
                 </div>
 
                 {/* Account Number */}
-                <div>
+                <div className='mb-1'>
                     <label className="block text-[#232323] font-bold mb-1">
                         Account Number <span className="text-red-500">*</span>
                     </label>
@@ -367,7 +367,7 @@ const AccountInfoEdit = () => {
                 </div>
 
                 {/* Bank Name */}
-                <div>
+                <div className='mb-1'>
                     <label className="block text-[#232323] font-bold mb-1">
                         Bank Name <span className="text-red-500">*</span>
                     </label>
@@ -385,7 +385,7 @@ const AccountInfoEdit = () => {
                 </div>
 
                 {/* Bank Branch */}
-                <div>
+                <div className='mb-1'>
                     <label className="block text-[#232323] font-bold mb-1">
                         Bank Branch <span className="text-red-500">*</span>
                     </label>
@@ -403,7 +403,7 @@ const AccountInfoEdit = () => {
                 </div>
 
                 {/* IFSC Code */}
-                <div>
+                <div className='mb-1'>
                     <label className="block text-[#232323] font-bold mb-1">
                         IFSC Code <span className="text-red-500">*</span>
                     </label>
@@ -421,7 +421,7 @@ const AccountInfoEdit = () => {
                 </div>
 
                 {/* Account Type */}
-                <div>
+                <div className='mb-1'>
                     <label className="block text-[#232323] font-bold mb-1">
                         Account Type <span className="text-red-500">*</span>
                     </label>

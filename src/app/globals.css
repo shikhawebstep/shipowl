@@ -385,11 +385,12 @@ button.dt-paging-button {
 }
 
 .profilePage p {
-  font-size: 17px;
-  padding: 3px 0;
+    font-size: 17px;
+    padding: 3px 0;
+    line-break: anywhere;
 }
 
-@media(min-width:450px) and (max-width:700px) {
+@media(min-width:430px) and (max-width:700px) {
   .productsSection {
     grid-template-columns: repeat(2, 48%);
   }

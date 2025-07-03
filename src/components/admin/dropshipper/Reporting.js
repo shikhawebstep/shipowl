@@ -189,86 +189,91 @@ function Reporting() {
                             </table>
 
                         </div>
-                         <h2 className="text-2xl font-bold pt-5 text-center">Orders Details</h2>
-                        <div className="overflow-x-auto p-4 mt-5 bg-white rounded-xl shadow-[0_2px_8px_0_rgba(0,0,0,0.1)] border border-gray-200">
+                        <h2 className="text-2xl font-bold pt-5 text-center">Orders Details</h2>
+                        {orders.length > 0 ? (
+                            <div className="overflow-x-auto p-4 mt-5 bg-white rounded-xl shadow-[0_2px_8px_0_rgba(0,0,0,0.1)] border border-gray-200">
 
-                            <table className="min-w-full ">
-                                <thead className="uppercase text-gray-700">
-                                    <tr className=" border-b border-[#DFEAF2]">
-                                        <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Order #</th>
-                                        <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Status</th>
-                                        <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Customer</th>
-                                        <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Total (INR)</th>
-                                        <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Tax</th>
-                                        <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Payment Transaction Id</th>
-                                        <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Payment Status</th>
-                                        <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y  bg-white">
-                                    {orders.map((order) => (
-                                        <tr key={order.id} className=" border-b border-[#DFEAF2]">
-                                            <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">{order.orderNumber}</td>
-                                            <td className="px-4 py-2 text-sm whitespace-nowrap text-yellow-600 capitalize">{order.status}</td>
-                                            <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">{order.shippingName}</td>
-                                            <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">₹{order.totalAmount}</td>
-                                            <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">₹{order.tax}</td>
-                                            <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800 text-center">{order.payment?.transactionId}</td>
-                                            <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800 text-center">{order.payment?.status}</td>
-                                            <td className="px-4 py-2 text-sm whitespace-nowrap text-center">
-                                                <button
-                                                    onClick={() => handleViewVariants(order.items)}
-                                                    className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600"
-                                                >
-                                                    View Variants
-                                                </button>
-                                            </td>
+                                <table className="min-w-full ">
+                                    <thead className="uppercase text-gray-700">
+                                        <tr className=" border-b border-[#DFEAF2]">
+                                            <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Order #</th>
+                                            <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Status</th>
+                                            <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Customer</th>
+                                            <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Total (INR)</th>
+                                            <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Tax</th>
+                                            <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Payment Transaction Id</th>
+                                            <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Payment Status</th>
+                                            <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Actions</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y  bg-white">
+                                        {orders.map((order) => (
+                                            <tr key={order.id} className=" border-b border-[#DFEAF2]">
+                                                <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">{order.orderNumber}</td>
+                                                <td className="px-4 py-2 text-sm whitespace-nowrap text-yellow-600 capitalize">{order.status}</td>
+                                                <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">{order.shippingName}</td>
+                                                <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">₹{order.totalAmount}</td>
+                                                <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">₹{order.tax}</td>
+                                                <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800 text-center">{order.payment?.transactionId}</td>
+                                                <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800 text-center">{order.payment?.status}</td>
+                                                <td className="px-4 py-2 text-sm whitespace-nowrap text-center">
+                                                    <button
+                                                        onClick={() => handleViewVariants(order.items)}
+                                                        className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600"
+                                                    >
+                                                        View Variants
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
 
 
-                            {/* Model */}
-                            {showModal && (
-                                <div className="fixed inset-0 flex items-center justify-center bg-[#000000ba] bg-opacity-50 z-50">
-                                    <div className="bg-white w-full max-w-3xl border-2 border-orange-500 p-6 rounded-md shadow-lg relative">
-                                        <button
-                                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-                                            onClick={() => setShowModal(false)}
-                                        >
-                                            ✕
-                                        </button>
-                                        <h2 className="text-xl font-semibold mb-4">Product Variants</h2>
-                                        <div className="grid grid-cols-1 lg:grid-cols-3 sm:grid-cols-2 gap-4">
-                                            {selectedVariants.map((variant, idx) => (
-                                                <div key={idx} className="border hover:border-orange-400 border-[#DFEAF2] p-4 rounded-md shadow-sm">
-                                                    <div className="flex gap-2 mb-2 overflow-x-auto">
-                                                        {(variant.image || '')
-                                                            .split(',')
-                                                            .filter((img) => img.trim() !== '')
-                                                            .map((imgUrl, imgIdx) => (
-                                                                <img
-                                                                    key={imgIdx}
-                                                                    src={imgUrl.trim()}
-                                                                    alt={`Variant ${idx} `}
-                                                                    className="h-24 w-24 object-cover rounded border border-[#DFEAF2]"
-                                                                />
-                                                            ))}
+                                {/* Model */}
+                                {showModal && (
+                                    <div className="fixed inset-0 flex items-center justify-center bg-[#000000ba] bg-opacity-50 z-50">
+                                        <div className="bg-white w-full max-w-3xl border-2 border-orange-500 p-6 rounded-md shadow-lg relative">
+                                            <button
+                                                className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+                                                onClick={() => setShowModal(false)}
+                                            >
+                                                ✕
+                                            </button>
+                                            <h2 className="text-xl font-semibold mb-4">Product Variants</h2>
+                                            <div className="grid grid-cols-1 lg:grid-cols-3 sm:grid-cols-2 gap-4">
+                                                {selectedVariants.map((variant, idx) => (
+                                                    <div key={idx} className="border hover:border-orange-400 border-[#DFEAF2] p-4 rounded-md shadow-sm">
+                                                        <div className="flex gap-2 mb-2 overflow-x-auto">
+                                                            {(variant.image || '')
+                                                                .split(',')
+                                                                .filter((img) => img.trim() !== '')
+                                                                .map((imgUrl, imgIdx) => (
+                                                                    <img
+                                                                        key={imgIdx}
+                                                                        src={imgUrl.trim()}
+                                                                        alt={`Variant ${idx} `}
+                                                                        className="h-24 w-24 object-cover rounded border border-[#DFEAF2]"
+                                                                    />
+                                                                ))}
+                                                        </div>
+                                                        <p><strong>Name:</strong> {variant.name}</p>
+                                                        <p><strong>Color:</strong> {variant.color}</p>
+                                                        <p><strong>Model:</strong> {variant.model}</p>
+                                                        <p><strong>SKU:</strong> {variant.sku}</p>
+                                                        <p><strong>Suggested Price:</strong> ₹{variant.suggested_price}</p>
                                                     </div>
-                                                    <p><strong>Name:</strong> {variant.name}</p>
-                                                    <p><strong>Color:</strong> {variant.color}</p>
-                                                    <p><strong>Model:</strong> {variant.model}</p>
-                                                    <p><strong>SKU:</strong> {variant.sku}</p>
-                                                    <p><strong>Suggested Price:</strong> ₹{variant.suggested_price}</p>
-                                                </div>
-                                            ))}
+                                                ))}
 
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
+                                )}
+                            </div>
+                        ) : (
+                           <p className="text-center text-gray-500 p-5">No Orders Found</p>
+                        )
+                        }
                     </>
                 ) : (
                     <p className="text-center text-gray-500">No Orders Found</p>

@@ -17,7 +17,7 @@ export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
-    const { verifyAdminAuth } = useAdmin();
+    const { verifyAdminAuth, isAdminStaff, extractedPermissions } = useAdmin();
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("courier-company", "courierCompanies");
 
@@ -67,18 +67,29 @@ export default function List() {
                 window.jQuery = window.$ = jQuery.default;
 
                 // Destroy existing DataTable if it exists
-                if ($.fn.DataTable.isDataTable('#courier-companytable')) {
-                    $('#courier-companytable').DataTable().destroy();
-                    $('#courier-companytable').empty();
+                if ($.fn.DataTable.isDataTable('#courierCompanytable')) {
+                    $('#courierCompanytable').DataTable().destroy();
+                    $('#courierCompanytable').empty();
                 }
 
                 // Reinitialize DataTable with new data
-                table = $('#courier-companytable').DataTable();
+                const isMobile = window.innerWidth <= 768;
+                const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+                table = $('#courierCompanytable').DataTable({
+                    pagingType,
+                    language: {
+                        paginate: {
+                            previous: "<",
+                            next: ">"
+                        }
+                    }
+                });
 
                 return () => {
                     if (table) {
                         table.destroy();
-                        $('#courier-companytable').empty();
+                        $('#courierCompanytable').empty();
                     }
                 };
             }).catch((error) => {
@@ -95,6 +106,7 @@ export default function List() {
             </div>
         );
     }
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
 
     const hasPermission = (action) =>
         !shouldCheckPermissions ||
@@ -116,10 +128,10 @@ export default function List() {
 
             <div className="bg-white rounded-3xl p-5">
                 <div className="flex flex-wrap justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold text-[#2B3674]">Courier Company List</h2>
+                    <h2 className="md:text-2xl font-bold text-[#2B3674]">Courier Company List</h2>
                     <div className="flex gap-3  flex-wrap items-center">
 
-                        <div className="flex justify-start gap-5 items-end">
+                        <div className="md:flex hidden justify-start gap-5 items-end">
                             {
                                 canViewTrashed && <button
                                     className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
@@ -138,8 +150,22 @@ export default function List() {
                         >
                             <MoreHorizontal className="text-[#F98F5C]" />
                             {isPopupOpen && (
-                                <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                                <div className="absolute md:left-0 right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
                                     <ul className="py-2 text-sm text-[#2B3674]">
+                                        <li className="px-4 py-2 md:hidden block hover:bg-gray-100 cursor-pointer"> {
+                                            canViewTrashed && <button
+                                                className={`p-2 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                                onClick={handleToggleTrash}
+                                            >
+                                                {isTrashed ? "Company Listing (Simple)" : "Trashed Company"}
+                                            </button>
+                                        }
+
+                                        </li>
+                                        <li className="px-4 py-2 md:hidden block hover:bg-gray-100 cursor-pointer">
+                                            {canAdd && (<button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/courier/create">Add New</Link></button>
+                                            )}
+                                        </li>
                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
@@ -151,7 +177,7 @@ export default function List() {
                 </div>
                 {data.length > 0 ? (
                     <div className="overflow-x-auto relative main-outer-wrapper w-full">
-                        <table className="md:w-full w-auto display main-tables" id="courier-companytable">
+                        <table className="md:w-full w-auto display main-tables" id="courierCompanytable">
                             <thead>
                                 <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                     <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Name</th>

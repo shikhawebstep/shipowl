@@ -23,6 +23,7 @@ const tabs = [
 ];
 import { useImageURL } from "@/components/ImageURLContext";
 import useScannerDetection from '../useScannerDetection';
+import 'datatables.net-dt/css/dataTables.dataTables.css';
 
 import { IoMdRefresh } from "react-icons/io";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -618,12 +619,12 @@ export default function RTO() {
 
   return (
     <div className='px-2 md:px-0'>
-      <div className="flex gap-4 bg-white rounded-md p-4 mb-8 font-lato text-sm ">
+      <div className="flex gap-4 bg-white overflow-auto rounded-md p-4 mb-8 font-lato text-sm ">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => { setActiveTab(tab.key), setSelected('') }}
-            className={`md:px-6 py-2 font-medium px-2  md:text-xl border-b-2 transition-all duration-200
+            className={`md:px-6 py-2 font-medium px-2 whitespace-nowrap  md:text-xl border-b-2 transition-all duration-200
                 ${activeTab === tab.key
                 ? "border-orange-500 text-orange-600"
                 : "border-transparent text-gray-500 hover:text-orange-600"
@@ -727,7 +728,7 @@ export default function RTO() {
               >
                 <MoreHorizontal className="text-[#F98F5C]" />
                 {isPopupOpen && (
-                  <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                  <div className="absolute md:left-0 mt-2 w-40 right-0 bg-white rounded-md shadow-lg z-10">
                     <ul className="py-2 text-sm text-[#2B3674]">
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
@@ -835,71 +836,85 @@ export default function RTO() {
                         setShowPaymentFilter(false);
                         setShowShipmentDetailsFilter(false)
                       }} className='flex gap-2 uppercase items-center'> Order Details <IoFilterSharp className="w-4 h-4" /></button>
-                      {showFilter && (
+                      {showStatus && (
                         <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
-                          {/* Header */}
-                          <div className="flex justify-between items-center mb-2">
-                            <label className="text-sm font-medium text-gray-700">Order ID:</label>
-                            <button
-                              onClick={() => {
-                                setOrderId('');
-                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
-                                  window.$('#rtoOrderTable').DataTable().search('').draw();
-                                }
-                              }}
-                              className="text-green-600 text-xs hover:underline"
-                            >
-                              Reset All
-                            </button>
-                          </div>
+                          <h3 className="font-medium text-gray-700 mb-2">Filter by Status:</h3>
 
-                          {/* Input Search */}
                           <input
                             type="text"
-                            value={orderId}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              setOrderId(value);
-
-                              if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
-                                window.$('#rtoOrderTable').DataTable().search(value).draw();
-                              }
-                            }}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring focus:ring-green-500"
-                            placeholder="Enter order ID"
+                            placeholder="Search"
+                            className="w-full mb-2 px-3 py-1 border border-gray-300 rounded text-sm"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                           />
 
-                          {/* Optional Dropdown Filter */}
-                          <div className="mt-4">
-                            <label className="text-sm font-medium text-gray-700">Filter:</label>
-                            {filterOptions.length === 0 ? (
-                              <p className="text-xs text-gray-400 mt-1">No items found</p>
-                            ) : (
-                              <select className="w-full mt-1 px-2 py-2 text-sm border rounded-md">
-                                {filterOptions.map((opt) => (
-                                  <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                  </option>
-                                ))}
-                              </select>
+                          <div className="h-60 overflow-y-auto border border-gray-200 rounded p-2">
+                            {filteredStatusList.map((status) => (
+                              <label key={status} className="flex items-center gap-2 py-1 text-sm text-gray-700">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedStatuses.includes(status)}
+                                  onChange={() => toggleStatus(status)}
+                                  className="h-4 w-4"
+                                />
+                                {status}
+                              </label>
+                            ))}
+                            {filteredStatusList.length === 0 && (
+                              <p className="text-gray-400 text-sm mt-2">No items found</p>
                             )}
                           </div>
 
-                          {/* Apply Button */}
-                          <button
-                            onClick={() => {
-                              if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
-                                window.$('#rtoOrderTable').DataTable().search(orderId).draw();
-                              }
-                              setShowFilter(false);
-                              setShowStatus(false);
-                            }}
-                            className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
-                          >
-                            Apply
-                          </button>
+                          <div className="mt-4 flex justify-between items-center gap-2">
+                            {/* Reset All */}
+                            <button
+                              onClick={() => {
+                                setSearch("");
+                                setSelectedStatuses([]);
+                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                  window.$('#rtoOrderTable').DataTable().column(2).search('').draw();
+                                }
+                              }}
+                              className="text-green-600 text-sm hover:underline"
+                            >
+                              Reset All
+                            </button>
+
+                            {/* Clear only checkboxes */}
+                            <button
+                              onClick={() => {
+                                setSelectedStatuses([]);
+                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                  window.$('#rtoOrderTable').DataTable().column(2).search('').draw();
+                                }
+                              }}
+                              className="text-gray-600 text-sm hover:underline"
+                            >
+                              Clear
+                            </button>
+
+                            {/* Apply */}
+                            <button
+                              className={`px-4 py-1 rounded text-white text-sm ${selectedStatuses.length
+                                ? "bg-green-600 hover:bg-green-700"
+                                : "bg-gray-300 cursor-not-allowed"
+                                }`}
+                              onClick={() => {
+                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                  const regex = selectedStatuses.join('|');
+                                  window.$('#rtoOrderTable').DataTable().column(2).search(regex, true, false).draw();
+                                }
+                                setShowStatus(false);
+                                setShowFilter(false);
+                              }}
+                              disabled={!selectedStatuses.length}
+                            >
+                              Apply
+                            </button>
+                          </div>
                         </div>
                       )}
+
 
                     </th>
 
@@ -927,32 +942,42 @@ export default function RTO() {
                             <input
                               type="text"
                               value={orderId}
-                              onChange={(e) => {
-                                setOrderId(e.target.value);
-
-                                // Apply search directly to DataTable
-                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
-                                  window.$('#rtoOrderTable').DataTable().search(e.target.value).draw();
-                                }
-                              }}
+                              onChange={(e) => setOrderId(e.target.value)}
                               placeholder="Name, Phone, or Email..."
                               className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
                             />
-                            <button
-                              className="mt-2 block px-4 w-full bg-green-600 text-white py-1 rounded hover:bg-green-700"
-                              onClick={() => {
-                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
-                                  window.$('#rtoOrderTable').DataTable().search(orderId).draw();
-                                }
-                                setShowCustomerFilter(false);
-                                setOrderId('');
-                              }}
 
-                            >
-                              Apply
-                            </button>
+                            <div className="flex justify-between items-center gap-2">
+                              <button
+                                className={`flex-1 px-4 py-1 rounded text-white text-sm ${orderId ? "bg-green-600 hover:bg-green-700" : "bg-gray-300 cursor-not-allowed"
+                                  }`}
+                                onClick={() => {
+                                  if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                    window.$('#rtoOrderTable').DataTable().search(orderId).draw();
+                                  }
+                                  setShowCustomerFilter(false);
+                                  setOrderId('');
+                                }}
+                                disabled={!orderId}
+                              >
+                                Apply
+                              </button>
+
+                              <button
+                                className="flex-1 px-4 py-1 rounded border border-gray-300 text-gray-700 text-sm hover:bg-gray-100"
+                                onClick={() => {
+                                  setOrderId('');
+                                  if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                    window.$('#rtoOrderTable').DataTable().search('').draw();
+                                  }
+                                }}
+                              >
+                                Reset
+                              </button>
+                            </div>
                           </div>
                         )}
+
 
                       </th>
                     }
@@ -984,13 +1009,7 @@ export default function RTO() {
                               <input
                                 type="text"
                                 value={orderId}
-                                onChange={(e) => {
-                                  setOrderId(e.target.value);
-                                  if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
-                                    window.$('#rtoOrderTable').DataTable().search(e.target.value).draw();
-                                  }
-
-                                }}
+                                onChange={(e) => setOrderId(e.target.value)}
                                 placeholder="Transaction ID..."
                                 className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
                               />
@@ -1013,34 +1032,41 @@ export default function RTO() {
                                 </div>
                               </div>
 
-                              {/* Apply Button */}
-                              <button
-                                className={`mt-4 w-full px-4 py-1 rounded text-white text-sm ${orderId || selectedPaymentStatuses.length
-                                  ? "bg-green-600 hover:bg-green-700"
-                                  : "bg-gray-300 cursor-not-allowed"
-                                  }`}
-                                onClick={() => {
-                                  if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
-                                    const table = window.$('#rtoOrderTable').DataTable();
-
-                                    // Combine transaction ID + status into one search query
-                                    let searchQuery = orderId.toLowerCase();
-                                    if (selectedPaymentStatuses.length) {
-                                      searchQuery += ' ' + selectedPaymentStatuses.join(' ');
+                              {/* Buttons */}
+                              <div className="flex justify-between items-center mt-4 gap-2">
+                                <button
+                                  className={`flex-1 px-4 py-1 rounded text-white text-sm ${orderId || selectedPaymentStatuses.length
+                                    ? "bg-green-600 hover:bg-green-700"
+                                    : "bg-gray-300 cursor-not-allowed"
+                                    }`}
+                                  onClick={() => {
+                                    if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                      window.$('#rtoOrderTable').DataTable().search(orderId).draw();
+                                      const regex = selectedPaymentStatuses.join('|');
+                                      window.$('#rtoOrderTable').DataTable().column(5).search(regex, true, false).draw();
                                     }
+                                    setShowPaymentFilter(false);
+                                    setShowFilter(false);
+                                  }}
+                                  disabled={!orderId && selectedPaymentStatuses.length === 0}
+                                >
+                                  Apply
+                                </button>
 
-                                    table.search(searchQuery).draw();
-                                  }
-
-                                  setOrderId('');
-                                  setSelectedPaymentStatuses([]);
-                                  setShowPaymentFilter(false);
-                                }}
-                                disabled={!orderId && selectedPaymentStatuses.length === 0}
-                              >
-                                Apply
-                              </button>
-
+                                <button
+                                  className="flex-1 px-4 py-1 rounded border border-gray-300 text-gray-700 text-sm hover:bg-gray-100"
+                                  onClick={() => {
+                                    setOrderId('');
+                                    setSelectedPaymentStatuses([]);
+                                    if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                      window.$('#rtoOrderTable').DataTable().search('').draw();
+                                      window.$('#rtoOrderTable').DataTable().column(5).search('').draw();
+                                    }
+                                  }}
+                                >
+                                  Reset
+                                </button>
+                              </div>
                             </div>
                           )}
                         </th>
@@ -1073,9 +1099,7 @@ export default function RTO() {
                               value={orderId}
                               onChange={(e) => {
                                 setOrderId(e.target.value);
-                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
-                                  window.$('#rtoOrderTable').DataTable().search(e.target.value).draw();
-                                }
+
                               }}
                               className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
                             />
@@ -1348,7 +1372,7 @@ export default function RTO() {
       </>
 
       {disputeOpen && (
-        <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+        <div className="fixed px-5 inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
           <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-3xl shadow-xl relative">
 
 
@@ -1417,7 +1441,7 @@ export default function RTO() {
 
       {showModal && selectedVariant && (
 
-        <div className="fixed inset-0 flex items-center justify-center bg-[#000000ba] bg-opacity-50 z-50">
+        <div className="fixed inset-0 px-5 flex items-center justify-center bg-[#000000ba] bg-opacity-50 z-50">
           <div className="bg-white w-full max-w-5xl border-2 border-orange-500 p-6 rounded-md shadow-lg relative">
             <button
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
@@ -1509,7 +1533,7 @@ export default function RTO() {
       {
         viewDispute && (
 
-          <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+          <div className="fixed px-5 inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
             <div className="bg-white p-6 max-h[500px] overflow-auto  rounded-lg border-orange-500 w-full border max-w-3xl shadow-xl relative">
 
               {selectedDisputeItem && (
@@ -1565,7 +1589,7 @@ export default function RTO() {
 
       {
         isBarCodePopupOpen && (
-          <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed px-5 inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
               <button
                 onClick={() => setIsBarCodePopupOpen(false)}
@@ -1590,7 +1614,7 @@ export default function RTO() {
 
       {
         isNoteModalOpen && (
-          <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed px-5 inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
               <button
                 onClick={() => setIsNoteModalOpen(false)}

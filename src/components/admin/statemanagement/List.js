@@ -139,55 +139,21 @@ export default function List() {
     const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
 
 
-    const canViewTrashed = shouldCheckPermissions
-        ? extractedPermissions.some(
+    const hasPermission = (action) =>
+        !shouldCheckPermissions ||
+        extractedPermissions.some(
             (perm) =>
                 perm.module === "State" &&
-                perm.action === "Trash Listing" &&
+                perm.action === action &&
                 perm.status === true
-        )
-        : true;
-    const canAdd = shouldCheckPermissions
-        ? extractedPermissions.some(
-            (perm) =>
-                perm.module === "State" &&
-                perm.action === "Create" &&
-                perm.status === true
-        )
-        : true;
+        );
 
-    const canDelete = shouldCheckPermissions
-        ? extractedPermissions.some(
-            (perm) =>
-                perm.module === "State" &&
-                perm.action === "Permanent Delete" &&
-                perm.status === true
-        )
-        : true;
-    const canEdit = shouldCheckPermissions
-        ? extractedPermissions.some(
-            (perm) =>
-                perm.module === "State" &&
-                perm.action === "Update" &&
-                perm.status === true
-        )
-        : true;
-    const canSoftDelete = shouldCheckPermissions
-        ? extractedPermissions.some(
-            (perm) =>
-                perm.module === "State" &&
-                perm.action === "Soft Delete" &&
-                perm.status === true
-        )
-        : true;
-    const canRestore = shouldCheckPermissions
-        ? extractedPermissions.some(
-            (perm) =>
-                perm.module === "State" &&
-                perm.action === "Restore" &&
-                perm.status === true
-        )
-        : true;
+    const canViewTrashed = hasPermission("Trash Listing");
+    const canAdd = hasPermission("Create");
+    const canDelete = hasPermission("Permanent Delete");
+    const canEdit = hasPermission("Update");
+    const canSoftDelete = hasPermission("Soft Delete");
+    const canRestore = hasPermission("Restore");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -221,7 +187,18 @@ export default function List() {
                 }
 
                 // Reinitialize DataTable with new data
-                table = $('#statetable').DataTable();
+                const isMobile = window.innerWidth <= 768;
+                const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+                table = $('#statetable').DataTable({
+                    pagingType,
+                    language: {
+                        paginate: {
+                            previous: "<",
+                            next: ">"
+                        }
+                    }
+                });
 
                 return () => {
                     if (table) {
@@ -538,9 +515,33 @@ export default function List() {
                             >
                                 <MoreHorizontal className="text-[#F98F5C]" />
                                 {isPopupOpen && (
-                                    <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                                    <div className="absolute md:left-0 mt-2 w-40 right-0 bg-white rounded-md shadow-lg z-10">
                                         <ul className="py-2 text-sm text-[#2B3674]">
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => exportCsv()}>
+                                           
+                                            <li className="px-4 md:hidden block py-2 hover:bg-gray-100 cursor-pointer">
+                                                {canViewTrashed && <button
+                                                    className={`p-2 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                                                    onClick={async () => {
+                                                        if (isTrashed) {
+                                                            setIsTrashed(false);
+                                                            await fetchState();
+                                                        } else {
+                                                            setIsTrashed(true);
+                                                            await trashState();
+                                                        }
+                                                    }}
+                                                >
+                                                    {isTrashed ? "state Listing (Simple)" : "Trashed state"}
+                                                </button>}
+
+                                            </li>
+                                            <li className="px-4 md:hidden block py-2 hover:bg-gray-100 cursor-pointer">
+                                                {canAdd && <button className="bg-[#4285F4] text-white rounded-md p-2 px-4" >
+                                                    <Link href="/admin/state/create">Add state</Link>
+                                                </button>
+                                                }
+                                            </li>
+                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => exportCsv()}>
                                                 Export CSV
                                             </li>
                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleBulkDelete()}>
@@ -551,7 +552,7 @@ export default function List() {
                                     </div>
                                 )}
                             </button>
-                            <div className="flex justify-end gap-2">
+                            <div className="md:flex hidden justify-end gap-2">
                                 {canViewTrashed && <button
                                     className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                     onClick={async () => {

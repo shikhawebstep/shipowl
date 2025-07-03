@@ -83,46 +83,46 @@ function List() {
         fetchRequests();
     }, [fetchRequests]);
 
-   const handleAction = async (requestId, action) => {
-  const adminData = JSON.parse(localStorage.getItem("shippingData"));
-  const token = adminData?.security?.token;
+    const handleAction = async (requestId, action) => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        const token = adminData?.security?.token;
 
-  try {
-    // Show loading Swal
-    Swal.fire({
-      title: `${action === "accept" ? "Accepting" : "Rejecting"} request...`,
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+        try {
+            // Show loading Swal
+            Swal.fire({
+                title: `${action === "accept" ? "Accepting" : "Rejecting"} request...`,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
 
-    const response = await fetch(
-      `/api/admin/supplier/bank-account/change-request/${requestId}/review`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: action }), // "accept" or "reject"
-      }
-    );
+            const response = await fetch(
+                `/api/admin/supplier/bank-account/change-request/${requestId}/review`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ status: action }), // "accept" or "reject"
+                }
+            );
 
-    const result = await response.json();
+            const result = await response.json();
 
-    if (!response.ok) {
-      Swal.fire("Error", result.message || "Failed to update status", "error");
-      return;
-    }
+            if (!response.ok) {
+                Swal.fire("Error", result.message || "Failed to update status", "error");
+                return;
+            }
 
-    Swal.fire("Success", result.message || `Request ${action}ed successfully`, "success");
-    fetchRequests(); // Refresh list
-  } catch (error) {
-    console.error("Action error:", error);
-    Swal.fire("Error", "Something went wrong", "error");
-  }
-};
+            Swal.fire("Success", result.message || `Request ${action}ed successfully`, "success");
+            fetchRequests(); // Refresh list
+        } catch (error) {
+            console.error("Action error:", error);
+            Swal.fire("Error", "Something went wrong", "error");
+        }
+    };
 
     useEffect(() => {
         if (typeof window !== 'undefined' && requests.length > 0 && !loading) {
@@ -144,7 +144,18 @@ function List() {
                 }
 
                 // Reinitialize DataTable with new data
-                table = $('#bankTable').DataTable();
+                const isMobile = window.innerWidth <= 768;
+                const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+                table = $('#bankTable').DataTable({
+                    pagingType,
+                    language: {
+                        paginate: {
+                            previous: "<",
+                            next: ">"
+                        }
+                    }
+                });
 
                 return () => {
                     if (table) {
@@ -184,7 +195,7 @@ function List() {
                         <tbody>
                             {requests.map((req) => (
                                 <tr key={req.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                    <td className="p-2 bg-transparent whitespace-nowrap text-left  border-0">{req?.supplier?.name ||req?.admin?.name || "-"}</td>
+                                    <td className="p-2 bg-transparent whitespace-nowrap text-left  border-0">{req?.supplier?.name || req?.admin?.name || "-"}</td>
                                     <td className="p-2 bg-transparent whitespace-nowrap text-left  border-0">{req.accountNumber}</td>
                                     <td className="p-2 bg-transparent whitespace-nowrap text-left  border-0">{req.bankName}</td>
                                     <td className="p-2 bg-transparent whitespace-nowrap text-left  border-0">{req.ifscCode}</td>

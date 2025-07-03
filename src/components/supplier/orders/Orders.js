@@ -14,7 +14,6 @@ import { HashLoader } from 'react-spinners';
 import Swal from 'sweetalert2'; // ✅ added import
 import { FaCheck } from "react-icons/fa";
 import { IoFilterSharp } from "react-icons/io5";
-import { useLayoutEffect } from 'react';
 
 const STATUS_LIST = [
   "Cancelled", "Damaged", "Delivered", "Progress", "In Transit", "Lost", "Not Serviceable",
@@ -627,7 +626,7 @@ export default function Orders() {
             >
               <MoreHorizontal className="text-[#F98F5C]" />
               {isPopupOpen && (
-                <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                <div className="absolute md:left-0 mt-2 w-40 right-0 bg-white rounded-md shadow-lg z-10">
                   <ul className="py-2 text-sm text-[#2B3674]">
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
@@ -649,626 +648,651 @@ export default function Orders() {
         </div>
 
 
-        {/* Orders Table */}
-        <div className="overflow-x-auto relative main-outer-wrapper w-full">
-          <table className="md:w-full w-auto display main-tables" id="orderTable">
-            <thead>
-              <tr className="text-[#A3AED0] uppercase border-b border-[#E9EDF7]">
-                <th className="p-3 px-5 whitespace-nowrap">SR.</th>
+        {
+          orders.length > 0 ? (
 
-                <th className="p-3 px-5 whitespace-nowrap overflow-visible relative" >
-                  <button onClick={() => {
-                    setShowFilter(!showFilter);
-                    setShowStatus(false);
-                    setShowCustomerFilter(false);
-                    setShowPaymentFilter(false);
-                    setShowShipmentDetailsFilter(false)
-                  }} className='flex gap-2 uppercase items-center'> Order Details <IoFilterSharp className="w-4 h-4" /></button>
-                  {showFilter && (
-                    <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
-                      {/* Header */}
-                      <div className="flex justify-between items-center mb-2">
-                        <label className="text-sm font-medium text-gray-700">Order ID:</label>
-                        <button
-                          onClick={() => {
-                            setOrderId('');
-                            if (window.$.fn.DataTable.isDataTable('#orderTable')) {
-                              window.$('#orderTable').DataTable().search('').draw();
-                            }
-                          }}
-                          className="text-green-600 text-xs hover:underline"
-                        >
-                          Reset All
-                        </button>
-                      </div>
+            <div className="overflow-x-auto relative main-outer-wrapper w-full">
+              <table className="md:w-full w-auto display main-tables" id="orderTable">
+                <thead>
+                  <tr className="text-[#A3AED0] uppercase border-b border-[#E9EDF7]">
+                    <th className="p-3 px-5 whitespace-nowrap">SR.</th>
 
-                      {/* Input Search */}
-                      <input
-                        type="text"
-                        value={orderId}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setOrderId(value);
-
-                          if (window.$.fn.DataTable.isDataTable('#orderTable')) {
-                            window.$('#orderTable').DataTable().search(value).draw();
-                          }
-                        }}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring focus:ring-green-500"
-                        placeholder="Enter order ID"
-                      />
-
-                      {/* Optional Dropdown Filter */}
-                      <div className="mt-4">
-                        <label className="text-sm font-medium text-gray-700">Filter:</label>
-                        {filterOptions.length === 0 ? (
-                          <p className="text-xs text-gray-400 mt-1">No items found</p>
-                        ) : (
-                          <select className="w-full mt-1 px-2 py-2 text-sm border rounded-md">
-                            {filterOptions.map((opt) => (
-                              <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                      </div>
-
-                      {/* Apply Button */}
-                      <button
-                        onClick={() => {
-                          if (window.$.fn.DataTable.isDataTable('#orderTable')) {
-                            window.$('#orderTable').DataTable().search(orderId).draw();
-                          }
-                          setShowFilter(false);
-                          setShowStatus(false);
-                        }}
-                        className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
-                      >
-                        Apply
-                      </button>
-                    </div>
-                  )}
-
-                </th>
-                <th className="p-3 px-5 whitespace-nowrap relative uppercase">
-                  <button onClick={() => {
-                    setShowStatus(!showStatus);
-                    setShowFilter(false);
-                    setShowCustomerFilter(false);
-                    setShowPaymentFilter(false);
-                    setShowShipmentDetailsFilter(false)
-                  }} className='flex gap-2 uppercase items-center'> Shipment Status <IoFilterSharp className="w-4 h-4" /></button>
-
-                  {
-                    showStatus && (
-                      <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
-                        <h3 className="font-medium text-gray-700 mb-2">Filter by Status:</h3>
-
-                        <input
-                          type="text"
-                          placeholder="Search"
-                          className="w-full mb-2 px-3 py-1 border border-gray-300 rounded text-sm"
-                          value={search}
-                          onChange={(e) => setSearch(e.target.value)}
-                        />
-
-                        <div className="h-60 overflow-y-auto border border-gray-200 rounded p-2">
-                          {filteredStatusList.map((status) => (
-                            <label key={status} className="flex items-center gap-2 py-1 text-sm text-gray-700">
-                              <input
-                                type="checkbox"
-                                checked={selectedStatuses.includes(status)}
-                                onChange={() => toggleStatus(status)}
-                                className="h-4 w-4"
-                              />
-                              {status}
-                            </label>
-                          ))}
-                          {filteredStatusList.length === 0 && (
-                            <p className="text-gray-400 text-sm mt-2">No items found</p>
-                          )}
-                        </div>
-
-                        <div className="mt-4 flex justify-between items-center">
-                          <button
-                            onClick={() => {
-                              setSearch("");
-                              setSelectedStatuses([]);
-
-                              // Clear DataTable column filter
-                              if (window.$.fn.DataTable.isDataTable('#orderTable')) {
-                                window.$('#orderTable').DataTable().column(2).search('').draw();
-                              }
-                            }}
-                            className="text-green-600 text-sm hover:underline"
-                          >
-                            Reset All
-                          </button>
-
-                          <button
-                            className={`px-4 py-1 rounded text-white text-sm ${selectedStatuses.length
-                              ? "bg-green-600 hover:bg-green-700"
-                              : "bg-gray-300 cursor-not-allowed"
-                              }`}
-                            onClick={() => {
-                              if (window.$.fn.DataTable.isDataTable('#orderTable')) {
-                                const regex = selectedStatuses.join('|'); // OR regex for filtering
-                                window.$('#orderTable').DataTable().column(2).search(regex, true, false).draw(); // exact match with regex
-                              }
-
-                              setShowStatus(false);
-                              setShowFilter(false);
-                            }}
-                            disabled={!selectedStatuses.length}
-                          >
-                            Apply
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  }
-
-                </th>
-
-
-                {hasAnyPermission(
-                  "shippingName",
-                  "shippingPhone",
-                  "shippingEmail"
-                ) && <th className="p-3 px-5 whitespace-nowrap relative">
-                    <button
-                      onClick={() => {
-                        setShowCustomerFilter(!showCustomerFilter);
-                        setShowShipmentDetailsFilter(false);
+                    <th className="p-3 px-5 whitespace-nowrap overflow-visible relative" >
+                      <button onClick={() => {
+                        setShowFilter(!showFilter);
                         setShowStatus(false);
+                        setShowCustomerFilter(false);
                         setShowPaymentFilter(false);
-                        setShowFilter(false);
-                      }}
-                      className="flex gap-2 uppercase items-center"
-                    >
-                      Customer Info <IoFilterSharp className="w-4 h-4" />
-                    </button>
-                    {showCustomerFilter && (
-                      <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
-                        <h3 className="font-medium text-gray-700 mb-2">Filter by Customer:</h3>
-
-                        <input
-                          type="text"
-                          value={orderId}
-                          onChange={(e) => {
-                            setOrderId(e.target.value);
-
-                            // Apply search directly to DataTable
-                            if (window.$.fn.DataTable.isDataTable('#orderTable')) {
-                              window.$('#orderTable').DataTable().search(e.target.value).draw();
-                            }
-                          }}
-                          placeholder="Name, Phone, or Email..."
-                          className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
-                        />
-                        <button
-                          className="mt-2 block px-4 w-full bg-green-600 text-white py-1 rounded hover:bg-green-700"
-                          onClick={() => {
-                            if (window.$.fn.DataTable.isDataTable('#orderTable')) {
-                              window.$('#orderTable').DataTable().search(orderId).draw();
-                            }
-                            setShowCustomerFilter(false);
-                            setOrderId('');
-                          }}
-
-                        >
-                          Apply
-                        </button>
-                      </div>
-                    )}
-
-                  </th>
-                }
-
-                {hasAnyPermission(
-                  "payment_mode",
-                  "transactionId",
-                  "amount",
-                  "status"
-                ) && (
-                    <th className="p-3 px-5 whitespace-nowrap relative">
-                      <button
-                        onClick={() => {
-                          setShowPaymentFilter(!showPaymentFilter);
-                          setShowCustomerFilter(false);
-                          setShowShipmentDetailsFilter(false);
-                          setShowStatus(false);
-                          setShowFilter(false);
-                        }}
-                        className="flex gap-2 uppercase items-center"
-                      >
-                        Payment Details <IoFilterSharp className="w-4 h-4" />
-                      </button>
-                      {showPaymentFilter && (
+                        setShowShipmentDetailsFilter(false)
+                      }} className='flex gap-2 uppercase items-center'> Order Details <IoFilterSharp className="w-4 h-4" /></button>
+                      {showFilter && (
                         <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
-                          <h3 className="font-medium text-gray-700 mb-2">Filter by Payment:</h3>
+                          {/* Header */}
+                          <div className="flex justify-between items-center mb-2">
+                            <label className="text-sm font-medium text-gray-700">Order ID:</label>
+                            <button
+                              onClick={() => {
+                                setOrderId('');
+                                if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                  window.$('#orderTable').DataTable().search('').draw();
+                                }
+                              }}
+                              className="text-green-600 text-xs hover:underline"
+                            >
+                              Reset All
+                            </button>
+                          </div>
 
-                          {/* Transaction ID input */}
+                          {/* Input Search */}
                           <input
                             type="text"
                             value={orderId}
                             onChange={(e) => {
-                              setOrderId(e.target.value);
-                              if (window.$.fn.DataTable.isDataTable('#orderTable')) {
-                                window.$('#orderTable').DataTable().search(e.target.value).draw();
-                              }
+                              const value = e.target.value;
+                              setOrderId(value);
+
 
                             }}
-                            placeholder="Transaction ID..."
-                            className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring focus:ring-green-500"
+                            placeholder="Enter order ID"
                           />
 
-                          {/* Payment Status checkboxes */}
-                          <div className="mt-3">
-                            <label className="block text-sm font-medium text-gray-700">Payment Status</label>
-                            <div className="grid grid-cols-3 gap-2 mt-2 text-xs text-gray-700">
-                              {["failed", "success", "pending"].map((status) => (
-                                <label key={status} className="flex items-center gap-1">
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedPaymentStatuses.includes(status)}
-                                    onChange={() => togglePaymentStatus(status)}
-                                    className="h-4 w-4"
-                                  />
-                                  {status}
-                                </label>
-                              ))}
-                            </div>
+                          {/* Optional Dropdown Filter */}
+                          <div className="mt-4">
+                            <label className="text-sm font-medium text-gray-700">Filter:</label>
+                            {filterOptions.length === 0 ? (
+                              <p className="text-xs text-gray-400 mt-1">No items found</p>
+                            ) : (
+                              <select className="w-full mt-1 px-2 py-2 text-sm border rounded-md">
+                                {filterOptions.map((opt) => (
+                                  <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
                           </div>
 
                           {/* Apply Button */}
                           <button
-                            className={`mt-4 w-full px-4 py-1 rounded text-white text-sm ${orderId || selectedPaymentStatuses.length
-                              ? "bg-green-600 hover:bg-green-700"
-                              : "bg-gray-300 cursor-not-allowed"
-                              }`}
                             onClick={() => {
                               if (window.$.fn.DataTable.isDataTable('#orderTable')) {
-                                const table = window.$('#orderTable').DataTable();
-
-                                // Combine transaction ID + status into one search query
-                                let searchQuery = orderId.toLowerCase();
-                                if (selectedPaymentStatuses.length) {
-                                  searchQuery += ' ' + selectedPaymentStatuses.join(' ');
-                                }
-
-                                table.search(searchQuery).draw();
+                                window.$('#orderTable').DataTable().search(orderId).draw();
                               }
-
-                              setOrderId('');
-                              setSelectedPaymentStatuses([]);
-                              setShowPaymentFilter(false);
+                              setShowFilter(false);
+                              setShowStatus(false);
                             }}
-                            disabled={!orderId && selectedPaymentStatuses.length === 0}
+                            className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
                           >
                             Apply
                           </button>
-
                         </div>
                       )}
-                    </th>
 
-                  )}
-                {hasAnyPermission(
-                  "order_number",
-                  "shippingPhone",
-                  "shippingAddress",
-                  "awb_number",
-                ) && <th className="p-3 px-5 whitespace-nowrap relative">
-                    <button
-                      onClick={() => {
-                        setShowShipmentDetailsFilter(!showShipmentDetailsFilter);
+                    </th>
+                    <th className="p-3 px-5 whitespace-nowrap relative uppercase">
+                      <button onClick={() => {
+                        setShowStatus(!showStatus);
+                        setShowFilter(false);
                         setShowCustomerFilter(false);
                         setShowPaymentFilter(false);
-                        setShowStatus(false);
-                        setShowFilter(false);
-                      }}
-                      className="flex gap-2 uppercase items-center"
-                    >
-                      Shipment Details <IoFilterSharp className="w-4 h-4" />
-                    </button>
-                    {showShipmentDetailsFilter && (
-                      <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
-                        <h3 className="font-medium text-gray-700 mb-2">Filter by Shipment:</h3>
-                        <input
-                          type="text"
-                          placeholder="AWB number..."
-                          value={orderId}
-                          onChange={(e) => {
-                            setOrderId(e.target.value);
-                            if (window.$.fn.DataTable.isDataTable('#orderTable')) {
-                              window.$('#orderTable').DataTable().search(e.target.value).draw();
-                            }
-                          }}
-                          className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
-                        />
-                        <button
-                          className="mt-2 block px-4 w-full bg-green-600 text-white py-1 rounded hover:bg-green-700"
-                          onClick={() => {
-                            if (window.$.fn.DataTable.isDataTable('#orderTable')) {
-                              window.$('#orderTable').DataTable().search(orderId).draw();
-                            }
-                            setOrderId('');
-                            setShowShipmentDetailsFilter(false);
-                          }}
-                        >
-                          Apply
-                        </button>
-                      </div>
-                    )}
+                        setShowShipmentDetailsFilter(false)
+                      }} className='flex gap-2 uppercase items-center'> Shipment Status <IoFilterSharp className="w-4 h-4" /></button>
 
-                  </th>
-                }
+                      {showStatus && (
+                        <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+                          <h3 className="font-medium text-gray-700 mb-2">Filter by Status:</h3>
 
-
-                {hasAnyPermission("trackingNumber ") && (
-                  <th className="p-3 px-5 whitespace-nowrap">Return Tracking #</th>
-                )}
-
-                {hasAnyPermission("rtoDelivered", "delivered") && (
-                  <>
-                    <th className="p-3 px-5 whitespace-nowrap">delivered Status</th>
-                  </>
-                )}
-                {hasAnyPermission("rtoDeliveredDate", "deliveredDate") && (
-                  <>
-                    <th className="p-3 px-5 whitespace-nowrap">delivered Date</th>
-                  </>
-                )}
-
-
-
-                {hasAnyPermission("totalAmount") && (
-                  <th className="p-3 px-5 whitespace-nowrap">Total</th>
-                )}
-                <th className="p-2 px-5 text-left whitespace-nowrap">Download Invoice</th>
-                <th className="p-2 px-5 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-
-              {orders.map((order, index) => {
-
-                return (
-                  <tr key={order.id} className="text-[#364e91] font-semibold border-b border-[#E9EDF7] align-top">
-                    {/* Order ID */}
-                    <td className="p-3 px-5 whitespace-nowrap">
-                      <div className="flex items-center">
-
-                        <label className="flex items-center cursor-pointer mr-2">
                           <input
-                            type="checkbox"
-                            checked={selected.includes(order.id)}
-                            onChange={() => handleCheckboxChange(order.id)}
-                            className="peer hidden"
+                            type="text"
+                            placeholder="Search"
+                            className="w-full mb-2 px-3 py-1 border border-gray-300 rounded text-sm"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                           />
-                          <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                            <FaCheck className="peer-checked:block text-white w-3 h-3" />
+
+                          <div className="h-60 overflow-y-auto border border-gray-200 rounded p-2">
+                            {filteredStatusList.map((status) => (
+                              <label key={status} className="flex items-center gap-2 py-1 text-sm text-gray-700">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedStatuses.includes(status)}
+                                  onChange={() => toggleStatus(status)}
+                                  className="h-4 w-4"
+                                />
+                                {status}
+                              </label>
+                            ))}
+                            {filteredStatusList.length === 0 && (
+                              <p className="text-gray-400 text-sm mt-2">No items found</p>
+                            )}
                           </div>
-                        </label>
 
-                        {index + 1}</div></td>
+                          <div className="mt-4 flex justify-between items-center gap-2">
+                            {/* Reset All */}
+                            <button
+                              onClick={() => {
+                                setSearch("");
+                                setSelectedStatuses([]);
+                                if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                  window.$('#orderTable').DataTable().column(2).search('').draw();
+                                }
+                              }}
+                              className="text-green-600 text-sm hover:underline"
+                            >
+                              Reset All
+                            </button>
 
-                    <td className="p-3 px-5 whitespace-nowrap">
-                      <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
-                      <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</span>
-                    </td>
-                    <td className="p-3 px-5 whitespace-nowrap">
-                      {order.status}
+                            {/* Clear only checkboxes */}
+                            <button
+                              onClick={() => {
+                                setSelectedStatuses([]);
+                                if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                  window.$('#orderTable').DataTable().column(2).search('').draw();
+                                }
+                              }}
+                              className="text-gray-600 text-sm hover:underline"
+                            >
+                              Clear
+                            </button>
 
-                    </td>
+                            {/* Apply */}
+                            <button
+                              className={`px-4 py-1 rounded text-white text-sm ${selectedStatuses.length
+                                  ? "bg-green-600 hover:bg-green-700"
+                                  : "bg-gray-300 cursor-not-allowed"
+                                }`}
+                              onClick={() => {
+                                if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                  const regex = selectedStatuses.join('|');
+                                  window.$('#orderTable').DataTable().column(2).search(regex, true, false).draw();
+                                }
+                                setShowStatus(false);
+                                setShowFilter(false);
+                              }}
+                              disabled={!selectedStatuses.length}
+                            >
+                              Apply
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
-                    {hasAnyPermission("shippingName", "shippingPhone", "shippingEmail") && (
-                      <td className="p-3 px-5 whitespace-nowrap">
-                        <PermissionField permissionKey="shippingName">{order.shippingName}</PermissionField>
-                        <br />
-                        <span className="text-sm block">
-                          <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
-                        </span>
-                        <span className="text-sm text-[#01b574]">
-                          <PermissionField permissionKey="shippingEmail">{order.shippingEmail}</PermissionField>
-                        </span>
-                      </td>
-                    )}
 
-                    {hasAnyPermission("payment_mode", "transactionId", "amount", "status") && (
-                      <td className="p-3 px-5 whitespace-nowrap font-semibold">
-                        <PermissionField permissionKey="payment_mode">
-                          <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "-"}</span></p>
-                        </PermissionField>
-                        <PermissionField permissionKey="transactionId">
-                          <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "-"}</span></p>
-                        </PermissionField>
-                        <PermissionField permissionKey="amount">
-                          <p>Amount: <span className="font-bold">{order.payment?.amount || "-"}</span></p>
-                        </PermissionField>
-                        <PermissionField permissionKey="status">
-                          <p>
-                            <span className={`font-bold uppercase ${order.payment?.status === "failed"
-                              ? "text-red-500"
-                              : order.payment?.status === "pending"
-                                ? "text-yellow-500"
-                                : "text-green-500"
-                              }`}>
-                              {order.payment?.status || "-"}
-                            </span>
-                          </p>
-                        </PermissionField>
-                      </td>
-                    )}
+                    </th>
 
-                    {hasAnyPermission("orderNumber", "shippingPhone", "shippingAddress", "awbNumber") && (
-                      <td className="p-3 px-5 whitespace-nowrap">
-                        <PermissionField permissionKey="orderNumber">
-                          {order.shippingApiResult?.data?.order_number || "-"}
-                        </PermissionField>
-                        <br />
-                        <PermissionField permissionKey="shippingAddress">
-                          {order.shippingAddress || "-"}
-                        </PermissionField>
-                        <br />
-                        <span className="text-green-500">
-                          <PermissionField permissionKey="shippingPhone">
-                            {order.shippingPhone || "-"}
-                          </PermissionField>
-                        </span>
-                        <br />
-                        <PermissionField permissionKey="awbNumber">
-                          {order.shippingApiResult?.data?.awb_number || "-"}
-                        </PermissionField>
-                      </td>
-                    )}
 
-                    {hasAnyPermission("trackingNumber") && (
-                      <td className="p-3 px-5 whitespace-nowrap">
-                        {order.items
-                          .map((item) => (
-                            <PermissionField key={item.id} permissionKey="trackingNumber">
-                              {item.supplierRTOResponse?.trackingNumber || "-"}
-                            </PermissionField>
-                          ))
-                          .reduce((prev, curr) => [prev, ", ", curr])}
-                      </td>
+                    {hasAnyPermission(
+                      "shippingName",
+                      "shippingPhone",
+                      "shippingEmail"
+                    ) && <th className="p-3 px-5 whitespace-nowrap relative">
+                        <button
+                          onClick={() => {
+                            setShowCustomerFilter(!showCustomerFilter);
+                            setShowShipmentDetailsFilter(false);
+                            setShowStatus(false);
+                            setShowPaymentFilter(false);
+                            setShowFilter(false);
+                          }}
+                          className="flex gap-2 uppercase items-center"
+                        >
+                          Customer Info <IoFilterSharp className="w-4 h-4" />
+                        </button>
+                      {showCustomerFilter && (
+  <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+    <h3 className="font-medium text-gray-700 mb-2">Filter by Customer:</h3>
+
+    <input
+      type="text"
+      value={orderId}
+      onChange={(e) => setOrderId(e.target.value)}
+      placeholder="Name, Phone, or Email..."
+      className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
+    />
+
+    <div className="flex justify-between items-center gap-2">
+      <button
+        className={`flex-1 px-4 py-1 rounded text-white text-sm ${
+          orderId ? "bg-green-600 hover:bg-green-700" : "bg-gray-300 cursor-not-allowed"
+        }`}
+        onClick={() => {
+          if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+            window.$('#orderTable').DataTable().search(orderId).draw();
+          }
+          setShowCustomerFilter(false);
+          setOrderId('');
+        }}
+        disabled={!orderId}
+      >
+        Apply
+      </button>
+
+      <button
+        className="flex-1 px-4 py-1 rounded border border-gray-300 text-gray-700 text-sm hover:bg-gray-100"
+        onClick={() => {
+          setOrderId('');
+          if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+            window.$('#orderTable').DataTable().search('').draw();
+          }
+        }}
+      >
+        Reset
+      </button>
+    </div>
+  </div>
+)}
+
+
+                      </th>
+                    }
+
+                    {hasAnyPermission(
+                      "payment_mode",
+                      "transactionId",
+                      "amount",
+                      "status"
+                    ) && (
+                        <th className="p-3 px-5 whitespace-nowrap relative">
+                          <button
+                            onClick={() => {
+                              setShowPaymentFilter(!showPaymentFilter);
+                              setShowCustomerFilter(false);
+                              setShowShipmentDetailsFilter(false);
+                              setShowStatus(false);
+                              setShowFilter(false);
+                            }}
+                            className="flex gap-2 uppercase items-center"
+                          >
+                            Payment Details <IoFilterSharp className="w-4 h-4" />
+                          </button>
+                          {showPaymentFilter && (
+                            <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+                              <h3 className="font-medium text-gray-700 mb-2">Filter by Payment:</h3>
+
+                              {/* Transaction ID input */}
+                              <input
+                                type="text"
+                                value={orderId}
+                                onChange={(e) => setOrderId(e.target.value)}
+                                placeholder="Transaction ID..."
+                                className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
+                              />
+
+                              {/* Payment Status checkboxes */}
+                              <div className="mt-3">
+                                <label className="block text-sm font-medium text-gray-700">Payment Status</label>
+                                <div className="grid grid-cols-3 gap-2 mt-2 text-xs text-gray-700">
+                                  {["failed", "success", "pending"].map((status) => (
+                                    <label key={status} className="flex items-center gap-1">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedPaymentStatuses.includes(status)}
+                                        onChange={() => togglePaymentStatus(status)}
+                                        className="h-4 w-4"
+                                      />
+                                      {status}
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Buttons */}
+                              <div className="flex justify-between items-center mt-4 gap-2">
+                                <button
+                                  className={`flex-1 px-4 py-1 rounded text-white text-sm ${orderId || selectedPaymentStatuses.length
+                                    ? "bg-green-600 hover:bg-green-700"
+                                    : "bg-gray-300 cursor-not-allowed"
+                                    }`}
+                                  onClick={() => {
+                                    if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                      window.$('#orderTable').DataTable().search(orderId).draw();
+                                      const regex = selectedPaymentStatuses.join('|');
+                                      window.$('#orderTable').DataTable().column(4).search(regex, true, false).draw();
+                                    }
+                                    setShowPaymentFilter(false);
+                                    setShowFilter(false);
+                                  }}
+                                  disabled={!orderId && selectedPaymentStatuses.length === 0}
+                                >
+                                  Apply
+                                </button>
+
+                                <button
+                                  className="flex-1 px-4 py-1 rounded border border-gray-300 text-gray-700 text-sm hover:bg-gray-100"
+                                  onClick={() => {
+                                    setOrderId('');
+                                    setSelectedPaymentStatuses([]);
+                                    if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                      window.$('#orderTable').DataTable().search('').draw();
+                                      window.$('#orderTable').DataTable().column(4).search('').draw();
+                                    }
+                                  }}
+                                >
+                                  Reset
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </th>
+
+                      )}
+                    {hasAnyPermission(
+                      "order_number",
+                      "shippingPhone",
+                      "shippingAddress",
+                      "awb_number",
+                    ) && <th className="p-3 px-5 whitespace-nowrap relative">
+                        <button
+                          onClick={() => {
+                            setShowShipmentDetailsFilter(!showShipmentDetailsFilter);
+                            setShowCustomerFilter(false);
+                            setShowPaymentFilter(false);
+                            setShowStatus(false);
+                            setShowFilter(false);
+                          }}
+                          className="flex gap-2 uppercase items-center"
+                        >
+                          Shipment Details <IoFilterSharp className="w-4 h-4" />
+                        </button>
+                        {showShipmentDetailsFilter && (
+                          <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+                            <h3 className="font-medium text-gray-700 mb-2">Filter by Shipment:</h3>
+                            <input
+                              type="text"
+                              placeholder="AWB number..."
+                              value={orderId}
+                              onChange={(e) => {
+                                setOrderId(e.target.value);
+
+                              }}
+                              className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
+                            />
+                            <button
+                              className="mt-2 block px-4 w-full bg-green-600 text-white py-1 rounded hover:bg-green-700"
+                              onClick={() => {
+                                if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                  window.$('#orderTable').DataTable().search(orderId).draw();
+                                }
+                                setOrderId('');
+                                setShowShipmentDetailsFilter(false);
+                              }}
+                            >
+                              Apply
+                            </button>
+                          </div>
+                        )}
+
+                      </th>
+                    }
+
+
+                    {hasAnyPermission("trackingNumber ") && (
+                      <th className="p-3 px-5 whitespace-nowrap">Return Tracking #</th>
                     )}
 
                     {hasAnyPermission("rtoDelivered", "delivered") && (
-                      <td className="p-3 px-5 whitespace-nowrap capitalize">
-                        <PermissionField permissionKey="rtoDelivered">
-                          {order.delivered ? (
-                            <span className="text-green-600">Delivered</span>
-                          ) : order.rtoDelivered ? (
-                            <span className="text-orange-500">RTO Delivered</span>
-                          ) : (
-                            <span className="text-red-500">Pending</span>
-                          )}
-                        </PermissionField>
-                      </td>
+                      <>
+                        <th className="p-3 px-5 whitespace-nowrap">delivered Status</th>
+                      </>
                     )}
-
                     {hasAnyPermission("rtoDeliveredDate", "deliveredDate") && (
-                      <td className="p-3 px-5 whitespace-nowrap">
-                        <PermissionField permissionKey="rtoDeliveredDate">
-                          {order.deliveredDate ? (
-                            <span>{new Date(order.deliveredDate).toLocaleDateString()}</span>
-                          ) : order.rtoDeliveredDate ? (
-                            <span>{new Date(order.rtoDeliveredDate).toLocaleDateString()}</span>
-                          ) : (
-                            <span className="text-red-500">Pending</span>
-                          )}
-                        </PermissionField>
-                      </td>
+                      <>
+                        <th className="p-3 px-5 whitespace-nowrap">delivered Date</th>
+                      </>
                     )}
 
 
 
-                    {/* Total Amount */}
                     {hasAnyPermission("totalAmount") && (
-                      <td className="p-3 px-5 whitespace-nowrap">
-                        <PermissionField permissionKey="totalAmount">₹{order.totalAmount}</PermissionField>
-                      </td>
+                      <th className="p-3 px-5 whitespace-nowrap">Total</th>
                     )}
-                    <td className="p-2 px-5 whitespace-nowrap">
-                      <button className="bg-[#2B3674] text-white font-medium px-4 py-2 rounded-md text-sm">
-                        Generate Invoice
-                      </button>
-                    </td>
-
-                    {/* Action */}
-                    <td className="p-2 px-5 whitespace-nowrap">
-                      <div className="flex gap-3 justify-end items-center mt-2">
-                        <button
-                          onClick={() => {
-                            setNoteInput(order.orderNote || "");
-                            setSelectedNoteOrder(order.id);
-                            setIsNoteModalOpen(true);
-                          }}
-                          className="text-[#F98F5C] border rounded-md font-dm-sans p-2 text-sm"
-                        >
-                          View / Add Notes
-                        </button>
-
-                        {!order.shippingApiResult?.data?.awb_number ? (
-                          <button
-                            className="bg-orange-500 text-white font-medium px-4 py-2 rounded-md text-sm"
-                            onClick={() => handleShipping(order.id)}
-                          >
-                            Shipping
-                          </button>
-                        ) : (
-                          <>
-                            <button
-                              className="bg-blue-600 text-white font-medium px-4 py-2 rounded-md text-sm"
-                              onClick={() => handleTracking(order.id)}
-                            >
-                              Tracking
-                            </button>
-                            <button
-                              className="bg-[#B71D21] text-white font-medium px-4 py-2 rounded-md text-sm"
-                              onClick={() => handleCancel(order.id)}
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        )}
-                      </div>
-
-                      <ul className="flex gap-6 mt-4 justify-end">
-                        <li><RiFileEditFill className="text-black text-xl" /></li>
-                        <li><IoCloudDownloadOutline className="text-black text-xl" /></li>
-                        <li><RxCrossCircled className="text-black text-xl" /></li>
-                        <li><IoIosArrowDropdown className="text-black text-xl" /></li>
-                      </ul>
-                    </td>
+                    <th className="p-2 px-5 text-left whitespace-nowrap">Download Invoice</th>
+                    <th className="p-2 px-5 text-center">Action</th>
                   </tr>
-                )
+                </thead>
+                <tbody>
+
+                  {orders.map((order, index) => {
+
+                    return (
+                      <tr key={order.id} className="text-[#364e91] font-semibold border-b border-[#E9EDF7] align-top">
+                        {/* Order ID */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <div className="flex items-center">
+
+                            <label className="flex items-center cursor-pointer mr-2">
+                              <input
+                                type="checkbox"
+                                checked={selected.includes(order.id)}
+                                onChange={() => handleCheckboxChange(order.id)}
+                                className="peer hidden"
+                              />
+                              <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                <FaCheck className="peer-checked:block text-white w-3 h-3" />
+                              </div>
+                            </label>
+
+                            {index + 1}</div></td>
+
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
+                          <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</span>
+                        </td>
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          {order.status}
+
+                        </td>
+
+                        {hasAnyPermission("shippingName", "shippingPhone", "shippingEmail") && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            <PermissionField permissionKey="shippingName">{order.shippingName}</PermissionField>
+                            <br />
+                            <span className="text-sm block">
+                              <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
+                            </span>
+                            <span className="text-sm text-[#01b574]">
+                              <PermissionField permissionKey="shippingEmail">{order.shippingEmail}</PermissionField>
+                            </span>
+                          </td>
+                        )}
+
+                        {hasAnyPermission("payment_mode", "transactionId", "amount", "status") && (
+                          <td className="p-3 px-5 whitespace-nowrap font-semibold">
+                            <PermissionField permissionKey="payment_mode">
+                              <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "-"}</span></p>
+                            </PermissionField>
+                            <PermissionField permissionKey="transactionId">
+                              <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "-"}</span></p>
+                            </PermissionField>
+                            <PermissionField permissionKey="amount">
+                              <p>Amount: <span className="font-bold">{order.payment?.amount || "-"}</span></p>
+                            </PermissionField>
+                            <PermissionField permissionKey="status">
+                              <p>
+                                <span className={`font-bold uppercase ${order.payment?.status === "failed"
+                                  ? "text-red-500"
+                                  : order.payment?.status === "pending"
+                                    ? "text-yellow-500"
+                                    : "text-green-500"
+                                  }`}>
+                                  {order.payment?.status || "-"}
+                                </span>
+                              </p>
+                            </PermissionField>
+                          </td>
+                        )}
+
+                        {hasAnyPermission("orderNumber", "shippingPhone", "shippingAddress", "awbNumber") && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            <PermissionField permissionKey="orderNumber">
+                              {order.shippingApiResult?.data?.order_number || "-"}
+                            </PermissionField>
+                            <br />
+                            <PermissionField permissionKey="shippingAddress">
+                              {order.shippingAddress || "-"}
+                            </PermissionField>
+                            <br />
+                            <span className="text-green-500">
+                              <PermissionField permissionKey="shippingPhone">
+                                {order.shippingPhone || "-"}
+                              </PermissionField>
+                            </span>
+                            <br />
+                            <PermissionField permissionKey="awbNumber">
+                              {order.shippingApiResult?.data?.awb_number || "-"}
+                            </PermissionField>
+                          </td>
+                        )}
+
+                        {hasAnyPermission("trackingNumber") && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            {order.items
+                              .map((item) => (
+                                <PermissionField key={item.id} permissionKey="trackingNumber">
+                                  {item.supplierRTOResponse?.trackingNumber || "-"}
+                                </PermissionField>
+                              ))
+                              .reduce((prev, curr) => [prev, ", ", curr])}
+                          </td>
+                        )}
+
+                        {hasAnyPermission("rtoDelivered", "delivered") && (
+                          <td className="p-3 px-5 whitespace-nowrap capitalize">
+                            <PermissionField permissionKey="rtoDelivered">
+                              {order.delivered ? (
+                                <span className="text-green-600">Delivered</span>
+                              ) : order.rtoDelivered ? (
+                                <span className="text-orange-500">RTO Delivered</span>
+                              ) : (
+                                <span className="text-red-500">Pending</span>
+                              )}
+                            </PermissionField>
+                          </td>
+                        )}
+
+                        {hasAnyPermission("rtoDeliveredDate", "deliveredDate") && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            <PermissionField permissionKey="rtoDeliveredDate">
+                              {order.deliveredDate ? (
+                                <span>{new Date(order.deliveredDate).toLocaleDateString()}</span>
+                              ) : order.rtoDeliveredDate ? (
+                                <span>{new Date(order.rtoDeliveredDate).toLocaleDateString()}</span>
+                              ) : (
+                                <span className="text-red-500">Pending</span>
+                              )}
+                            </PermissionField>
+                          </td>
+                        )}
 
 
-              })}
-            </tbody>
-          </table>
 
-          {/* Note Model */}
-          {isNoteModalOpen && (
-            <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
-                <button
-                  onClick={() => setIsNoteModalOpen(false)}
-                  className="absolute top-2 right-2 text-gray-500 hover:text-black"
-                >
-                  ✕
-                </button>
-                <h2 className="text-lg font-bold mb-4">Order Notes</h2>
-                <textarea
-                  className="w-full border p-2 rounded-xl mb-4"
-                  rows={4}
-                  value={noteInput}
-                  onChange={(e) => setNoteInput(e.target.value)}
-                  placeholder="Add your note here..."
-                />
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => setIsNoteModalOpen(false)}
-                    className="bg-gray-200 px-4 py-2 rounded-md"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveNote}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md"
-                  >
-                    Save
-                  </button>
+                        {/* Total Amount */}
+                        {hasAnyPermission("totalAmount") && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            <PermissionField permissionKey="totalAmount">₹{order.totalAmount}</PermissionField>
+                          </td>
+                        )}
+                        <td className="p-2 px-5 whitespace-nowrap">
+                          <button className="bg-[#2B3674] text-white font-medium px-4 py-2 rounded-md text-sm">
+                            Generate Invoice
+                          </button>
+                        </td>
+
+                        {/* Action */}
+                        <td className="p-2 px-5 whitespace-nowrap">
+                          <div className="flex gap-3 justify-end items-center mt-2">
+                            <button
+                              onClick={() => {
+                                setNoteInput(order.orderNote || "");
+                                setSelectedNoteOrder(order.id);
+                                setIsNoteModalOpen(true);
+                              }}
+                              className="text-[#F98F5C] border rounded-md font-dm-sans p-2 text-sm"
+                            >
+                              View / Add Notes
+                            </button>
+
+                            {!order.shippingApiResult?.data?.awb_number ? (
+                              <button
+                                className="bg-orange-500 text-white font-medium px-4 py-2 rounded-md text-sm"
+                                onClick={() => handleShipping(order.id)}
+                              >
+                                Shipping
+                              </button>
+                            ) : (
+                              <>
+                                <button
+                                  className="bg-blue-600 text-white font-medium px-4 py-2 rounded-md text-sm"
+                                  onClick={() => handleTracking(order.id)}
+                                >
+                                  Tracking
+                                </button>
+                                <button
+                                  className="bg-[#B71D21] text-white font-medium px-4 py-2 rounded-md text-sm"
+                                  onClick={() => handleCancel(order.id)}
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            )}
+                          </div>
+
+                          <ul className="flex gap-6 mt-4 justify-end">
+                            <li><RiFileEditFill className="text-black text-xl" /></li>
+                            <li><IoCloudDownloadOutline className="text-black text-xl" /></li>
+                            <li><RxCrossCircled className="text-black text-xl" /></li>
+                            <li><IoIosArrowDropdown className="text-black text-xl" /></li>
+                          </ul>
+                        </td>
+                      </tr>
+                    )
+
+
+                  })}
+                </tbody>
+              </table>
+
+              {/* Note Model */}
+              {isNoteModalOpen && (
+                <div className="fixed px-5 inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+                    <button
+                      onClick={() => setIsNoteModalOpen(false)}
+                      className="absolute top-2 right-2 text-gray-500 hover:text-black"
+                    >
+                      ✕
+                    </button>
+                    <h2 className="text-lg font-bold mb-4">Order Notes</h2>
+                    <textarea
+                      className="w-full border p-2 rounded-xl mb-4"
+                      rows={4}
+                      value={noteInput}
+                      onChange={(e) => setNoteInput(e.target.value)}
+                      placeholder="Add your note here..."
+                    />
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => setIsNoteModalOpen(false)}
+                        className="bg-gray-200 px-4 py-2 rounded-md"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleSaveNote}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
-          )}
-        </div>
+          ) : (
+            <p className="text-center">No Order Available</p>
+          )
+        }
 
 
 
@@ -1320,7 +1344,7 @@ export default function Orders() {
       )}
 
       {isModalOpen && tracking?.trackingData && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed px-5 inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-2xl shadow-lg p-6 relative">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Tracking Details</h2>
 
@@ -1369,7 +1393,7 @@ export default function Orders() {
         </div>
       )}
       {isBarCodePopupOpen && (
-        <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed px-5 inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
             <button
               onClick={() => setIsBarCodePopupOpen(false)}

@@ -73,12 +73,23 @@ const Dropshipper = () => {
                 .then(([jQuery]) => {
                     window.jQuery = window.$ = jQuery.default;
 
-                    if ($.fn.DataTable.isDataTable("#supplierTable")) {
-                        $("#supplierTable").DataTable().destroy();
+                    if ($.fn.DataTable.isDataTable("#dropshipperTable")) {
+                        $("#dropshipperTable").DataTable().destroy();
                         // Remove the empty() call here
                     }
 
-                    table = $("#supplierTable").DataTable();
+                    const isMobile = window.innerWidth <= 768;
+                    const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+                    table = $('#dropshipperTable').DataTable({
+                        pagingType,
+                        language: {
+                            paginate: {
+                                previous: "<",
+                                next: ">"
+                            }
+                        }
+                    });
 
                     return () => {
                         if (table) {
@@ -225,8 +236,24 @@ const Dropshipper = () => {
                     >
                         <MoreHorizontal className="text-[#F98F5C]" />
                         {isPopupOpen && (
-                            <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                            <div className="absolute md:left-0 right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
                                 <ul className="py-2 text-sm text-[#2B3674]">
+                                    <li className="px-4 md:hidden block  py-2 hover:bg-gray-100 cursor-pointer"> {canAdd && (
+                                        <button onClick={setActiveTab('account_details')} className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
+                                            <Link href="/admin/dropshipper/create">Add New</Link>
+                                        </button>
+                                    )}
+                                    </li>
+                                    <li className="px-4 md:hidden block  py-2 hover:bg-gray-100 cursor-pointer"> {canViewTrashed && (
+
+                                        <button
+                                            className={`p-2 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                            onClick={handleToggleTrash}
+                                        >
+                                            {isTrashed ? "Dropshipper Listing (Simple)" : "Trashed Dropshipper"}
+                                        </button>
+                                    )}
+                                    </li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
@@ -234,7 +261,7 @@ const Dropshipper = () => {
                             </div>
                         )}
                     </button>
-                    <div className="flex justify-end gap-2">
+                    <div className="md:flex hidden justify-end gap-2">
                         {canAdd && (
                             <button onClick={setActiveTab('account_details')} className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
                                 <Link href="/admin/dropshipper/create">Add New</Link>
@@ -257,7 +284,7 @@ const Dropshipper = () => {
 
             {dropshippers.length > 0 ? (
                 <div className="overflow-x-auto w-full relative main-outer-wrapper">
-                    <table className="display main-tables w-full" id="supplierTable">
+                    <table className="display main-tables w-full" id="dropshipperTable">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Sr.</th>
@@ -297,6 +324,7 @@ const Dropshipper = () => {
                                             <td className="p-3 px-4 text-left">{item.permanentAddress || '-'}</td>
                                             <td className="p-3 px-4 text-center whitespace-nowrap">
                                                 <button
+                                                 disabled={!item.bankAccount}
                                                     onClick={() =>
                                                         expandedItem?.id === item.id
                                                             ? setExpandedItem(null)
@@ -363,7 +391,7 @@ const Dropshipper = () => {
                         </tbody>
                     </table>
                     {expandedItem && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                        <div className="fixed inset-0 px-5  z-50 flex items-center justify-center bg-[#0000007c] bg-opacity-40">
                             <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl relative">
                                 <button
                                     onClick={() => setExpandedItem(null)}
@@ -398,7 +426,7 @@ const Dropshipper = () => {
                         </div>
                     )}
                     {expandPassModal && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000094] bg-opacity-40">
+                        <div className="fixed inset-0 z-50 px-5 flex items-center justify-center bg-[#00000094] bg-opacity-40">
                             <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl relative">
                                 <button
                                     onClick={() => setExpandPassModal(null)}

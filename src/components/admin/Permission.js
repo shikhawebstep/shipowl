@@ -159,7 +159,7 @@ function Permission() {
 
               {/* Model */}
               {selectedPanel && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                <div className="fixed px-6 inset-0 bg-[#000000a8] bg-opacity-40 flex items-center justify-center z-50">
                   <div className="bg-white p-6 rounded-lg max-w-3xl h-[600px] overflow-auto w-full relative">
                     <h3 className="text-lg text-center font-semibold mb-4">
                       Permissions for <span className="capitalize">{selectedPanel}</span>

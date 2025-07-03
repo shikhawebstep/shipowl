@@ -1392,7 +1392,7 @@ export default function ProductDetails() {
                 >
                   <div className="p-3">
                     {/* FLIP CARD */}
-                    <div className="relative md:h-[200px] h-[100px] perspective">
+                    <div className="relative h-[200px] h-[100px] perspective">
                       <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                         {/* FRONT */}
                         <Image

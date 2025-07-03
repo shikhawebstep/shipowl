@@ -71,15 +71,15 @@ export default function ProfileView() {
     }
     return (
         <>
-            <div className="bg-white p-5 rounded-md profilePage">
+            <div className="bg-white md:p-5 rounded-md profilePage">
                 <div className="flex justify-center items-center gap-5 mb-4">
-                    <h2 className='text-center py-3 font-bold text-2xl'>{suppliers?.name} Profile</h2>
+                    <h2 className='text-center py-3 font-bold md:text-2xl'>{suppliers?.name}</h2>
                     <button
                         className='bg-green-500 p-3 rounded-md  text-white'
                         onClick={() => { router.push(`/admin/supplier/update?id=${suppliers.id}`) }}>Update Profile</button>
                 </div>
-                <div className="flex gap-10">
-                    <div className="col md:w-3/12 border border-gray-300 p-5 rounded-md">
+                <div className="lg:flex gap-10">
+                    <div className="col lg:w-3/12 border border-gray-300 p-5 rounded-md">
                         <div className="img">
                             <Image src={fetchImages(suppliers.profilePicture)} alt={suppliers.name || 'Text'} height={200} width={200} />
                         </div>
@@ -96,7 +96,7 @@ export default function ProfileView() {
 
                         </div>
                     </div>
-                    <div className="col md:w-9/12 grid md:grid-cols-2 gap-4 border border-gray-300 p-5 rounded-md">
+                    <div className="col lg:w-9/12 mt-5 grid md:grid-cols-2 gap-4 border border-gray-300 p-5 rounded-md">
                         <div className=" border border-gray-300 p-3 rounded col">
                             <h3 className='text-orange-500 font-bold text-lg underline py-2'>Company Details</h3>
                             <p><b>Company Name:</b> {suppliers?.companyDetail?.companyName || "NIL"}</p>

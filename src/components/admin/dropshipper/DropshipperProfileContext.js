@@ -26,6 +26,17 @@ const DropshipperProfileProvider = ({ children }) => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  const validate2 = () => {
+    const newErrors = {};
+    if (!formData.name) newErrors.name = 'Full Name is required';
+    if (!formData.email) newErrors.email = 'Email is required';
+    if (!formData.phoneNumber) newErrors.phoneNumber = 'Mobile Number is required';
+    if (!formData.website) newErrors.website = 'Website URL is required';
+    if (!formData.referralCode) newErrors.referralCode = 'Referral Code is required';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
   const id = searchParams.get("id");
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -252,7 +263,7 @@ const DropshipperProfileProvider = ({ children }) => {
     return Object.keys(newErrors).length === 0;
   };
   return (
-    <DropshipperProfileContext.Provider value={{ files, setFiles,errors, loading, setLoading, setErrors, errorsAddress, setErrorsAddress, validate, validateAddress, activeTab, setActiveTab, formData, setFormData, setStateData, setCityData, cityData, stateData, handleChange, fetchSupplier }}>
+    <DropshipperProfileContext.Provider value={{ files, setFiles,validate2,errors, loading, setLoading, setErrors, errorsAddress, setErrorsAddress, validate, validateAddress, activeTab, setActiveTab, formData, setFormData, setStateData, setCityData, cityData, stateData, handleChange, fetchSupplier }}>
       {children}
     </DropshipperProfileContext.Provider>
   );

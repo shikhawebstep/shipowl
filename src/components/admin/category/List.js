@@ -220,7 +220,7 @@ const canRestore = hasPermission("Restore");
                                                                     slidesPerView={1}
                                                                     loop={item.image?.split(",").length > 1}
                                                                     navigation={true}
-                                                                    className="mySwiper w-[250px] ms-2"
+                                                                    className="mySwiper xl:w-[250px] md:w-[100px] w-[50px] ms-2"
                                                                 >
                                                                     {item.image?.split(",").map((img, index) => (
                                                                         <SwiperSlide key={index}>

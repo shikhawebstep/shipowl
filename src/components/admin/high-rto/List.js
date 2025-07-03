@@ -110,7 +110,7 @@ export default function List() {
 
     useEffect(() => {
         if (typeof window !== "undefined" && data.length > 0 && !loading) {
-            Promise.all([
+          Promise.all([
                 import('jquery'),
                 import('datatables.net'),
                 import('datatables.net-dt'),
@@ -119,13 +119,32 @@ export default function List() {
             ]).then(([jQuery]) => {
                 window.jQuery = window.$ = jQuery.default;
 
-                const $ = window.$;
-
-                if ($.fn.DataTable.isDataTable('#rto-table')) {
-                    $('#rto-table').DataTable().destroy();
+                // Destroy existing DataTable if it exists
+                if ($.fn.DataTable.isDataTable('#highRto')) {
+                    $('#highRto').DataTable().destroy();
+                    $('#highRto').empty();
                 }
 
-                $('#rto-table').DataTable();
+                // Reinitialize DataTable with new data
+                const isMobile = window.innerWidth <= 768;
+                const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+                table = $('#highRto').DataTable({
+                    pagingType,
+                    language: {
+                        paginate: {
+                            previous: "<",
+                            next: ">"
+                        }
+                    }
+                });
+
+                return () => {
+                    if (table) {
+                        table.destroy();
+                        $('#highRto').empty();
+                    }
+                };
             }).catch(console.error);
         }
     }, [data, loading]);
@@ -143,7 +162,7 @@ export default function List() {
             <div className="flex flex-wrap justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#2B3674]">High Rto List</h2>
                 <div className="flex gap-3 flex-wrap items-center">
-                    <div className="flex justify-start gap-5 items-end">
+                    <div className="md:flex hidden justify-start gap-5 items-end">
                         {canViewTrashed && <button
                             className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                             onClick={handleToggleTrash}
@@ -162,8 +181,25 @@ export default function List() {
                     >
                         <MoreHorizontal className="text-[#F98F5C]" />
                         {isPopupOpen && (
-                            <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                            <div className="absolute md:left-0 mt-2 w-40 right-0 bg-white rounded-md shadow-lg z-10">
                                 <ul className="py-2 text-sm text-[#2B3674]">
+                                    <li className="px-4 py-2 hover:bg-gray-100 block md:hidden cursor-pointer">
+                                        {canViewTrashed && <button
+                                            className={`p-2 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                            onClick={handleToggleTrash}
+                                        >
+                                            {isTrashed ? "Bad Pincodes Listing (Simple)" : "Trashed Pincodes"}
+                                        </button>
+                                        }
+
+                                    </li>
+                                    <li className="px-4 py-2 hover:bg-gray-100 block md:hidden cursor-pointer">
+                                        {canAdd && <Link href="/admin/high-rto/create">
+                                            <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'>Add New</button>
+                                        </Link>
+                                        }
+
+                                    </li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
@@ -176,7 +212,7 @@ export default function List() {
 
             {data.length > 0 ? (
                 <div className="overflow-x-auto relative main-outer-wrapper w-full">
-                    <table className="md:w-full w-auto display main-tables" id="rto-table">
+                    <table className="md:w-full w-auto display main-tables" id="highRto">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                 <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country</th>

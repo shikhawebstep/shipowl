@@ -599,7 +599,7 @@ const BusinessInfo = () => {
             </div>
           ))}
           {/* Separate file input for "Upload GST Document" */}
-          <div className="">
+          <div className="w-full overflow-auto">
             <div className="mb-4">
               {renderLabel('Upload GST Document', 'gstDocument')}
               <input
@@ -615,28 +615,9 @@ const BusinessInfo = () => {
 
             {/* File preview for GST Document */}
             {formData?.gstDocument?.length > 0 && (
-              <Swiper
-                key={formData.id}
-                modules={[Navigation]}
-                slidesPerView={2}
-                loop={formData.gstDocument?.split(',').length > 1}
-                navigation={true}
-                touchRatio={0} // 👈 disables dragging/swiping
-                className="mySwiper w-full ms-2"
-                breakpoints={{
-                  0: {
-                    slidesPerView: 1,
-                    allowTouchMove: false, // 👈 disable drag on mobile
-                  },
-                  1024: {
-                    slidesPerView: 2,
-                    allowTouchMove: true, // 👈 enable drag on tablet/desktop
-                  }
-                }}
-              >
-
+              <div className="flex overflow-x-auto gap-4 p-2 ms-2">
                 {formData.gstDocument?.split(',').map((img, index) => (
-                  <SwiperSlide key={index} className="relative gap-3">
+                  <div key={index} className="relative min-w-[250px] max-w-[300px]">
                     {/* Delete Button */}
                     <button
                       type="button"
@@ -652,8 +633,7 @@ const BusinessInfo = () => {
                           confirmButtonText: 'Yes, delete it!'
                         }).then((result) => {
                           if (result.isConfirmed) {
-
-                            handleImageDelete(index, 'gstDocument'); // Call your delete function
+                            handleImageDelete(index, 'gstDocument');
                           }
                         });
                       }}
@@ -667,14 +647,15 @@ const BusinessInfo = () => {
                       alt={`Image ${index + 1}`}
                       width={500}
                       height={500}
-                      className="me-3 p-2 object-cover rounded"
+                      className="object-cover rounded p-2"
                     />
-                  </SwiperSlide>
+                  </div>
                 ))}
-              </Swiper>
+              </div>
             )}
+
           </div>
-          <div className="">
+         <div className="w-full overflow-auto">
             <div className="mb-4">
               {renderLabel('Upload company PanCard Image', 'companyPanCardImage')}
               <input
@@ -690,27 +671,9 @@ const BusinessInfo = () => {
 
             {/* File preview for GST Document */}
             {formData?.companyPanCardImage?.length > 0 && (
-              <Swiper
-                touchRatio={0} // 👈 disables dragging/swiping
-                key={formData.id}
-                modules={[Navigation]}
-                slidesPerView={2}
-                loop={formData.companyPanCardImage?.split(',').length > 1}
-                navigation={true}
-                className="mySwiper w-full ms-2"
-                breakpoints={{
-                  0: {
-                    slidesPerView: 1,
-                    allowTouchMove: false, // 👈 disable drag on mobile
-                  },
-                  1024: {
-                    slidesPerView: 2,
-                    allowTouchMove: true, // 👈 enable drag on tablet/desktop
-                  }
-                }}
-              >
+              <div className="flex overflow-x-auto gap-4 p-2 ms-2">
                 {formData.companyPanCardImage?.split(',').map((img, index) => (
-                  <SwiperSlide key={index} className="relative gap-3">
+                  <div key={index} className="relative min-w-[250px] max-w-[300px]">
                     {/* Delete Button */}
                     <button
                       type="button"
@@ -726,8 +689,7 @@ const BusinessInfo = () => {
                           confirmButtonText: 'Yes, delete it!'
                         }).then((result) => {
                           if (result.isConfirmed) {
-
-                            handleImageDelete(index, 'companyPanCardImage'); // Call your delete function
+                            handleImageDelete(index, 'companyPanCardImage');
                           }
                         });
                       }}
@@ -741,12 +703,13 @@ const BusinessInfo = () => {
                       alt={`Image ${index + 1}`}
                       width={500}
                       height={500}
-                      className="me-3 p-2 object-cover rounded"
+                      className="object-cover rounded p-2"
                     />
-                  </SwiperSlide>
+                  </div>
                 ))}
-              </Swiper>
+              </div>
             )}
+
           </div>
         </div>
       </div>
@@ -774,7 +737,7 @@ const BusinessInfo = () => {
       {/* PAN and Aadhar Upload */}
       <div className="grid md:grid-cols-2 py-5 gap-3">
         {/* PAN Card Image Upload */}
-        <div>
+        <div className="w-full overflow-auto">
           {renderLabel('Upload PAN card image', 'panCardImage')}
           <input
             type="file"
@@ -786,70 +749,53 @@ const BusinessInfo = () => {
           />
 
           {formData.panCardImage?.length > 0 && (
-            <div className="py-6">
-              <div className="mt-2">
-                <Swiper
-                  key={formData.id}
-                  modules={[Navigation]}
-                  slidesPerView={2}
-                  loop={(formData.panCardImage || '').split(',').length > 1}
-                  navigation={true}
-                  touchRatio={0} // 👈 disables dragging/swiping
-                  className="mySwiper w-full ms-2"
-                  breakpoints={{
-                    0: {
-                      slidesPerView: 1,
-                      allowTouchMove: false, // 👈 disable drag on mobile
-                    },
-                    1024: {
-                      slidesPerView: 2,
-                      allowTouchMove: true, // 👈 enable drag on tablet/desktop
-                    }
-                  }}
-                >
-                  {(formData.panCardImage || '').split(',').map((img, index) => (
-                    <SwiperSlide key={index} className="relative gap-3">
-                      {/* Delete Button */}
-                      <button
-                        type="button"
-                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
-                        onClick={() => {
-                          Swal.fire({
-                            title: 'Are you sure?',
-                            text: `Do you want to delete this image?`,
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#d33',
-                            cancelButtonColor: '#3085d6',
-                            confirmButtonText: 'Yes, delete it!'
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              handleImageDelete(index, 'panCardImage'); // Call your delete function
-                            }
-                          });
-                        }}
-                      >
-                        ✕
-                      </button>
-                      {/* Image */}
-                      <Image
-                        src={fetchImages(img)}
-                        alt={`Image ${index + 1}`}
-                        width={500}
-                        height={500}
-                        className="me-3 p-2 object-cover rounded"
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              </div>    </div>
+            <div className="py-6 w-full">
+              <div className="mt-2 flex overflow-x-auto gap-4 p-2 ms-2">
+                {(formData.panCardImage || '').split(',').map((img, index) => (
+                  <div key={index} className="relative min-w-[250px] max-w-[300px]">
+                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                      onClick={() => {
+                        Swal.fire({
+                          title: 'Are you sure?',
+                          text: `Do you want to delete this image?`,
+                          icon: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#d33',
+                          cancelButtonColor: '#3085d6',
+                          confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            handleImageDelete(index, 'panCardImage');
+                          }
+                        });
+                      }}
+                    >
+                      ✕
+                    </button>
+
+                    {/* Image */}
+                    <Image
+                      src={fetchImages(img)}
+                      alt={`Image ${index + 1}`}
+                      width={500}
+                      height={500}
+                      className="object-cover rounded p-2"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
+
           {renderError('panCardImage')}
 
         </div>
 
         {/* Aadhar Card Image Upload */}
-        <div>
+     <div className="w-full overflow-auto">
           {renderLabel('Upload Aadhar card image', 'aadharCardImage')}
           <input
             type="file"
@@ -860,30 +806,11 @@ const BusinessInfo = () => {
             className={inputClasses('aadharCardImage')}
           />
           <div className="mt-2">
-            <div className="py-6">
+            <div className="py-6 w-full">
               {formData?.aadharCardImage?.length > 0 && (
-
-                <Swiper
-                  key={formData.id}
-                  modules={[Navigation]}
-                  slidesPerView={2}
-                  loop={formData.aadharCardImage?.split(',').length > 1}
-                  navigation={true}
-                  touchRatio={0} // 👈 disables dragging/swiping
-                  className="mySwiper w-full ms-2"
-                  breakpoints={{
-                    0: {
-                      slidesPerView: 1,
-                      allowTouchMove: false, // 👈 disable drag on mobile
-                    },
-                    1024: {
-                      slidesPerView: 2,
-                      allowTouchMove: true, // 👈 enable drag on tablet/desktop
-                    }
-                  }}
-                >
+                <div className="flex overflow-x-auto gap-4 p-2 ms-2">
                   {formData.aadharCardImage?.split(',').map((img, index) => (
-                    <SwiperSlide key={index} className="relative gap-3">
+                    <div key={index} className="relative min-w-[250px] max-w-[300px]">
                       {/* Delete Button */}
                       <button
                         type="button"
@@ -899,25 +826,27 @@ const BusinessInfo = () => {
                             confirmButtonText: 'Yes, delete it!'
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              handleImageDelete(index, 'aadharCardImage'); // Call your delete function
+                              handleImageDelete(index, 'aadharCardImage');
                             }
                           });
                         }}
                       >
                         ✕
                       </button>
+
                       {/* Image */}
                       <Image
                         src={fetchImages(img)}
                         alt={`Image ${index + 1}`}
                         width={500}
                         height={500}
-                        className="me-3 p-2 object-cover rounded"
+                        className="object-cover rounded p-2"
                       />
-                    </SwiperSlide>
+                    </div>
                   ))}
-                </Swiper>
+                </div>
               )}
+
               {renderError('aadharCardImage')}
             </div>
           </div>
@@ -948,7 +877,7 @@ const BusinessInfo = () => {
         ))}
 
         {/* Document to upload with Swiper preview */}
-        <div>
+     <div className="w-full overflow-auto">
           {renderLabel('Document to upload', 'additionalDocumentUpload')}
           <input
             type="file"
@@ -959,71 +888,52 @@ const BusinessInfo = () => {
             className={inputClasses('additionalDocumentUpload')}
           />
 
-          <div className="py-6">
+          <div className="py-6 w-full">
             {formData?.additionalDocumentUpload?.length > 0 && (
-              <div className="mt-2">
-                <Swiper
-                  key={formData.id}
-                  modules={[Navigation]}
-                  slidesPerView={2}
-                  loop={formData.additionalDocumentUpload?.split(',').length > 1}
-                  navigation={true}
-                  touchRatio={0} // 👈 disables dragging/swiping
-                  className="mySwiper w-full ms-2"
-                  breakpoints={{
-                    0: {
-                      slidesPerView: 1,
-                      allowTouchMove: false, // 👈 disable drag on mobile
-                    },
-                    1024: {
-                      slidesPerView: 2,
-                      allowTouchMove: true, // 👈 enable drag on tablet/desktop
-                    }
-                  }}
-                >
-                  {formData.additionalDocumentUpload?.split(',').map((img, index) => (
-                    <SwiperSlide key={index} className="relative gap-3">
-                      {/* Delete Button */}
-                      <button
-                        type="button"
-                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
-                        onClick={() => {
-                          Swal.fire({
-                            title: 'Are you sure?',
-                            text: `Do you want to delete this image?`,
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#d33',
-                            cancelButtonColor: '#3085d6',
-                            confirmButtonText: 'Yes, delete it!'
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              handleImageDelete(index, 'additionalDocumentUpload'); // Call your delete function
-                            }
-                          });
-                        }}
-                      >
-                        ✕
-                      </button>
-                      {/* Image */}
-                      <Image
-                        src={fetchImages(img)}
-                        alt={`Image ${index + 1}`}
-                        width={500}
-                        height={500}
-                        className="me-3 p-2 object-cover rounded"
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              </div>
+              <div className="mt-2 flex overflow-x-auto gap-4 p-2 ms-2">
+                {formData.additionalDocumentUpload?.split(',').map((img, index) => (
+                  <div key={index} className="relative min-w-[250px] max-w-[300px]">
+                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                      onClick={() => {
+                        Swal.fire({
+                          title: 'Are you sure?',
+                          text: `Do you want to delete this image?`,
+                          icon: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#d33',
+                          cancelButtonColor: '#3085d6',
+                          confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            handleImageDelete(index, 'additionalDocumentUpload');
+                          }
+                        });
+                      }}
+                    >
+                      ✕
+                    </button>
 
+                    {/* Image */}
+                    <Image
+                      src={fetchImages(img)}
+                      alt={`Image ${index + 1}`}
+                      width={500}
+                      height={500}
+                      className="object-cover rounded p-2"
+                    />
+                  </div>
+                ))}
+              </div>
             )}
+
           </div>
         </div>
 
         {/* Document Image */}
-        <div>
+         <div className="w-full overflow-auto">
           {renderLabel('Document Image', 'documentImage')}
           <input
             type="file"
@@ -1034,66 +944,47 @@ const BusinessInfo = () => {
             className={inputClasses('documentImage')}
           />
 
-          <div className="py-6">
+          <div className="py-6 w-full">
             {formData?.documentImage?.length > 0 && (
+              <div className="mt-2 flex overflow-x-auto gap-4 p-2 ms-2">
+                {formData.documentImage?.split(',').map((img, index) => (
+                  <div key={index} className="relative min-w-[250px] max-w-[300px]">
+                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                      onClick={() => {
+                        Swal.fire({
+                          title: 'Are you sure?',
+                          text: `Do you want to delete this image?`,
+                          icon: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#d33',
+                          cancelButtonColor: '#3085d6',
+                          confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            handleImageDelete(index, 'documentImage');
+                          }
+                        });
+                      }}
+                    >
+                      ✕
+                    </button>
 
-              <div className="mt-2">
-                <Swiper
-                  key={formData.id}
-                  modules={[Navigation]}
-                  slidesPerView={2}
-                  touchRatio={0} // 👈 disables dragging/swiping
-                  loop={formData.documentImage?.split(',').length > 1}
-                  navigation={true}
-                  className="mySwiper w-full ms-2"
-                  breakpoints={{
-                    0: {
-                      slidesPerView: 1,
-                      allowTouchMove: false, // 👈 disable drag on mobile
-                    },
-                    1024: {
-                      slidesPerView: 2,
-                      allowTouchMove: true, // 👈 enable drag on tablet/desktop
-                    }
-                  }}
-                >
-                  {formData.documentImage?.split(',').map((img, index) => (
-                    <SwiperSlide key={index} className="relative gap-3">
-                      {/* Delete Button */}
-                      <button
-                        type="button"
-                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
-                        onClick={() => {
-                          Swal.fire({
-                            title: 'Are you sure?',
-                            text: `Do you want to delete this image?`,
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#d33',
-                            cancelButtonColor: '#3085d6',
-                            confirmButtonText: 'Yes, delete it!'
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              handleImageDelete(index, 'documentImage'); // Call your delete function
-                            }
-                          });
-                        }}
-                      >
-                        ✕
-                      </button>
-                      {/* Image */}
-                      <Image
-                        src={fetchImages(img)}
-                        alt={`Image ${index + 1}`}
-                        width={500}
-                        height={500}
-                        className="me-3 p-2 object-cover rounded"
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
+                    {/* Image */}
+                    <Image
+                      src={fetchImages(img)}
+                      alt={`Image ${index + 1}`}
+                      width={500}
+                      height={500}
+                      className="object-cover rounded p-2"
+                    />
+                  </div>
+                ))}
               </div>
             )}
+
           </div>
         </div>
       </div>

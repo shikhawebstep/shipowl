@@ -146,18 +146,29 @@ export default function List() {
                 window.jQuery = window.$ = jQuery.default;
 
                 // Destroy existing DataTable if it exists
-                if ($.fn.DataTable.isDataTable('#rto-table')) {
-                    $('#rto-table').DataTable().destroy();
-                    $('#rto-table').empty();
+                if ($.fn.DataTable.isDataTable('#subuserTableSupplier')) {
+                    $('#subuserTableSupplier').DataTable().destroy();
+                    $('#subuserTableSupplier').empty();
                 }
 
                 // Reinitialize DataTable with new data
-                table = $('#rto-table').DataTable();
+                const isMobile = window.innerWidth <= 768;
+                const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+                table = $('#subuserTableSupplier').DataTable({
+                    pagingType,
+                    language: {
+                        paginate: {
+                            previous: "<",
+                            next: ">"
+                        }
+                    }
+                });
 
                 return () => {
                     if (table) {
                         table.destroy();
-                        $('#rto-table').empty();
+                        $('#subuserTableSupplier').empty();
                     }
                 };
             }).catch((error) => {
@@ -423,8 +434,26 @@ export default function List() {
                         >
                             <MoreHorizontal className="text-[#F98F5C]" />
                             {isPopupOpen && (
-                                <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                                <div className="absolute md:left-0 right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
                                     <ul className="py-2 text-sm text-[#2B3674]">
+                                        <li className="md:hidden block px-4 py-2 hover:bg-gray-100 cursor-pointer"> {canViewTrashed && <button
+                                            className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                                            onClick={async () => {
+                                                if (isTrashed) {
+                                                    setIsTrashed(false);
+                                                    await fetchUsers();
+                                                } else {
+                                                    setIsTrashed(true);
+                                                    await trashedUsers();
+                                                }
+                                            }}
+                                        >
+                                            {isTrashed ? "Subuser Listing (Simple)" : "Trashed Subuser"}
+                                        </button>
+
+                                        }</li>
+                                        <li className="px-4 md:hidden block py-2 hover:bg-gray-100 cursor-pointer">
+                                            {canCreate && <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/supplier/sub-user/create">Add New</Link></button>}</li>
                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
@@ -432,7 +461,7 @@ export default function List() {
                                 </div>
                             )}
                         </button>
-                        <div className="flex justify-start gap-5 items-end">
+                        <div className="md:flex hidden justify-start gap-5 items-end">
                             {canViewTrashed && <button
                                 className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                 onClick={async () => {
@@ -455,7 +484,7 @@ export default function List() {
                 </div>
                 {data.length > 0 ? (
                     <div className="overflow-x-auto relative main-outer-wrapper w-full">
-                        <table className="md:w-full w-auto display main-tables" id="rto-table">
+                        <table className="md:w-full w-auto display main-tables" id="subuserTableSupplier">
                             <thead>
                                 <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                     <th className="p-2 whitespace-nowrap px-5 text-left uppercase">SR.</th>

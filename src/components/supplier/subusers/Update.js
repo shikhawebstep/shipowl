@@ -426,7 +426,7 @@ const handleSubmit = async (e) => {
 
       <div className="md:grid lg:grid-cols-3 md:grid-cols-2 gap-4 grid-cols-1 mt-3">
         {["permanentCountry", "permanentState", "permanentCity"].map((field) => (
-          <div key={field} className="relative">
+          <div key={field} className="relative mb-1">
             <label className="block text-[#232323] font-bold mb-1 capitalize">
               {field.replace("permanent", "")} <span className="text-red-500">*</span>
             </label>
@@ -492,7 +492,7 @@ const handleSubmit = async (e) => {
                   </div>
 
                   {/* Permission Checkboxes */}
-                  <div className="grid border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 gap-2 md:grid-cols-3">
+                  <div className="md:grid flex flex-wrap  border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 gap-2 md:grid-cols-3">
                     {perms.map((perm) => (
                       <label key={perm.id} className="flex items-center space-x-2">
                         <input

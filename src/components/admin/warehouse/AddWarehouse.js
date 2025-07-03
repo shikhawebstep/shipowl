@@ -556,10 +556,10 @@ export default function AddWarehouse() {
 
 
                     <div className="flex flex-wrap gap-3 mt-5">
-                        <button type="submit" className="bg-orange-500 text-white px-15 rounded-md p-3">Save</button>
+                        <button type="submit" className="bg-orange-500 text-white md:px-15 rounded-md p-3 px-4">Save</button>
                         <button
                             type="button"
-                            className="bg-gray-500 text-white px-15 rounded-md p-3"
+                            className="bg-gray-500 text-white md:px-15 rounded-md p-3 px-4"
                             onClick={() => router.back()}>
                             Cancel
                         </button>

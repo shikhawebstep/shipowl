@@ -48,7 +48,7 @@ function LayoutWrapperInner({ children }) {
       )}
       <div
         className={`px-3 mt-20 lg:mt-0 lg-px-0 ${
-          isAuthPage ? "w-full" : "main-outlet xl:w-[81.5%] lg:w-[73%]"
+          isAuthPage ? "w-full" : "main-outlet xl:w-[81.5%] lg:w-[77%]"
         }`}
       >
         {!isAuthPage && <Header />}

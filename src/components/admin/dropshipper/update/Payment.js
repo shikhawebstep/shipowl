@@ -14,9 +14,9 @@ import 'swiper/css/navigation';
 const Payment = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const { formData, setFormData, fetchSupplier,files, setFiles, setActiveTab } = useContext(DropshipperProfileContext);
+  const { formData, setFormData, fetchSupplier, files, setFiles, setActiveTab } = useContext(DropshipperProfileContext);
   const [errors, setErrors] = useState({});
- 
+
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   if (loading) {
@@ -162,7 +162,7 @@ const Payment = () => {
 
     try {
       Swal.fire({
-        title: 'Updating admin...',
+        title: 'Updating Dropshipper...',
         text: 'Please wait while we save your changes.',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
@@ -279,7 +279,7 @@ const Payment = () => {
 
           {/* File Uploads */}
           {['panCardImage', 'aadharCardImage', 'gstDocument'].map((name) => (
-            <div key={name} className="mb-6">
+            <div key={name} className="mb-6 w-full overflow-auto">
               <label className="block text-[#232323] font-bold mb-1 capitalize">
                 {name.replace(/([A-Z])/g, ' $1')} Upload
               </label>
@@ -292,16 +292,9 @@ const Payment = () => {
               />
 
               {formData[name]?.length > 0 && (
-                <Swiper
-                  key={name}
-                  modules={[Navigation]}
-                  slidesPerView={2}
-                  loop={formData[name].split(',').length > 1}
-                  navigation
-                  className="mySwiper w-full mt-3"
-                >
+                <div className="flex gap-3 overflow-x-auto mt-3">
                   {formData[name].split(',').map((img, index) => (
-                    <SwiperSlide key={index} className="relative">
+                    <div key={index} className="relative min-w-[200px]">
                       <button
                         type="button"
                         className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
@@ -326,16 +319,17 @@ const Payment = () => {
                       <Image
                         src={img.trim()}
                         alt={`Image ${index + 1}`}
-                        width={500}
-                        height={500}
-                        className="me-3 p-2 object-cover rounded"
+                        width={200}
+                        height={200}
+                        className="p-2 object-cover rounded border border-[#DFEAF2]"
                       />
-                    </SwiperSlide>
+                    </div>
                   ))}
-                </Swiper>
+                </div>
               )}
             </div>
           ))}
+
 
         </div>
       </div>

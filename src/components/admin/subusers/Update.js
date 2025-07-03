@@ -495,7 +495,7 @@ const handleSubmit = async (e) => {
                   </div>
 
                   {/* Permission Checkboxes */}
-                  <div className="grid border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 gap-2 md:grid-cols-3">
+                  <div className="md:grid flex flex-wrap border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 md:gap-2 gap-4 md:grid-cols-3">
                     {perms.map((perm) => (
                       <label key={perm.id} className="flex items-center space-x-2">
                         <input

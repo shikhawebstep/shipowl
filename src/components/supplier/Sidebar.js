@@ -82,7 +82,7 @@ export default function Sidebar() {
       {/* Overlay for mobile sidebar */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-30 z-40 lg:hidden"
+          className="fixed inset-0 bg-[#0000006b] bg-opacity-30 z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         ></div>
       )}
@@ -90,7 +90,7 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 w-72 sidebar rounded-md bg-white z-50 shadow-lg transition-transform duration-300 ease-in-out
-        ${isSidebarOpen ? "translate-x-0 h-[500px] overflow-auto" : "-translate-x-full"} 
+        ${isSidebarOpen ? "translate-x-0 h-[600px] overflow-auto" : "-translate-x-full"} 
         lg:translate-x-0 lg:relative lg:h-full lg:w-full`}
       >
         <div className="flex items-center justify-between lg:justify-center p-5 border-b border-[#F4F7FE]">
@@ -103,7 +103,7 @@ export default function Sidebar() {
         <nav className="p-3 h-full">
           <ul className="space-y-1">
             {menuItems.map((item) => {
-              const isActive = pathname === item.href || pathname === item.href + "/";
+              const isActive = pathname === item.href || pathname === item.href;
               const isSubmenuOpen = openSubMenu === item.name;
 
               return (
@@ -123,7 +123,7 @@ export default function Sidebar() {
 
                       <ul className="ml-6 mt-1 space-y-1">
                         {item.subMenu.map((sub) => {
-                          const isSubActive = pathname === sub.href || pathname === sub.href + "/";
+                          const isSubActive = pathname === sub.href || pathname === sub.href;
                           return (
                             <li key={sub.name}>
                               <Link href={sub.href}>

@@ -215,7 +215,7 @@ export default function NewProducts() {
       <div>
         {productsRequest.length > 0 ? (
           <div className="grid xl:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-3 productsSection">
-            {productsRequest.map((product) => {
+            {productsRequest.map((product, index) => {
               const imageUrl = product.variants?.[0]?.image?.split(',') || [];
 
               const productName = product.name || "Unnamed Product";
@@ -235,7 +235,7 @@ export default function NewProducts() {
                 // Case 1: Only 1 model and 1 variant
                 if (modalKeys.length === 1 && modalMap[modalKeys[0]].length === 1) {
                   const price = modalMap[modalKeys[0]][0]?.suggested_price ?? 0;
-                  return <span>{modalKeys[0]}: ₹{price}</span>;
+                  return <span className="block text-sm text-gray-800">{modalKeys[0]}: ₹{price}</span>;
                 }
 
                 // Case 2: 1 model, multiple variants
@@ -243,7 +243,7 @@ export default function NewProducts() {
                   const prices = modalMap[modalKeys[0]].map(v => v?.suggested_price ?? 0);
                   const min = Math.min(...prices);
                   const max = Math.max(...prices);
-                  return <span>{modalKeys[0]}: ₹{min} - ₹{max}</span>;
+                  return <span className="block text-sm text-gray-800">{modalKeys[0]}: ₹{min} - ₹{max}</span>;
                 }
 
                 // Case 3 or 4: multiple models
@@ -267,40 +267,61 @@ export default function NewProducts() {
 
               return (
                 <div
-                  key={product.id}
-                  className="group flex flex-col rounded justify-between bg-white p-4 overflow-hidden  shadow-sm hover:shadow-md  transition-all duration-300 relative"
+                  key={index}
+                  tabIndex={0} // Enables focus for mobile tap
+                  className="bg-white relative overflow-hidden rounded-xl group cursor-pointer shadow-md transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] outline-none"
                 >
-                  {/* Flip Image Section */}
-                  <div className="relative h-[200px] perspective">
-                    <div
-                      onClick={() => viewProduct(product.id)}
-                      className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180"
-                    >
-                      {/* FRONT */}
-                      <Image
-                        src={fetchImages(imageUrl[0])}
-                        alt={productName}
-                        height={200}
-                        width={100}
-                        className="w-full h-full object-cover backface-hidden"
-                      />
-                      {/* BACK */}
-                      <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
-                        <span className="text-sm">Back View</span>
+                  <div className="p-3">
+                    {/* FLIP CARD */}
+                    <div   onClick={() => viewProduct(product.id)} className="relative h-[200px]  perspective">
+                      <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                        {/* FRONT */}
+                        <Image
+                          src={fetchImages(imageUrl[0])}
+                          alt={productName}
+                          height={200}
+                          width={100}
+                          className="w-full h-full object-cover backface-hidden"
+                        />
+                        {/* BACK */}
+                        <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
+                          <span className="text-sm">Back View</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Content */}
-                  <div className="relative py-3">
-                    <div className="">
-                      <h2 className="text-lg font-semibold capitalize truncate">{productName}</h2>
-                      <p className="font-semibold ">
+                    {/* PRICE & NAME */}
+                    <div className="flex justify-between items-center mt-3">
+                      <p className="text-lg font-extrabold font-lato text-[#2C3454]">
                         {getPriceDisplay(product.variants)}
                       </p>
-
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-gray-700">
+                    <p className="text-[13px] text-[#7A7A7A] font-lato font-semibold mt-1 hover:text-black transition-colors duration-300">
+                      {productName}
+                    </p>
+                    <div className="flex mt-2 items-center gap-2">
+                      <FileText size={16} />
+                      <span className='text-sm'>
+                        <button
+                          onClick={() => setOpenDescriptionId(product.description)}
+                          className="text-blue-600"
+                        >
+                          View Description
+                        </button>
+
+                      </span>
+                    </div>
+
+                    <div className="flex my-1 items-center gap-2">
+                      <Tag size={14} />
+                      <span className='text-sm'>SKU: {product?.main_sku || "-"}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Truck size={14} />
+                      <span className='text-sm'>Shipping Time: {product?.shipping_time || "-"}</span>
+                    </div>
+                    <div className="flex mt-2 items-center gap-1 text-sm text-gray-700">
                       <span>{product.variants?.rating || 4.3}</span>
                       <div className="flex gap-[1px] text-orange-500">
                         {Array.from({ length: 5 }).map((_, i) => (
@@ -316,82 +337,32 @@ export default function NewProducts() {
                       <span className="ml-1 text-gray-500">4,800</span>
                     </div>
 
-                    <div className="mt-2 space-y-1 text-sm text-gray-700">
-                      <div className="flex items-center gap-2">
-                        <FileText size={16} />
-                        <span>
-                          <button
-                            onClick={() => setOpenDescriptionId(product.id)}
-                            className="text-blue-600"
-                          >
-                            View Description
-                          </button>
-                          {openDescriptionId === product.id && (
-                            <div className="fixed p-4 inset-0 z-50 m-auto flex items-center justify-center bg-black/50">
-                              <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
-                                <button
-                                  onClick={() => setOpenDescriptionId(null)}
-                                  className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
-                                >
-                                  &times;
-                                </button>
-                                {product.description ? (
-                                  <div
-                                    className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                                    dangerouslySetInnerHTML={{ __html: product.description }}
-                                  />
-                                ) : (
-                                  <p className="text-gray-500">NIL</p>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Tag size={16} />
-                        <span>SKU: {product?.main_sku || "-"}</span>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Truck size={16} />
-                        <span>Shipping Time: {product?.shipping_time || "-"}</span>
-                      </div>
-                    </div>
-
-                    <button className="mt-3 w-full bg-orange-500 text-white px-4 py-2 rounded font-semibold hover:bg-orange-600 transition">
-                      Add to List
-                    </button>
-
-                    {/* Hover Action Buttons */}
-                    {
-                      canCreate && (
-                        <div
-                          className="absolute bottom-0 left-0 w-full p-3 bg-white z-10 opacity-0 translate-y-4
-            group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300
-            pointer-events-none group-hover:pointer-events-auto shadow border border-gray-100"
+                    {/* SLIDE-IN BUTTON PANEL */}
+                    <div
+                      className="absolute bottom-0 left-0 w-full p-3 bg-white z-10 border border-gray-100 shadow
+                                 opacity-0 translate-y-4 pointer-events-none overflow-hidden
+                                 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
+                                 group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto
+                                 transition-all duration-300"
+                    >
+                      {canCreate && (
+                        <button
+                          onClick={() => {
+                            setShowPopup(true);
+                            setInventoryData({
+                              productId: product.id,
+                              variant: product.variants,
+                              id: product.id,
+                              isVarientExists: product.isVarientExists,
+                            });
+                          }}
+                          className="py-2 px-4 text-white rounded-md md:text-sm  text-xs w-full bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out"
                         >
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                setShowPopup(true);
-                                setInventoryData({
-                                  productId: product.id,
-                                  variant: product.variants,
-                                  id: product.id,
-                                  isVarientExists: product.isVarientExists,
-                                });
-                              }}
-                              className="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded font-semibold hover:bg-blue-600 transition"
-                            >
-                              Add
-                            </button>
-                          </div>
-                        </div>
+                          Add To List
+                        </button>
+                      )}
 
-                      )
-                    }
+                    </div>
                   </div>
                 </div>
               );
@@ -405,7 +376,7 @@ export default function NewProducts() {
       </div>
 
       {showPopup && (
-        <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+        <div className="fixed px-6 inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
           <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
             <h2 className="text-2xl  flex justify-center gap-3 items-center text-center underline font-semibold mb-6 text-orange-500"><MdInventory /> Add To List</h2>
 
@@ -570,7 +541,26 @@ export default function NewProducts() {
           </div>
         </div>
       )}
-
+      {openDescriptionId && (
+        <div className="fixed p-4 inset-0 z-50 m-auto flex items-center justify-center bg-black/50">
+          <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
+            <button
+              onClick={() => setOpenDescriptionId(null)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+            >
+              &times;
+            </button>
+            {openDescriptionId ? (
+              <div
+                className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                dangerouslySetInnerHTML={{ __html: openDescriptionId }}
+              />
+            ) : (
+              <p className="text-gray-500">NIL</p>
+            )}
+          </div>
+        </div>
+      )}
 
     </>
   );

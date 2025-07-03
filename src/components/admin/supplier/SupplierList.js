@@ -96,7 +96,18 @@ const SupplierList = () => {
                         // Remove the empty() call here
                     }
 
-                    table = $("#supplierTable").DataTable();
+                    const isMobile = window.innerWidth <= 768;
+                    const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+                    table = $('#supplierTable').DataTable({
+                        pagingType,
+                        language: {
+                            paginate: {
+                                previous: "<",
+                                next: ">"
+                            }
+                        }
+                    });
 
                     return () => {
                         if (table) {
@@ -283,8 +294,21 @@ const SupplierList = () => {
                     >
                         <MoreHorizontal className="text-[#F98F5C]" />
                         {isPopupOpen && (
-                            <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                            <div className="absolute md:left-0 right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
                                 <ul className="py-2 text-sm text-[#2B3674]">
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer md:hidden block">
+                                        {canAdd && <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
+                                            <Link href="/admin/supplier/create">Add New</Link>
+                                        </button>
+                                        } </li>
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer md:hidden block">
+                                        {canViewTrashed && <button
+                                            className={`p-2 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                            onClick={handleToggleTrash}
+                                        >
+                                            {isTrashed ? "Supplier Listing (Simple)" : "Trashed Supplier"}
+                                        </button>
+                                        } </li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
@@ -292,7 +316,7 @@ const SupplierList = () => {
                             </div>
                         )}
                     </button>
-                    <div className="flex justify-end gap-2">
+                    <div className="md:flex hidden justify-end gap-2">
                         {canAdd && <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
                             <Link href="/admin/supplier/create">Add New</Link>
                         </button>
@@ -473,7 +497,7 @@ const SupplierList = () => {
                         </tbody>
                     </table>
                     {expandedItem && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000094] bg-opacity-40">
+                        <div className="fixed inset-0 px-5 z-50 flex items-center justify-center bg-[#00000094] bg-opacity-40">
                             <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl relative">
                                 <button
                                     onClick={() => setExpandedItem(null)}
@@ -508,7 +532,7 @@ const SupplierList = () => {
                         </div>
                     )}
                     {expandPassModal && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000094] bg-opacity-40">
+                        <div className="fixed px-5 inset-0 z-50 flex items-center justify-center bg-[#00000094] bg-opacity-40">
                             <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl relative">
                                 <button
                                     onClick={() => setExpandPassModal(null)}

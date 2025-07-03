@@ -69,15 +69,15 @@ export default function ProfileView() {
     }
     return (
         <>
-            <div className="bg-white p-5 rounded-md profilePage">
+            <div className="bg-white md:p-5 rounded-md profilePage">
                 <div className="flex justify-center items-center gap-5 mb-4">
-                    <h2 className='text-center py-3 font-bold text-2xl'>{dropshippers?.name} Profile</h2>
+                    <h2 className='text-center py-3 font-bold md:text-2xl'>{dropshippers?.name} </h2>
                     <button
                         className='bg-green-500 p-3 rounded-md  text-white'
                         onClick={() => { router.push(`/admin/dropshipper/update?id=${dropshippers.id}`) }}>Update Profile</button>
                 </div>
-                <div className="flex gap-10">
-                    <div className="md:w-4/12 col border border-gray-300 p-5 rounded-md">
+                <div className="md:flex gap-10">
+                    <div className="lg:w-4/12 col md:w-6/12 border border-gray-300 p-5 rounded-md">
                         <div className=" border border-gray-300 p-3 rounded col">
                             <div className="img">
                                 <Image src={fetchImages(dropshippers.profilePicture)} alt={dropshippers.name || 'Text'} height={200} width={200} />
@@ -102,7 +102,7 @@ export default function ProfileView() {
                             <p><b>Postal Code:</b>{dropshippers?.permanentPostalCode}</p>
                         </div>
                     </div>
-                    <div className="col md:w-8/12  gap-4 border border-gray-300 p-5 rounded-md">
+                    <div className="col mt-5 md:mt-0 lg:w-8/12 md:w-6/12   gap-4 border border-gray-300 p-5 rounded-md">
                         <div className="rounded col">
                             <h3 className='text-orange-500 font-bold text-lg underline py-2'>KYC Details</h3>
                             <p><b>GST Number:</b> {dropshippers?.companyDetail?.gstNumber || "NIL"}</p>

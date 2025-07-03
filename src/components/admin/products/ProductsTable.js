@@ -194,7 +194,7 @@ const ProductTable = () => {
     return (
         <div className="">
             <div className="md:flex flex-wrap justify-between items-center gap-2 mb-4">
-                <div className="grid md:w-4/12 md:grid-cols-2 gap-4 items-end">
+                <div className="grid lg:w-4/12 md:grid-cols-2 gap-4 items-end">
 
 
                     <div className="">
@@ -241,6 +241,14 @@ const ProductTable = () => {
                             <Link href="/admin/products/create">Add New</Link>
                         </button>
                     }
+                      {
+                                    canViewTrashed && <button
+                                        className={`text-sm p-2  gap-2 flex md:hidden items-center text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                        onClick={handleToggleTrash}
+                                    >
+                                        <Trash2 className="text-sm" /> {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
+                                    </button>
+                                }
                     <button className="bg-[#4285F4] text-white px-4 py-2 rounded-lg text-sm">Filters</button></div>
             </div>
 
@@ -253,7 +261,7 @@ const ProductTable = () => {
                 </div>
             ) : (
                 <div className="bg-white rounded-2xl mt-5 p-4">
-                    <div className="flex flex-wrap md:flex-nowrap justify-between items-center mb-4">
+                    <div className="flex flex-wrap md:flex-nowrap  justify-between md:items-start lg:items-center mb-4">
                         <h2 className="md:text-2xl font-bold whitespace-nowrap text-[#2B3674]">Product Details</h2>
                         <label className=" flex md:hidden items-center cursor-pointer">
                             <input type="checkbox" className="sr-only" checked={showRtoLiveCount} onChange={() => setShowRtoLiveCount(!showRtoLiveCount)} />
@@ -262,7 +270,7 @@ const ProductTable = () => {
                             </div>
                             <span className="ml-2 text-sm  text-gray-600">RTO Count</span>
                         </label>
-                        <div className="flex gap-3 justify-between md:justify-end w-full  flex-wrap items-center">
+                        <div className="flex gap-3 justify-between md:justify-end w-full  flex-wrap items-center md:mt-0 mt-4">
                             <label className="md:flex hidden items-center cursor-pointer">
                                 <input type="checkbox" className="sr-only" checked={showRtoLiveCount} onChange={() => setShowRtoLiveCount(!showRtoLiveCount)} />
                                 <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${showRtoLiveCount ? "bg-orange-500" : ""}`}>
@@ -296,10 +304,10 @@ const ProductTable = () => {
                                     </div>
                                 )}
                             </button>
-                            <div className="flex justify-end gap-2">
+                            <div className="justify-end gap-2  md:flex hidden">
                                 {
                                     canViewTrashed && <button
-                                        className={`text-sm p-2  gap-2 md:flex hidden items-center text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                        className={`text-sm p-2  gap-2 flex items-center text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                                         onClick={handleToggleTrash}
                                     >
                                         <Trash2 className="text-sm" /> {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
@@ -377,36 +385,14 @@ const ProductTable = () => {
                                                 </td>
                                                 <td className="p-2 px-5 text-left whitespace-nowrap">
                                                     <button
-                                                        onClick={() => setOpenDescriptionId(item.id)}
+                                                        onClick={() => setOpenDescriptionId(item.description)}
                                                         className="text-blue-600"
                                                     >
-                                                        View
+                                                        View Description
                                                     </button>
 
                                                 </td>
-                                                {openDescriptionId === item.id && (
-                                                    <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
-                                                        <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
-                                                            {/* Close Button */}
-                                                            <button
-                                                                onClick={() => setOpenDescriptionId(null)}
-                                                                className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
-                                                            >
-                                                                &times;
-                                                            </button>
-
-                                                            {/* HTML Description Content */}
-                                                            {item.description ? (
-                                                                <div
-                                                                    className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                                                                    dangerouslySetInnerHTML={{ __html: item.description }}
-                                                                />
-                                                            ) : (
-                                                                <p className="text-gray-500">NIL</p>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
+                                               
 
 
 
@@ -476,7 +462,7 @@ const ProductTable = () => {
                                 </tbody>
                             </table>
                             {showVariantPopup && selectedProduct && (
-                                <div className="fixed inset-0  p-4 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                                <div className="fixed inset-0  p-4 bg-[#00000054] bg-opacity-40 flex items-center justify-center z-50">
                                     <div className="bg-white overflow-auto  h-[500px] p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
                                         <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
 
@@ -554,6 +540,29 @@ const ProductTable = () => {
 
                 </div>
             )}
+             {openDescriptionId && (
+                                                    <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
+                                                        <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
+                                                            {/* Close Button */}
+                                                            <button
+                                                                onClick={() => setOpenDescriptionId(null)}
+                                                                className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+                                                            >
+                                                                &times;
+                                                            </button>
+
+                                                            {/* HTML Description Content */}
+                                                            {openDescriptionId ? (
+                                                                <div
+                                                                    className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                                                                    dangerouslySetInnerHTML={{ __html: openDescriptionId }}
+                                                                />
+                                                            ) : (
+                                                                <p className="text-gray-500">NIL</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
         </div>
 
     );
