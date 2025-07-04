@@ -23,15 +23,6 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Admin ID is missing or invalid' }, { status: 400 });
     }
 
-    const type = req.nextUrl.searchParams.get('type');
-
-    logMessage('debug', `Attempting to delete image at index ${imageIndex} from product ${productId}, type: ${type}`);
-
-    if (!type) {
-      logMessage('warn', 'Missing or invalid type parameter in request', { adminId, adminRole });
-      return NextResponse.json({ error: 'Type parameter is missing or invalid' }, { status: 400 });
-    }
-
     // Authenticate admin user
     const userCheck = await isUserExist(Number(adminId), String(adminRole));
     if (!userCheck.status) {
