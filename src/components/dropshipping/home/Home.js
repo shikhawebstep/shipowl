@@ -16,6 +16,7 @@ const Home = () => {
         const onPageLoad = () => {
             const connectShop = async () => {
                 const shop = localStorage.getItem("shop");
+                localStorage.removeItem("shop");
                 const shippingData = localStorage.getItem("shippingData");
 
                 if (!shop || !shippingData) return;

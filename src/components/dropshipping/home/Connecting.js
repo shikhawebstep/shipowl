@@ -44,10 +44,12 @@ export default function Connecting() {
       const result = await response.json();
 
       if (
-        typeof result.message === "string" &&
-        result.message.includes("used") &&
-        result.message.includes("verified")
+        typeof result.message === "string" && (
+          (result.message.includes("used") &&
+            result.message.includes("verified")) || (result.message.includes("registered") &&
+              result.message.includes("verified")))
       ) {
+        localStorage.removeItem("shop");
         router.push("/dropshipping");
       }
 
