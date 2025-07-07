@@ -115,7 +115,15 @@ export async function createDropshipperShopifyStore(dropshipperId: number, drops
         // 🚫 Check if the shop is already used and verified
         const isAlreadyUsed = await isShopUsedAndVerified(shop);
         if (isAlreadyUsed.status) {
-            return { status: false, message: "This Shopify store is already registered and verified." };
+            if (isAlreadyUsed.shopifyStore?.adminId !== admin.connect.id) {
+                return { status: true, message: "This Shopify store is already registered and verified." };
+            } else {
+                if (isAlreadyUsed.verified) {
+                    return { status: false, message: "This Shopify store is already registered and verified." };
+                } else {
+                    await deleteShopIfNotVerified(shop);
+                }
+            }
         }
 
         const statusRaw = false;

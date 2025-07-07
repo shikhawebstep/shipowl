@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
 
         // Check if the Shopify store is already registered and verified
         const isAlreadyUsed = await isShopUsedAndVerified(shop);
-        if (isAlreadyUsed.status && isAlreadyUsed.shopifyStore?.adminId !== mainDropshipperId) {
+        if (isAlreadyUsed.status) {
             if (isAlreadyUsed.shopifyStore?.adminId == mainDropshipperId) {
                 return NextResponse.json({ status: true, installUrl: `${appHost}/dropshipping` }, { status: 200 });
             } else {
