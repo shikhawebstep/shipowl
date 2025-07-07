@@ -137,6 +137,7 @@ export async function POST(req: NextRequest) {
                     return NextResponse.json(
                         {
                             status: false,
+                            isAlreadyUsed,
                             message: isAlreadyUsed.message || 'This Shopify store is already registered and verified.',
                         },
                         { status: 409 }
