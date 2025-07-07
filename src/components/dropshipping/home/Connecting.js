@@ -11,21 +11,20 @@ export default function Connecting() {
   const shop = searchParams.get("shop");
 
   const fetchStores = useCallback(async () => {
-    /*
-      const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
-      if (dropshipperData?.project?.active_panel !== "dropshipper") {
-        localStorage.removeItem("shippingData");
-        router.push("/dropshipping/auth/login");
-        return;
-      }
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
-      const token = dropshipperData?.security?.token;
-      if (!token) {
-        router.push("/dropshipping/auth/login");
-        return;
-      }
-    */
+    if (dropshipperData?.project?.active_panel !== "dropshipper") {
+      localStorage.removeItem("shippingData");
+      router.push("/dropshipping/auth/login");
+      return;
+    }
+
+    const token = dropshipperData?.security?.token;
+    if (!token) {
+      router.push("/dropshipping/auth/login");
+      return;
+    }
 
     try {
       const form = new FormData();
@@ -35,11 +34,9 @@ export default function Connecting() {
 
       const response = await fetch(url, {
         method: "POST",
-        /*
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        */
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: form,
       });
 
