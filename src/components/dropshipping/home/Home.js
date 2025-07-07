@@ -11,52 +11,56 @@ const Home = () => {
     const router = useRouter();
 
     useEffect(() => {
+        if (typeof window === 'undefined') return;
+
         const connectShop = async () => {
             const shop = localStorage.getItem("shop");
+            const shippingData = localStorage.getItem("shippingData");
 
-            if (shop) {
-                const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-                if (dropshipperData?.project?.active_panel !== "dropshipper") {
-                    localStorage.removeItem("shippingData");
-                    router.push("/dropshipping/auth/login");
-                    return;
+            if (!shop || !shippingData) return;
+
+            const dropshipperData = JSON.parse(shippingData);
+
+            if (dropshipperData?.project?.active_panel !== "dropshipper") {
+                localStorage.removeItem("shippingData");
+                router.replace("/dropshipping/auth/login");
+                return;
+            }
+
+            const token = dropshipperData?.security?.token;
+            if (!token) {
+                router.replace("/dropshipping/auth/login");
+                return;
+            }
+
+            try {
+                const form = new FormData();
+                form.append("shop", shop);
+
+                const response = await fetch("/api/dropshipper/shopify/connect", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: form,
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || !result.installUrl) {
+                    router.replace("/dropshipping/shopify/failed");
+                } else {
+                    router.replace(result.installUrl);
                 }
-
-                const token = dropshipperData?.security?.token;
-                if (!token) {
-                    router.push("/dropshipping/auth/login");
-                    return;
-                }
-
-                try {
-                    const form = new FormData();
-                    form.append("shop", shop);
-
-                    const response = await fetch("/api/dropshipper/shopify/connect", {
-                        method: "POST",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                        body: form,
-                    });
-
-                    const result = await response.json();
-
-                    if (!response.ok) {
-                        router.push("/dropshipping/shopify/failed");
-                    } else {
-                        router.push(result.installUrl);
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    router.push("/dropshipping/shopify/failed");
-                }
+            } catch (error) {
+                console.error("Error connecting shop:", error);
+                router.replace("/dropshipping/shopify/failed");
             }
         };
 
         verifyDropShipperAuth();
         connectShop();
-    }, [verifyDropShipperAuth, router]);
+    }, [verifyDropShipperAuth]);
 
     return (
         <>
