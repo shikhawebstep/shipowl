@@ -16,13 +16,14 @@ export default function Connecting() {
       return;
     }
 
+    // ✅ Use NEXT_PUBLIC_ variables for client-side access
     const {
-      APP_HOST,
-      SHOPIFY_API_KEY,
-      SHOPIFY_API_SECRET,
-      SHOPIFY_SCOPES,
-      SHOPIFY_REDIRECT_URL,
-      SHOPIFY_API_VERSION,
+      NEXT_PUBLIC_APP_HOST: APP_HOST,
+      NEXT_PUBLIC_SHOPIFY_API_KEY: SHOPIFY_API_KEY,
+      NEXT_PUBLIC_SHOPIFY_API_SECRET: SHOPIFY_API_SECRET,
+      NEXT_PUBLIC_SHOPIFY_SCOPES: SHOPIFY_SCOPES,
+      NEXT_PUBLIC_SHOPIFY_REDIRECT_URL: SHOPIFY_REDIRECT_URL,
+      NEXT_PUBLIC_SHOPIFY_API_VERSION: SHOPIFY_API_VERSION,
     } = process.env;
 
     const requiredVars = {
