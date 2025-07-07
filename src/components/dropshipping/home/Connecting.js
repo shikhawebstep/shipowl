@@ -48,7 +48,7 @@ export default function Connecting() {
       `https://${shop}/admin/oauth/authorize` +
       `?client_id=${SHOPIFY_API_KEY}` +
       `&scope=${SHOPIFY_SCOPES}` +
-      `&redirect_uri=${encodeURIComponent(SHOPIFY_REDIRECT_URL!)}` +
+      `&redirect_uri=${encodeURIComponent(SHOPIFY_REDIRECT_URL)}` +
       `&grant_options[]=per-user`;
 
     window.location.href = installUrl;
