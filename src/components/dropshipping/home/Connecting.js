@@ -10,58 +10,22 @@ export default function Connecting() {
   const router = useRouter();
   const shop = searchParams.get("shop");
 
-  const fetchStores = useCallback(async () => {
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+  const redirectToShopifyInstall = useCallback(() => {
+    if (!shop) return;
 
-    if (dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.removeItem("shippingData");
-      router.push("/dropshipping/auth/login");
-      return;
-    }
+    const installUrl =
+      `https://${shop}/admin/oauth/authorize` +
+      `?client_id=${process.env.SHOPIFY_API_KEY}` +
+      `&scope=${process.env.SHOPIFY_SCOPES}` +
+      `&redirect_uri=${encodeURIComponent(process.env.SHOPIFY_REDIRECT_URL)}` +
+      `&grant_options[]=per-user`;
 
-    const token = dropshipperData?.security?.token;
-    if (!token) {
-      router.push("/dropshipping/auth/login");
-      return;
-    }
-
-
-    try {
-      const form = new FormData();
-      form.append("shop", shop);
-
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/shopify/connect`;
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: form,
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        router.push("/dropshipping/shopify/failed");
-      } else {
-        router.push(result.installUrl);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      router.push("/dropshipping/shopify/failed");
-    } finally {
-      
-    }
-  }, [router, shop]);
+    window.location.href = installUrl; // Perform redirect
+  }, [shop]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await verifyDropShipperAuth();
-      await fetchStores();
-    };
-    fetchData();
-  }, [verifyDropShipperAuth, fetchStores]);
+    redirectToShopifyInstall();
+  }, [redirectToShopifyInstall]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white text-center p-4">
@@ -70,8 +34,6 @@ export default function Connecting() {
       <p className="text-gray-500 mt-2">
         Please wait while we establish a secure connection.
       </p>
-
-      
     </div>
   );
 }
