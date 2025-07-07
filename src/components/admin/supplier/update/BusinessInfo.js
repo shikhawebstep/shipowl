@@ -630,7 +630,7 @@ const BusinessInfo = () => {
               slidesPerView={2}
               loop={formData.gstDocument?.split(',').length > 1}
               navigation={true}
-              className="mySwiper w-full lg:w-[300px] md:w-[200px] w-[60px] ms-2 md:h-[200px] h-[60px]"
+              className="mySwiper w-full lg:w-[300px] md:w-[200px]  ms-2 md:h-[200px] h-[60px]"
             >
               {formData.gstDocument?.split(',').map((img, index) => (
                 <SwiperSlide key={index} className="relative gap-3">
@@ -712,7 +712,7 @@ const BusinessInfo = () => {
                       }).then((result) => {
                         if (result.isConfirmed) {
 
-                          handleImageDelete(index, 'gstDocument'); // Call your delete function
+                          handleImageDelete(index, 'companyPanCardImage'); // Call your delete function
                         }
                       });
                     }}
@@ -889,7 +889,7 @@ const BusinessInfo = () => {
         ))}
 
         {/* Additional Document Upload */}
-        <div className="py-6 col-span-2 w-full overflow -auto">
+        <div className="py-6 w-full overflow -auto">
           {renderLabel('Document to upload', 'additionalDocumentUpload')}
           <input
             type="file"
@@ -939,7 +939,7 @@ const BusinessInfo = () => {
         </div>
 
         {/* Document Image Upload */}
-        <div className="py-6 col-span-2 w-full overflow -auto">
+        <div className="py-6 w-full overflow -auto">
           {renderLabel('Document Image', 'documentImage')}
           <input
             type="file"

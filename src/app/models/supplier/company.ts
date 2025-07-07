@@ -48,7 +48,7 @@ interface SupplierCompany {
     deletedByRole?: string | null; // Role of the admin who deleted the supplier
 }
 
-type ImageType = "gstDocument" | "panCardImage" | "aadharCardImage" | "additionalDocumentUpload" | "documentImage";
+type ImageType = "panCardImage" | "companyPanCardImage" | "gstDocument" | "additionalDocumentUpload" | "documentImage" | "aadharCardImage" | "profilePicture";
 
 const serializeBigInt = <T>(obj: T): T => {
     if (typeof obj === "bigint") {
@@ -170,11 +170,18 @@ export const removeCompanyDetailImageByIndex = async (companyDetailId: number, s
             return { status: false, message: message || "companyDetail not found." };
         }
 
-        if (!companyDetail[imageType]) {
+        const imageKey = imageType as keyof typeof companyDetail;
+        if (imageKey in companyDetail && !companyDetail[imageKey]) {
             return { status: false, message: "No images available to delete." };
         }
 
-        const images = companyDetail[imageType].split(",");
+        const value = companyDetail[imageKey];
+
+        if (typeof value !== "string" || !value) {
+            return { status: false, message: "No images available to delete." };
+        }
+
+        const images = value.split(",");
 
         if (imageIndex < 0 || imageIndex >= images.length) {
             return { status: false, message: "Invalid image index provided." };
@@ -186,7 +193,7 @@ export const removeCompanyDetailImageByIndex = async (companyDetailId: number, s
         // Update category in DB
         const updatedCompanyDeatil = await prisma.companyDetail.update({
             where: { id: companyDetailId },
-            data: { [imageType]: updatedImages },
+            data: { [imageKey]: updatedImages },
         });
 
         // 🔥 Attempt to delete the image file from storage

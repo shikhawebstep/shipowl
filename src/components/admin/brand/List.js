@@ -216,7 +216,7 @@ export default function List() {
                                                                 slidesPerView={1}
                                                                 loop={item.image?.split(',').length > 1}
                                                                 navigation={true}
-                                                                className="mySwiper xl:w-[250px] md:w-[100px] md:h-[200px] w-[50px] ms-2 h-[50px]"  >                                                              {item.image?.split(',').map((img, index) => (
+                                                                className="mySwiper xl:w-[250px] md:w-[100px]  md:h-[100px] lg:h-[200px] w-[50px] ms-2 h-[50px]">                                                            {item.image?.split(',').map((img, index) => (
                                                                     <SwiperSlide key={index}>
                                                                         <Image
                                                                             src={fetchImages(img)}

@@ -5,7 +5,7 @@ import { isUserExist } from '@/utils/auth/authUtils';
 import { getCompanyDeailBySupplierId, removeCompanyDetailImageByIndex } from '@/app/models/supplier/company';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
-type ImageType = "gstDocument" | "panCardImage" | "aadharCardImage" | "additionalDocumentUpload" | "documentImage";
+type ImageType = "panCardImage" | "companyPanCardImage" | "gstDocument" | "additionalDocumentUpload" | "documentImage" | "aadharCardImage" | "profilePicture";
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -101,5 +101,5 @@ export async function DELETE(req: NextRequest) {
 
 // Helper function to check if imageType is valid
 function isValidImageType(type: string): type is ImageType {
-  return ["gstDocument", "panCardImage", "aadharCardImage", "additionalDocumentUpload", "documentImage"].includes(type);
+  return ["panCardImage", "companyPanCardImage", "gstDocument", "additionalDocumentUpload", "documentImage", "aadharCardImage", "profilePicture"].includes(type);
 }

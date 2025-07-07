@@ -1142,7 +1142,7 @@ export default function ProductDetails() {
         <h4 className="text-2xl text-black mb-3 font-semibold">From different sellers</h4>
 
         {relatedProducts.length === 0 ? (
-          <p className="text-center font-bold text-3xl mt-8">No Related Products Found</p>
+          <p className="text-center font-bold md:text-3xl mt-8">No Related Products Found</p>
         ) : (
           <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-2 md:gap-3 gap-2 xl:gap-10">
             {relatedProducts.map((item, index) => {

@@ -56,25 +56,7 @@ export default function Profile() {
       const result = await response.json();
       const suppliers = result?.supplier || {};
       const companyDetail = suppliers?.companyDetail || {};
-      if (activeTab == "profile-edit") {
-        await fetchCountry();
-        if (suppliers.permanentCountryId) {
-          await fetchState(suppliers.permanentCountryId);
-        }
-        if (suppliers.permanentStateId) {
-          await fetchCity(suppliers.permanentStateId);
-        }
-      }
-
-      if (activeTab == "business-info") {
-        await fetchCountry();
-        if (companyDetail.billingCountryId) {
-          await fetchState(companyDetail.billingCountryId);
-        }
-        if (companyDetail.billingStateId) {
-          await fetchCity(companyDetail.billingStateId);
-        }
-      }
+   
 
       setFormData({
         name: suppliers.name || "",
@@ -112,6 +94,26 @@ export default function Profile() {
         documentImage: companyDetail.documentImage || "",
         companyid: companyDetail.id || "",
       });
+
+         if (activeTab == "profile-edit") {
+        await fetchCountry();
+        if (suppliers.permanentCountryId) {
+          await fetchState(suppliers.permanentCountryId);
+        }
+        if (suppliers.permanentStateId) {
+          await fetchCity(suppliers.permanentStateId);
+        }
+      }
+
+      if (activeTab == "business-info") {
+        await fetchCountry();
+        if (companyDetail.billingCountryId) {
+          await fetchState(companyDetail.billingCountryId);
+        }
+        if (companyDetail.billingStateId) {
+          await fetchCity(companyDetail.billingStateId);
+        }
+      }
 
 
     } catch (error) {

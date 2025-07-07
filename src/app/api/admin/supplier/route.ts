@@ -259,7 +259,7 @@ export async function POST(req: NextRequest) {
       emailVerifiedAt: new Date(),
       isVerified: true,
       verifiedAt: new Date(),
-      status: true,
+      status: false,
       createdAt: new Date(),
       createdBy: adminId,
       createdByRole: adminRole,

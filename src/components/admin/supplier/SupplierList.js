@@ -241,7 +241,7 @@ const SupplierList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://shipowl-kd06.onrender.com/api/admin/supplier/${id}/status?status=${item}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/${id}/status?status=${item}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

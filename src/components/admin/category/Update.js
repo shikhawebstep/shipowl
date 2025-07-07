@@ -351,7 +351,7 @@ export default function Update() {
                                             slidesPerView={2}
                                             loop={formData.image?.split(',').length > 1}
                                             navigation={true}
-                                           className="mySwiper xl:w-[400px] md:w-[100px] md:h-[200px]  ms-2"
+                                           className="mySwiper xl:w-[500px] md:w-auto md:h-[200px]  ms-2"
                                         >
                                             {formData.image?.split(',').map((img, index) => (
                                                 <SwiperSlide key={index} className="relative gap-3">

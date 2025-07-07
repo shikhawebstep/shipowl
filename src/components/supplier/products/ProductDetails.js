@@ -1074,7 +1074,7 @@ const ProductDetails = () => {
         <h4 className="text-2xl text-black mb-3 font-semibold">From different sellers</h4>
 
         {relatedProducts.length === 0 ? (
-          <p className="text-center font-bold text-3xl mt-8">No Related Products Found</p>
+          <p className="text-center font-bold md:text-3xl mt-8">No Related Products Found</p>
         ) : (
           <div className="grid xl:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-3 productsSection">
             {relatedProducts.map((item, index) => {
