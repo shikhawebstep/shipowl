@@ -15,6 +15,7 @@ export default function Connecting() {
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
     if (dropshipperData?.project?.active_panel !== "dropshipper") {
+      localStorage.setItem("shop", shop);
       localStorage.removeItem("shippingData");
       router.push("/dropshipping/auth/login");
       return;

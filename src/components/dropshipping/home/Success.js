@@ -15,21 +15,29 @@ export default function Success() {
   const timestamp = searchParams.get("timestamp");
 
   const fetchStores = useCallback(async () => {
-    /*
-      const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
-      if (dropshipperData?.project?.active_panel !== "dropshipper") {
-        localStorage.removeItem("shippingData");
-        router.push("/dropshipping/auth/login");
-        return;
-      }
+    if (dropshipperData?.project?.active_panel !== "dropshipper") {
+      localStorage.setItem("code", code);
+      localStorage.setItem("host", host);
+      localStorage.setItem("hmac", hmac);
+      localStorage.setItem("shop", shop);
+      localStorage.setItem("timestamp", timestamp);
+      localStorage.removeItem("shippingData");
+      router.push("/dropshipping/auth/login");
+      return;
+    }
 
-      const token = dropshipperData?.security?.token;
-      if (!token) {
-        router.push("/dropshipping/auth/login");
-        return;
-      }
-    */
+    const token = dropshipperData?.security?.token;
+    if (!token) {
+      localStorage.setItem("code", code);
+      localStorage.setItem("host", host);
+      localStorage.setItem("hmac", hmac);
+      localStorage.setItem("shop", shop);
+      localStorage.setItem("timestamp", timestamp);
+      router.push("/dropshipping/auth/login");
+      return;
+    }
 
     if (!code || !host || !hmac || !shop) {
       setStatus(false);
