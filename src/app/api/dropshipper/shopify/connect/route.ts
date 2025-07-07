@@ -90,6 +90,7 @@ export async function POST(req: NextRequest) {
 
         // Required environment variables
         const requiredEnvVars = {
+            APP_HOST: process.env.APP_HOST,
             SHOPIFY_API_KEY: process.env.SHOPIFY_API_KEY,
             SHOPIFY_API_SECRET: process.env.SHOPIFY_API_SECRET,
             SHOPIFY_SCOPES: process.env.SHOPIFY_SCOPES,
@@ -119,6 +120,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Safe to use non-null assertion here because we checked above
+        const appHost = requiredEnvVars.APP_HOST!;
         const apiKey = requiredEnvVars.SHOPIFY_API_KEY!;
         const apiSecret = requiredEnvVars.SHOPIFY_API_SECRET!;
         const scopes = requiredEnvVars.SHOPIFY_SCOPES!;
@@ -128,16 +130,20 @@ export async function POST(req: NextRequest) {
         // Check if the Shopify store is already registered and verified
         const isAlreadyUsed = await isShopUsedAndVerified(shop);
         if (isAlreadyUsed.status && isAlreadyUsed.shopifyStore?.adminId !== mainDropshipperId) {
-            if (isAlreadyUsed.verified) {
-                return NextResponse.json(
-                    {
-                        status: false,
-                        message: isAlreadyUsed.message || 'This Shopify store is already registered and verified.',
-                    },
-                    { status: 409 }
-                );
+            if (isAlreadyUsed.shopifyStore?.adminId == mainDropshipperId) {
+                return NextResponse.json({ status: true, installUrl: `${appHost}/dropshipping` }, { status: 200 });
             } else {
-                await deleteShopIfNotVerified(shop);
+                if (isAlreadyUsed.verified) {
+                    return NextResponse.json(
+                        {
+                            status: false,
+                            message: isAlreadyUsed.message || 'This Shopify store is already registered and verified.',
+                        },
+                        { status: 409 }
+                    );
+                } else {
+                    await deleteShopIfNotVerified(shop);
+                }
             }
         }
 
