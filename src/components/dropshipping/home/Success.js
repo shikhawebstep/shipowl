@@ -28,12 +28,12 @@ export default function Success() {
       }
 
       const env = {
-        SHOPIFY_API_KEY: process.env.SHOPIFY_API_KEY,
-        SHOPIFY_API_SECRET: process.env.SHOPIFY_API_SECRET,
-        SHOPIFY_SCOPES: process.env.SHOPIFY_SCOPES,
-        SHOPIFY_REDIRECT_URL: process.env.SHOPIFY_REDIRECT_URL,
-        SHOPIFY_API_VERSION: process.env.SHOPIFY_API_VERSION,
-        APP_HOST: process.env.APP_HOST,
+        SHOPIFY_API_KEY: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY,
+        SHOPIFY_API_SECRET: process.env.NEXT_PUBLIC_SHOPIFY_API_SECRET,
+        SHOPIFY_SCOPES: process.env.NEXT_PUBLIC_SHOPIFY_SCOPES,
+        SHOPIFY_REDIRECT_URL: process.env.NEXT_PUBLIC_SHOPIFY_REDIRECT_URL,
+        SHOPIFY_API_VERSION: process.env.NEXT_PUBLIC_SHOPIFY_API_VERSION,
+        APP_HOST: process.env.NEXT_PUBLIC_APP_HOST,
       };
 
       const missingEnv = Object.entries(env).filter(([_, val]) => !val?.trim());

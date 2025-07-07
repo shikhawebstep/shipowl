@@ -15,9 +15,9 @@ export default function Connecting() {
 
     const installUrl =
       `https://${shop}/admin/oauth/authorize` +
-      `?client_id=${process.env.SHOPIFY_API_KEY}` +
-      `&scope=${process.env.SHOPIFY_SCOPES}` +
-      `&redirect_uri=${encodeURIComponent(process.env.SHOPIFY_REDIRECT_URL)}` +
+      `?client_id=${process.env.NEXT_PUBLIC_SHOPIFY_API_KEY}` +
+      `&scope=${process.env.NEXT_PUBLIC_SHOPIFY_SCOPES}` +
+      `&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_SHOPIFY_REDIRECT_URL)}` +
       `&grant_options[]=per-user`;
 
     window.location.href = installUrl; // Perform redirect
