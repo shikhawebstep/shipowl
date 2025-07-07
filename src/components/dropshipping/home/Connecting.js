@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback } from "react";
+import { useEffect, useCallback } from "react";
+import { useDropshipper } from "../middleware/DropshipperMiddleWareContext";
 import { useSearchParams, useRouter } from "next/navigation";
 
 export default function Connecting() {
@@ -47,11 +48,15 @@ export default function Connecting() {
       `https://${shop}/admin/oauth/authorize` +
       `?client_id=${SHOPIFY_API_KEY}` +
       `&scope=${SHOPIFY_SCOPES}` +
-      `&redirect_uri=${encodeURIComponent(SHOPIFY_REDIRECT_URL)}` +
+      `&redirect_uri=${encodeURIComponent(SHOPIFY_REDIRECT_URL!)}` +
       `&grant_options[]=per-user`;
 
     window.location.href = installUrl;
   }, [shop, router]);
+
+  useEffect(() => {
+    fetchStores();
+  }, [fetchStores]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white text-center p-4">
