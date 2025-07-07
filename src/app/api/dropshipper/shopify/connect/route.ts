@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
 
         // Check if the Shopify store is already registered and verified
         const isAlreadyUsed = await isShopUsedAndVerified(shop);
-        if (isAlreadyUsed.status) {
+        if (isAlreadyUsed.status && isAlreadyUsed.shopifyStore?.adminId !== mainDropshipperId) {
             if (isAlreadyUsed.verified) {
                 return NextResponse.json(
                     {
@@ -189,7 +189,7 @@ export async function POST(req: NextRequest) {
 }
 
 export const config = {
-  api: {
-    bodyParser: false,
-  },
+    api: {
+        bodyParser: false,
+    },
 };

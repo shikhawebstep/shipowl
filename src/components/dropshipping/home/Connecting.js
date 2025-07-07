@@ -43,6 +43,14 @@ export default function Connecting() {
 
       const result = await response.json();
 
+      if (
+        typeof result.message === "string" &&
+        result.message.includes("used") &&
+        result.message.includes("verified")
+      ) {
+        router.push("/dropshipping");
+      }
+
       if (!response.ok) {
         router.push("/dropshipping/shopify/failed");
       } else {
