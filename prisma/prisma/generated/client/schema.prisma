@@ -110,7 +110,7 @@ model admin {
 
 model shopifyStore {
   id                 Int       @id @default(autoincrement())
-  adminId            Int
+  adminId            Int?
   name               String?
   logo               String?   @db.LongText
   shop               String    @unique
@@ -143,7 +143,7 @@ model shopifyStore {
   deletedByRole      String?
 
   dropshipperProducts dropshipperProduct[] @relation("ShopifyStoreRelation")
-  admin               admin                @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  admin               admin?               @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
 
 model companyDetail {

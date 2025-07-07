@@ -8855,7 +8855,7 @@ export namespace Prisma {
 
   export type ShopifyStoreGroupByOutputType = {
     id: number
-    adminId: number
+    adminId: number | null
     name: string | null
     logo: string | null
     shop: string
@@ -8941,7 +8941,7 @@ export namespace Prisma {
     deletedBy?: boolean
     deletedByRole?: boolean
     dropshipperProducts?: boolean | shopifyStore$dropshipperProductsArgs<ExtArgs>
-    admin?: boolean | adminDefaultArgs<ExtArgs>
+    admin?: boolean | shopifyStore$adminArgs<ExtArgs>
     _count?: boolean | ShopifyStoreCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["shopifyStore"]>
 
@@ -8985,7 +8985,7 @@ export namespace Prisma {
   export type shopifyStoreOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "adminId" | "name" | "logo" | "shop" | "accessToken" | "email" | "shopName" | "planName" | "country" | "shopOwner" | "domain" | "myshopifyDomain" | "province" | "city" | "phone" | "currency" | "moneyFormat" | "timezone" | "createdAtShop" | "userId" | "verificationStatus" | "status" | "createdAt" | "createdBy" | "createdByRole" | "updatedAt" | "updatedBy" | "updatedByRole" | "deletedAt" | "deletedBy" | "deletedByRole", ExtArgs["result"]["shopifyStore"]>
   export type shopifyStoreInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     dropshipperProducts?: boolean | shopifyStore$dropshipperProductsArgs<ExtArgs>
-    admin?: boolean | adminDefaultArgs<ExtArgs>
+    admin?: boolean | shopifyStore$adminArgs<ExtArgs>
     _count?: boolean | ShopifyStoreCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -8993,11 +8993,11 @@ export namespace Prisma {
     name: "shopifyStore"
     objects: {
       dropshipperProducts: Prisma.$dropshipperProductPayload<ExtArgs>[]
-      admin: Prisma.$adminPayload<ExtArgs>
+      admin: Prisma.$adminPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      adminId: number
+      adminId: number | null
       name: string | null
       logo: string | null
       shop: string
@@ -9369,7 +9369,7 @@ export namespace Prisma {
   export interface Prisma__shopifyStoreClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     dropshipperProducts<T extends shopifyStore$dropshipperProductsArgs<ExtArgs> = {}>(args?: Subset<T, shopifyStore$dropshipperProductsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$dropshipperProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    admin<T extends adminDefaultArgs<ExtArgs> = {}>(args?: Subset<T, adminDefaultArgs<ExtArgs>>): Prisma__adminClient<$Result.GetResult<Prisma.$adminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    admin<T extends shopifyStore$adminArgs<ExtArgs> = {}>(args?: Subset<T, shopifyStore$adminArgs<ExtArgs>>): Prisma__adminClient<$Result.GetResult<Prisma.$adminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9795,6 +9795,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: DropshipperProductScalarFieldEnum | DropshipperProductScalarFieldEnum[]
+  }
+
+  /**
+   * shopifyStore.admin
+   */
+  export type shopifyStore$adminArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the admin
+     */
+    select?: adminSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the admin
+     */
+    omit?: adminOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: adminInclude<ExtArgs> | null
+    where?: adminWhereInput
   }
 
   /**
@@ -50201,7 +50220,7 @@ export namespace Prisma {
     OR?: shopifyStoreWhereInput[]
     NOT?: shopifyStoreWhereInput | shopifyStoreWhereInput[]
     id?: IntFilter<"shopifyStore"> | number
-    adminId?: IntFilter<"shopifyStore"> | number
+    adminId?: IntNullableFilter<"shopifyStore"> | number | null
     name?: StringNullableFilter<"shopifyStore"> | string | null
     logo?: StringNullableFilter<"shopifyStore"> | string | null
     shop?: StringFilter<"shopifyStore"> | string
@@ -50233,12 +50252,12 @@ export namespace Prisma {
     deletedBy?: IntNullableFilter<"shopifyStore"> | number | null
     deletedByRole?: StringNullableFilter<"shopifyStore"> | string | null
     dropshipperProducts?: DropshipperProductListRelationFilter
-    admin?: XOR<AdminScalarRelationFilter, adminWhereInput>
+    admin?: XOR<AdminNullableScalarRelationFilter, adminWhereInput> | null
   }
 
   export type shopifyStoreOrderByWithRelationInput = {
     id?: SortOrder
-    adminId?: SortOrder
+    adminId?: SortOrderInput | SortOrder
     name?: SortOrderInput | SortOrder
     logo?: SortOrderInput | SortOrder
     shop?: SortOrder
@@ -50280,7 +50299,7 @@ export namespace Prisma {
     AND?: shopifyStoreWhereInput | shopifyStoreWhereInput[]
     OR?: shopifyStoreWhereInput[]
     NOT?: shopifyStoreWhereInput | shopifyStoreWhereInput[]
-    adminId?: IntFilter<"shopifyStore"> | number
+    adminId?: IntNullableFilter<"shopifyStore"> | number | null
     name?: StringNullableFilter<"shopifyStore"> | string | null
     logo?: StringNullableFilter<"shopifyStore"> | string | null
     accessToken?: StringNullableFilter<"shopifyStore"> | string | null
@@ -50311,12 +50330,12 @@ export namespace Prisma {
     deletedBy?: IntNullableFilter<"shopifyStore"> | number | null
     deletedByRole?: StringNullableFilter<"shopifyStore"> | string | null
     dropshipperProducts?: DropshipperProductListRelationFilter
-    admin?: XOR<AdminScalarRelationFilter, adminWhereInput>
+    admin?: XOR<AdminNullableScalarRelationFilter, adminWhereInput> | null
   }, "id" | "shop">
 
   export type shopifyStoreOrderByWithAggregationInput = {
     id?: SortOrder
-    adminId?: SortOrder
+    adminId?: SortOrderInput | SortOrder
     name?: SortOrderInput | SortOrder
     logo?: SortOrderInput | SortOrder
     shop?: SortOrder
@@ -50359,7 +50378,7 @@ export namespace Prisma {
     OR?: shopifyStoreScalarWhereWithAggregatesInput[]
     NOT?: shopifyStoreScalarWhereWithAggregatesInput | shopifyStoreScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"shopifyStore"> | number
-    adminId?: IntWithAggregatesFilter<"shopifyStore"> | number
+    adminId?: IntNullableWithAggregatesFilter<"shopifyStore"> | number | null
     name?: StringNullableWithAggregatesFilter<"shopifyStore"> | string | null
     logo?: StringNullableWithAggregatesFilter<"shopifyStore"> | string | null
     shop?: StringWithAggregatesFilter<"shopifyStore"> | string
@@ -55353,12 +55372,12 @@ export namespace Prisma {
     deletedBy?: number | null
     deletedByRole?: string | null
     dropshipperProducts?: dropshipperProductCreateNestedManyWithoutShopifyStoreInput
-    admin: adminCreateNestedOneWithoutShopifyStoresInput
+    admin?: adminCreateNestedOneWithoutShopifyStoresInput
   }
 
   export type shopifyStoreUncheckedCreateInput = {
     id?: number
-    adminId: number
+    adminId?: number | null
     name?: string | null
     logo?: string | null
     shop: string
@@ -55424,12 +55443,12 @@ export namespace Prisma {
     deletedBy?: NullableIntFieldUpdateOperationsInput | number | null
     deletedByRole?: NullableStringFieldUpdateOperationsInput | string | null
     dropshipperProducts?: dropshipperProductUpdateManyWithoutShopifyStoreNestedInput
-    admin?: adminUpdateOneRequiredWithoutShopifyStoresNestedInput
+    admin?: adminUpdateOneWithoutShopifyStoresNestedInput
   }
 
   export type shopifyStoreUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
-    adminId?: IntFieldUpdateOperationsInput | number
+    adminId?: NullableIntFieldUpdateOperationsInput | number | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     logo?: NullableStringFieldUpdateOperationsInput | string | null
     shop?: StringFieldUpdateOperationsInput | string
@@ -55465,7 +55484,7 @@ export namespace Prisma {
 
   export type shopifyStoreCreateManyInput = {
     id?: number
-    adminId: number
+    adminId?: number | null
     name?: string | null
     logo?: string | null
     shop: string
@@ -55533,7 +55552,7 @@ export namespace Prisma {
 
   export type shopifyStoreUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
-    adminId?: IntFieldUpdateOperationsInput | number
+    adminId?: NullableIntFieldUpdateOperationsInput | number | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     logo?: NullableStringFieldUpdateOperationsInput | string | null
     shop?: StringFieldUpdateOperationsInput | string
@@ -61261,9 +61280,9 @@ export namespace Prisma {
     _max?: NestedBigIntNullableFilter<$PrismaModel>
   }
 
-  export type AdminScalarRelationFilter = {
-    is?: adminWhereInput
-    isNot?: adminWhereInput
+  export type AdminNullableScalarRelationFilter = {
+    is?: adminWhereInput | null
+    isNot?: adminWhereInput | null
   }
 
   export type shopifyStoreOrderByRelevanceInput = {
@@ -61393,6 +61412,11 @@ export namespace Prisma {
     createdBy?: SortOrder
     updatedBy?: SortOrder
     deletedBy?: SortOrder
+  }
+
+  export type AdminScalarRelationFilter = {
+    is?: adminWhereInput
+    isNot?: adminWhereInput
   }
 
   export type companyDetailOrderByRelevanceInput = {
@@ -64298,11 +64322,6 @@ export namespace Prisma {
     isNot?: dropshipperProductVariantWhereInput | null
   }
 
-  export type AdminNullableScalarRelationFilter = {
-    is?: adminWhereInput | null
-    isNot?: adminWhereInput | null
-  }
-
   export type SupplierProductNullableScalarRelationFilter = {
     is?: supplierProductWhereInput | null
     isNot?: supplierProductWhereInput | null
@@ -65279,10 +65298,12 @@ export namespace Prisma {
     deleteMany?: dropshipperProductScalarWhereInput | dropshipperProductScalarWhereInput[]
   }
 
-  export type adminUpdateOneRequiredWithoutShopifyStoresNestedInput = {
+  export type adminUpdateOneWithoutShopifyStoresNestedInput = {
     create?: XOR<adminCreateWithoutShopifyStoresInput, adminUncheckedCreateWithoutShopifyStoresInput>
     connectOrCreate?: adminCreateOrConnectWithoutShopifyStoresInput
     upsert?: adminUpsertWithoutShopifyStoresInput
+    disconnect?: adminWhereInput | boolean
+    delete?: adminWhereInput | boolean
     connect?: adminWhereUniqueInput
     update?: XOR<XOR<adminUpdateToOneWithWhereWithoutShopifyStoresInput, adminUpdateWithoutShopifyStoresInput>, adminUncheckedUpdateWithoutShopifyStoresInput>
   }
@@ -70008,7 +70029,7 @@ export namespace Prisma {
     OR?: shopifyStoreScalarWhereInput[]
     NOT?: shopifyStoreScalarWhereInput | shopifyStoreScalarWhereInput[]
     id?: IntFilter<"shopifyStore"> | number
-    adminId?: IntFilter<"shopifyStore"> | number
+    adminId?: IntNullableFilter<"shopifyStore"> | number | null
     name?: StringNullableFilter<"shopifyStore"> | string | null
     logo?: StringNullableFilter<"shopifyStore"> | string | null
     shop?: StringFilter<"shopifyStore"> | string
@@ -80744,12 +80765,12 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     deletedBy?: number | null
     deletedByRole?: string | null
-    admin: adminCreateNestedOneWithoutShopifyStoresInput
+    admin?: adminCreateNestedOneWithoutShopifyStoresInput
   }
 
   export type shopifyStoreUncheckedCreateWithoutDropshipperProductsInput = {
     id?: number
-    adminId: number
+    adminId?: number | null
     name?: string | null
     logo?: string | null
     shop: string
@@ -81348,12 +81369,12 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedBy?: NullableIntFieldUpdateOperationsInput | number | null
     deletedByRole?: NullableStringFieldUpdateOperationsInput | string | null
-    admin?: adminUpdateOneRequiredWithoutShopifyStoresNestedInput
+    admin?: adminUpdateOneWithoutShopifyStoresNestedInput
   }
 
   export type shopifyStoreUncheckedUpdateWithoutDropshipperProductsInput = {
     id?: IntFieldUpdateOperationsInput | number
-    adminId?: IntFieldUpdateOperationsInput | number
+    adminId?: NullableIntFieldUpdateOperationsInput | number | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
     logo?: NullableStringFieldUpdateOperationsInput | string | null
     shop?: StringFieldUpdateOperationsInput | string

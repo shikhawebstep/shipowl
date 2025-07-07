@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 interface ShopifyStore {
     // === Primary Keys and Relations ===
     admin: {
-        connect: { id: number };
+        connect: { id: number | null };
     };
     id?: bigint; // Optional: ID of the dropshipperShopifyStore (if exists)
     createdBy?: number;
@@ -135,7 +135,7 @@ export async function createDropshipperShopifyStore(dropshipperId: number, drops
 
         const newShopifyStore = await prisma.shopifyStore.create({
             data: {
-                admin,
+                adminId: dropshipperId,
                 shop,
                 status,
                 verificationStatus,
@@ -152,7 +152,11 @@ export async function createDropshipperShopifyStore(dropshipperId: number, drops
     }
 }
 
-export async function verifyDropshipperShopifyStore(dropshipperId: number, dropshipperRole: string, dropshipperShopifyStore: ShopifyStore) {
+export async function verifyDropshipperShopifyStore(
+    dropshipperId: number | null,
+    dropshipperRole: string | null,
+    dropshipperShopifyStore: ShopifyStore
+) {
     try {
         const {
             shop,
@@ -175,41 +179,78 @@ export async function verifyDropshipperShopifyStore(dropshipperId: number, drops
 
         const existing = await isShopUsedAndVerified(shop);
 
-        // 🚫 Stop if already verified
+        // 🚫 If already verified, return early
         if (existing.status && existing.shopifyStore && existing.verified) {
-            return { status: true, message: "Shop already verified and connected." };
+            return {
+                status: true,
+                message: "Shop already verified and connected.",
+                shopifyStore: existing.shopifyStore
+            };
         }
 
-        if (!existing.shopifyStore) {
-            return { status: false, message: "Shopify store not found." };
+        if (existing.shopifyStore) {
+            // ✅ If store exists but not verified, update it
+            const updatedStore = await prisma.shopifyStore.update({
+                where: { id: Number(existing.shopifyStore.id) },
+                data: {
+                    accessToken,
+                    verificationStatus: true,
+                    email,
+                    shopOwner,
+                    name,
+                    domain,
+                    myshopifyDomain,
+                    planName,
+                    country: countryName,
+                    province,
+                    city,
+                    phone,
+                    currency,
+                    moneyFormat,
+                    timezone: ianaTimezone,
+                    createdAtShop: shopCreatedAt
+                }
+            });
+
+            return {
+                status: true,
+                message: "Shop updated and verified.",
+                shopifyStore: updatedStore
+            };
+        } else {
+            // 🆕 If no record exists, create a new one
+            const newStore = await prisma.shopifyStore.create({
+                data: {
+                    adminId: dropshipperId ?? undefined,
+                    accessToken,
+                    verificationStatus: true,
+                    email,
+                    shopOwner,
+                    name,
+                    shop,
+                    domain,
+                    myshopifyDomain,
+                    planName,
+                    country: countryName,
+                    province,
+                    city,
+                    phone,
+                    currency,
+                    moneyFormat,
+                    timezone: ianaTimezone,
+                    createdAtShop: shopCreatedAt
+                }
+            });
+
+            return {
+                status: true,
+                message: "Shop created and verified.",
+                shopifyStore: newStore
+            };
         }
 
-        // ✅ Update the accessToken and mark verified
-        await prisma.shopifyStore.update({
-            where: { id: Number(existing.shopifyStore.id) },
-            data: {
-                accessToken,
-                verificationStatus: true,
-                email,
-                shopOwner,
-                name,
-                domain,
-                myshopifyDomain,
-                planName,
-                country: countryName,
-                province,
-                city,
-                phone,
-                currency,
-                moneyFormat,
-                timezone: ianaTimezone,
-                createdAtShop: shopCreatedAt
-            }
-        });
-
-        return { status: true };
     } catch (error) {
-        console.error(`Error creating city:`, error);
+        console.error(`Error verifying or creating Shopify store:`, error);
         return { status: false, message: "Internal Server Error" };
     }
 }

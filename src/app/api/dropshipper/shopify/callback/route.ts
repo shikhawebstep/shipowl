@@ -22,19 +22,24 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Missing required parameters.' }, { status: 400 });
         }
 
-        // ✅ Check if shop is already used and verified
-        console.log(`Step 4: Checking if shop "${shop}" is already used and verified...`);
-        const isAlreadyUsed = await isShopUsedAndVerified(shop);
-        console.log('Step 5: isShopUsedAndVerified result:', isAlreadyUsed);
+        /*
+            // ✅ Check if shop is already used and verified
+            console.log(`Step 4: Checking if shop "${shop}" is already used and verified...`);
+            const isAlreadyUsed = await isShopUsedAndVerified(shop);
+            console.log('Step 5: isShopUsedAndVerified result:', isAlreadyUsed);
 
-        if (!isAlreadyUsed.status || !isAlreadyUsed.shopifyStore) {
-            console.log('Step 6: Shop not used or not verified, aborting');
-            return NextResponse.json({ status: false, message: isAlreadyUsed.message }, { status: 401 });
-        }
+            if (!isAlreadyUsed.status || !isAlreadyUsed.shopifyStore) {
+                console.log('Step 6: Shop not used or not verified, aborting');
+                return NextResponse.json({ status: false, message: isAlreadyUsed.message }, { status: 401 });
+            }
+            const shopifyStore = isAlreadyUsed.shopifyStore;
+            console.log('Step 7: shopifyStore and dropshipper info:', { shopifyStore,  dropshipper });
+        */
 
-        const shopifyStore = isAlreadyUsed.shopifyStore;
-        const dropshipper = shopifyStore.admin;
-        console.log('Step 7: shopifyStore and dropshipper info:', { shopifyStore, dropshipper });
+        const dropshipper = {
+            id: null,
+            role: null
+        };
 
         // Required environment variables
         const requiredEnvVars = {
@@ -219,7 +224,7 @@ export async function GET(req: NextRequest) {
         const payload = {
             admin: {
                 connect: {
-                    id: shopData.adminId
+                    id: null
                 }
             },
             shop: shop,
@@ -253,11 +258,10 @@ export async function GET(req: NextRequest) {
         console.log('Step 23: Result from verifyDropshipperShopifyStore:', result);
 
         if (result?.status) {
-
             const shopifyAppRedirectUrl = `${redirectUrl}/apps/shipping-owl?host=${host}&shop=${shopData.myshopify_domain}`;
 
             console.log('Step 24: Store verified successfully, sending success response');
-            return NextResponse.json({ status: true, redirectUrl: shopifyAppRedirectUrl }, { status: 200 });
+            return NextResponse.json({ status: true, redirectUrl: shopifyAppRedirectUrl, shopifyStore: result.shopifyStore }, { status: 200 });
         }
 
         logMessage('error', 'Failed to create store:', result?.message || 'Unknown error');

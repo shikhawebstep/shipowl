@@ -86,7 +86,7 @@ CREATE TABLE `admin` (
 -- CreateTable
 CREATE TABLE `shopifyStore` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `adminId` INTEGER NOT NULL,
+    `adminId` INTEGER NULL,
     `name` VARCHAR(191) NULL,
     `logo` LONGTEXT NULL,
     `shop` VARCHAR(191) NOT NULL,
