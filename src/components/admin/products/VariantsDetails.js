@@ -5,13 +5,17 @@ import { Plus, Minus, ImageIcon } from 'lucide-react';
 import { ProductContextEdit } from './ProductContextEdit';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Image from 'next/image';
 import Swal from "sweetalert2";
 import { useImageURL } from "@/components/ImageURLContext";
 export default function VariantDetails() {
+
+  const searchParams = useSearchParams();
+
+  const productId = searchParams.get("id");
   const { fetchImages } = useImageURL();
   const { formData, setFormData, setActiveTab } = useContext(ProductContextEdit);
   const [loading, setLoading] = useState(null);
@@ -116,8 +120,8 @@ export default function VariantDetails() {
   const handleSubmit = () => {
     setActiveTab('shipping-details');
   };
-  const handleImageDelete = async (index, type, variantId) => {
 
+  const handleImageDelete = async (index, type, variantId) => {
     setLoading(true);
 
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
@@ -134,19 +138,7 @@ export default function VariantDetails() {
     }
 
     try {
-
-
-      const url = `/api/admin/product/${variantId}/image/${index}?type=${type}`;
-
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (Swal.isVisible()) Swal.close();
-
-      await Swal.fire({
+      Swal.fire({
         title: 'Deleting Image...',
         text: 'Please wait while we remove the image.',
         allowOutsideClick: false,
@@ -155,9 +147,19 @@ export default function VariantDetails() {
         }
       });
 
+      const url = `/api/admin/product/${productId}/variant/${variantId}/image/${index}`;
+
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       if (!response.ok) {
+        Swal.close();
         const errorMessage = await response.json();
-        await Swal.fire({
+        Swal.fire({
           icon: "error",
           title: "Delete Failed",
           text: errorMessage.message || errorMessage.error || "An error occurred",
@@ -166,31 +168,37 @@ export default function VariantDetails() {
       }
 
       const result = await response.json();
+      Swal.close();
+
 
       if (result) {
-        await Swal.fire({
+        Swal.fire({
           icon: "success",
           title: "Image Deleted",
-          text: "The image has been deleted successfully!",
+          text: `The image has been deleted successfully!`,
           showConfirmButton: true,
+        }).then((res) => {
+          if (res.isConfirmed) {
+            window.location.reload(); // ✅ Works for Pages Router
+          }
         });
-
-        // ✅ Refresh the page after success
-        router.refresh(); // Use this for app router (Next.js 13+)
-        // router.reload(); // Use this for pages directory (Next.js 12 or below)
       }
+
     } catch (error) {
       console.error("Error:", error);
       Swal.close();
-      await Swal.fire({
+      Swal.fire({
         icon: "error",
         title: "Submission Error",
         text: error.message || "Something went wrong. Please try again.",
       });
+      setError(error.message || "Submission failed.");
     } finally {
       setLoading(false);
     }
   };
+
+
 
   return (
     <div className="mt-4 p-6 rounded-xl bg-white">
