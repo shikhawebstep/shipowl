@@ -15,8 +15,6 @@ export default function Success() {
   const timestamp = searchParams.get("timestamp");
 
   const fetchStores = useCallback(async () => {
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-
     if (!code || !host || !hmac || !shop) {
       setStatus(false);
     }
@@ -29,9 +27,6 @@ export default function Success() {
 
       const response = await fetch(url, {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       const result = await response.json();
