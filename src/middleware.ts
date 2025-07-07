@@ -82,6 +82,7 @@ export function middleware(req: NextRequest) {
                 "/api/dropshipper/auth/registration",
                 { route: "/api/location/country", methods: ["GET"] },
                 { route: "/api/location/country/[countryId]/states", methods: ["GET"] },
+                { route: "/api/admin/product/[productId]/description", methods: ["GET"] },
                 { route: "/api/location/state", methods: ["GET"] },
                 { route: "/api/location/state/[stateId]/cities", methods: ["GET"] },
                 { route: "/api/location/city", methods: ["GET"] },

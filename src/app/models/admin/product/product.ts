@@ -616,7 +616,51 @@ export const getProductsByFiltersAndStatus = async (productFilters: ProductFilte
         const products = await prisma.product.findMany({
             where: whereCondition,
             orderBy: { id: "desc" },
-            include: { variants: true },
+            select: {
+                id: true,
+                shippingOwlProductId: true,
+                categoryId: true,
+                name: true,
+                slug: true,
+                main_sku: true,
+                tags: true,
+                brandId: true,
+                originCountryId: true,
+                hsnCode: true,
+                taxRate: true,
+                rtoAddress: true,
+                pickupAddress: true,
+                shippingCountryId: true,
+                video_url: true,
+                list_as: true,
+                shipping_time: true,
+                weight: true,
+                package_length: true,
+                package_width: true,
+                package_height: true,
+                chargeable_weight: true,
+                package_weight_image: true,
+                package_length_image: true,
+                package_width_image: true,
+                package_height_image: true,
+                product_detail_video: true,
+                training_guidance_video: true,
+                isVisibleToAll: true,
+                status: true,
+                isVarientExists: true,
+                createdAt: true,
+                createdBy: true,
+                createdByRole: true,
+                updatedAt: true,
+                updatedBy: true,
+                updatedByRole: true,
+                deletedAt: true,
+                deletedBy: true,
+                deletedByRole: true,
+
+                // Include related "variants"
+                variants: true, // or use `select` inside if you want specific fields from variants
+            },
         });
 
         const sanitizedProducts = serializeBigInt(products);
@@ -653,7 +697,51 @@ export const getProductsByStatus = async (status: "active" | "inactive" | "delet
         const products = await prisma.product.findMany({
             where: whereCondition,
             orderBy: { id: "desc" },
-            include: { variants: true },
+            select: {
+                id: true,
+                shippingOwlProductId: true,
+                categoryId: true,
+                name: true,
+                slug: true,
+                main_sku: true,
+                tags: true,
+                brandId: true,
+                originCountryId: true,
+                hsnCode: true,
+                taxRate: true,
+                rtoAddress: true,
+                pickupAddress: true,
+                shippingCountryId: true,
+                video_url: true,
+                list_as: true,
+                shipping_time: true,
+                weight: true,
+                package_length: true,
+                package_width: true,
+                package_height: true,
+                chargeable_weight: true,
+                package_weight_image: true,
+                package_length_image: true,
+                package_width_image: true,
+                package_height_image: true,
+                product_detail_video: true,
+                training_guidance_video: true,
+                isVisibleToAll: true,
+                status: true,
+                isVarientExists: true,
+                createdAt: true,
+                createdBy: true,
+                createdByRole: true,
+                updatedAt: true,
+                updatedBy: true,
+                updatedByRole: true,
+                deletedAt: true,
+                deletedBy: true,
+                deletedByRole: true,
+
+                // Include related "variants"
+                variants: true, // or use `select` inside if you want specific fields from variants
+            },
         });
 
         const sanitizedProducts = serializeBigInt(products);
@@ -816,6 +904,24 @@ export const getProductById = async (id: number, includeOtherSuppliers: boolean 
     } catch (error) {
         console.error("❌ getProductById Error:", error);
         return { status: false, message: "Error fetching product" };
+    }
+};
+
+export const getProductDescriptionById = async (id: number) => {
+    try {
+        const product = await prisma.product.findUnique({
+            where: { id },
+            select: {
+                description: true
+            }
+        });
+
+        if (!product) return { status: false, message: "Product not found" };
+
+        return { status: true, product: serializeBigInt(product) };
+    } catch (error) {
+        console.error("❌ getProductDescriptionById Error:", error);
+        return { status: false, message: "Error fetching product description" };
     }
 };
 
