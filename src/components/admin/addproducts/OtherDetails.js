@@ -94,7 +94,7 @@ export default function OtherDetails() {
         didOpen: () => Swal.showLoading(),
       });
 
-      const url = "/api/admin/product";
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/product`;
       const form = new FormData();
 
       for (const key in formData) {

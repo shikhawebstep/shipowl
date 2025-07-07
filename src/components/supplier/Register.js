@@ -216,7 +216,7 @@ export default function Register() {
 
   const fetchState = useCallback((countryId) => {
     fetchProtected(
-      `/api/location/country/${countryId}/states`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${countryId}/states`,
       setStates,
       "states",         // ⚠️ verify that your API returns a `billingstates` key
       setBillingStateLoading
@@ -225,7 +225,7 @@ export default function Register() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `/api/location/country/${countryId}/states`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -234,7 +234,7 @@ export default function Register() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `/api/location/state/${stateId}/cities`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities
@@ -243,7 +243,7 @@ export default function Register() {
 
   const fetchCity2 = useCallback((stateId) => {
     fetchProtected(
-      `/api/location/state/${stateId}/cities`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${stateId}/cities`,
       setCity,
       "cities",               // ⚠️ This key must match your API response structure
       setBillingCityLoading
@@ -251,7 +251,7 @@ export default function Register() {
   }, [fetchProtected]);
   const fetchContry2 = useCallback(() => {
     fetchProtected(
-      `/api/location/country`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country`,
       setCountry,
       "countries",               // ⚠️ This key must match your API response structure
       setBillingCountryLoading

@@ -73,7 +73,7 @@ const AccountInfo = () => {
         }
       });
 
-      const url = `/api/supplier/${formData.id}/company/${id}/image/${index}?type=${type}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/${formData.id}/company/${id}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -163,7 +163,7 @@ const AccountInfo = () => {
           }
         });
 
-        const url = `/api/supplier/${id}`; // Ensure the URL is correct
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/${id}`; // Ensure the URL is correct
         const form = new FormData();
         for (const key in files) {
           const value = files[key];

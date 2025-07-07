@@ -43,7 +43,7 @@ function DropshipperBankChange() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/admin/dropshipper/bank-account/change-request`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/dropshipper/bank-account/change-request`,
                 {
                     method: "GET",
                     headers: {
@@ -98,7 +98,7 @@ function DropshipperBankChange() {
             });
 
             const response = await fetch(
-                `/api/admin/dropshipper/bank-account/change-request/${requestId}/review`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/dropshipper/bank-account/change-request/${requestId}/review`,
                 {
                     method: "POST",
                     headers: {

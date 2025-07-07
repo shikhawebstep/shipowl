@@ -48,7 +48,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/location/city`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -97,7 +97,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/location/city/trashed`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/city/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -234,7 +234,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/location/city/${item.id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/city/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -295,7 +295,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/location/city/${item?.id}/restore`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/city/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -374,7 +374,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/location/city/${item.id}/destroy`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/city/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -445,7 +445,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`/api/location/city/${id}`, {
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/city/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",

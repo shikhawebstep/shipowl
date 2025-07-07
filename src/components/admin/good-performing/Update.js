@@ -52,7 +52,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/good-pincode/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/good-pincode/${id}`,
         {
           method: "GET",
           headers: {

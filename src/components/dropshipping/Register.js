@@ -184,7 +184,7 @@ export default function Register() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `/api/location/country/${countryId}/states`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -193,7 +193,7 @@ export default function Register() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `/api/location/state/${stateId}/cities`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities

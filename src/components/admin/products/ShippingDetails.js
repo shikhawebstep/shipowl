@@ -59,7 +59,7 @@ export default function ShippingDetails() {
         }
       });
 
-      const url = `/api/admin/product/${id}/image/${index}?type=${type}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/product/${id}/image/${index}?type=${type}`;
 
       const response = await fetch(url, {
         method: "DELETE",

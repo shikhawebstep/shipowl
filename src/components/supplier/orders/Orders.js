@@ -195,7 +195,7 @@ export default function Orders() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/supplier/order?from=${formatDate(fromDate)}&to=${formatDate(toDate)}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/order?from=${formatDate(fromDate)}&to=${formatDate(toDate)}`,
         {
           method: "GET",
           headers: {

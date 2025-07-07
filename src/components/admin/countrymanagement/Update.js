@@ -65,7 +65,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/location/country/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${id}`,
         {
           method: "GET",
           headers: {
@@ -146,7 +146,7 @@ export default function Update() {
         }
       });
 
-      const url = `/api/location/country/${id}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${id}`;
       const form = new FormData();
       for (const key in formData) {
         if (formData[key]) {

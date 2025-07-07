@@ -18,11 +18,6 @@ export default function Success() {
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
     if (dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.setItem("code", code);
-      localStorage.setItem("host", host);
-      localStorage.setItem("hmac", hmac);
-      localStorage.setItem("shop", shop);
-      localStorage.setItem("timestamp", timestamp);
       localStorage.removeItem("shippingData");
       router.push("/dropshipping/auth/login");
       return;
@@ -30,11 +25,6 @@ export default function Success() {
 
     const token = dropshipperData?.security?.token;
     if (!token) {
-      localStorage.setItem("code", code);
-      localStorage.setItem("host", host);
-      localStorage.setItem("hmac", hmac);
-      localStorage.setItem("shop", shop);
-      localStorage.setItem("timestamp", timestamp);
       router.push("/dropshipping/auth/login");
       return;
     }
@@ -47,15 +37,13 @@ export default function Success() {
       const form = new FormData();
       form.append("shop", shop);
 
-      const url = `/api/dropshipper/shopify/callback?code=${code}&hmac=${hmac}&host=${host}&shop=${shop}&timestamp=${timestamp}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/shopify/callback?code=${code}&hmac=${hmac}&host=${host}&shop=${shop}&timestamp=${timestamp}`;
 
       const response = await fetch(url, {
         method: "GET",
-        /*
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        */
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const result = await response.json();

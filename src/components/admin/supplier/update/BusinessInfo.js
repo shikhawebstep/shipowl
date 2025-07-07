@@ -66,7 +66,7 @@ const BusinessInfo = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/location/country/${id}/states`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {
@@ -167,7 +167,7 @@ const BusinessInfo = () => {
         }
       });
 
-      const url = `/api/admin/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -241,7 +241,7 @@ const BusinessInfo = () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const url = `/api/admin/supplier/${id}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/${id}`;
       const form = new FormData();
 
       // Append all basic formData (excluding files)

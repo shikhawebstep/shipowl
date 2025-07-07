@@ -62,7 +62,7 @@ const handleChange = (e) => {
         didOpen: () => Swal.showLoading(),
       });
 
-      const url = `/api/admin/dropshipper`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/dropshipper`;
       const form = new FormData();
 
       // Append formData

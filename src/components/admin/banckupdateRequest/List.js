@@ -43,7 +43,7 @@ function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/admin/supplier/bank-account/change-request`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/bank-account/change-request`,
                 {
                     method: "GET",
                     headers: {
@@ -98,7 +98,7 @@ function List() {
             });
 
             const response = await fetch(
-                `/api/admin/supplier/bank-account/change-request/${requestId}/review`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/bank-account/change-request/${requestId}/review`,
                 {
                     method: "POST",
                     headers: {

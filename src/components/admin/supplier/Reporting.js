@@ -53,7 +53,7 @@ function Reporting() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/admin/supplier/${id}/payment-report?from=${formatDate(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/${id}/payment-report?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {

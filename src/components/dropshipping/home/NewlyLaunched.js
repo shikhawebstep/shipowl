@@ -237,7 +237,7 @@ const NewlyLaunched = () => {
 
 
 
-      const url = "/api/dropshipper/product/my-inventory";
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/product/my-inventory`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -316,7 +316,7 @@ const NewlyLaunched = () => {
     try {
       setLoading(true);
       const res = await fetch(
-        `/api/dropshipper/product/inventory?type=${type}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/product/inventory?type=${type}`,
         {
           headers: {
             "Content-Type": "application/json",

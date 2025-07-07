@@ -189,7 +189,7 @@ export default function Create() {
   }, [router]);
   const fetchPermission = useCallback(() => {
     fetchProtected(
-      "/api/dropshipper/staff/meta",
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/staff/meta`,
       setPermission,
       "staffPermissions",
       setLoadingPermission
@@ -207,7 +207,7 @@ export default function Create() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `/api/location/country/${countryId}/states`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -216,7 +216,7 @@ export default function Create() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `/api/location/state/${stateId}/cities`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities
@@ -265,8 +265,7 @@ export default function Create() {
           name="profilePicture"
           accept="image/*"
           onChange={handleChange}
-          className={`w-full p-3  file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100  border rounded-lg font-bold ${errors.profilePicture ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
-            }`}
+          className={`w-full p-3  file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100  border rounded-lg font-bold ${errors.profilePicture ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'}`}
         />
         {errors.profilePicture && <p className="text-red-500 text-sm">{errors.profilePicture}</p>}
       </div>

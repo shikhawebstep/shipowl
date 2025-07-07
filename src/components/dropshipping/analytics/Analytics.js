@@ -55,7 +55,7 @@ export default function Analytics() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/dropshipper/order/report?from=${fromDate}&to=${toDate}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/order/report?from=${fromDate}&to=${toDate}`,
                 {
                     method: "GET",
                     headers: {

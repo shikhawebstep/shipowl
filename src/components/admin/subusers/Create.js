@@ -189,7 +189,7 @@ export default function Create() {
   }, [router]);
   const fetchPermission = useCallback(() => {
     fetchProtected(
-      "/api/admin/staff/meta",
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/staff/meta`,
       setPermission,
       "staffPermissions",
       setLoadingPermission
@@ -207,7 +207,7 @@ export default function Create() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `/api/location/country/${countryId}/states`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -216,7 +216,7 @@ export default function Create() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `/api/location/state/${stateId}/cities`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities

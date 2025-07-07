@@ -84,7 +84,7 @@ const ProfileList = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/location/city`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -131,7 +131,7 @@ const ProfileList = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/location/state`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state`,
                 {
                     method: "GET",
                     headers: {

@@ -50,7 +50,7 @@ export default function AddWarehouse() {
         try {
             setLoadingCity(true)
             const response = await fetch(
-                `/api/location/state/${id}/cities`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${id}/cities`,
                 {
                     method: "GET",
                     headers: {
@@ -97,7 +97,7 @@ export default function AddWarehouse() {
         try {
             setLoadingState(true);
             const response = await fetch(
-                `/api/location/country/${value}/states`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${value}/states`,
                 {
                     method: "GET",
                     headers: {
@@ -151,7 +151,7 @@ export default function AddWarehouse() {
         try {
             setLoadingCountry(true);
             const response = await fetch(
-                `/api/location/country`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country`,
                 {
                     method: "GET",
                     headers: {

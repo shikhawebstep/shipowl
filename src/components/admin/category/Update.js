@@ -67,7 +67,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/admin/category/${id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -143,7 +143,7 @@ export default function Update() {
                 }
             });
 
-            const url = `/api/admin/category/${id}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/${id}`;
             const form = new FormData();
             form.append('name', formData.name);
             form.append('description', formData.description);
@@ -237,7 +237,7 @@ export default function Update() {
                 }
             });
 
-            const url = `/api/admin/category/${id}/image/${index}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/${id}/image/${index}`;
 
             const response = await fetch(url, {
                 method: "DELETE",

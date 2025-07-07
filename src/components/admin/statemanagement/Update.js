@@ -66,7 +66,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/location/state/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${id}`,
         {
           method: "GET",
           headers: {
@@ -123,7 +123,7 @@ export default function Update() {
 
     try {
       const response = await fetch(
-        `/api/location/country`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country`,
         {
           method: "GET",
           headers: {
@@ -193,7 +193,7 @@ export default function Update() {
       }
 
       const response = await fetch(
-        `/api/location/state/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${id}`,
         {
           method: "PUT",
           headers: {

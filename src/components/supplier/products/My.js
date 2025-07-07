@@ -13,7 +13,12 @@ import { CiEdit } from "react-icons/ci";
 import { MdOutlineChecklistRtl } from "react-icons/md";
 
 export default function My() {
-    const { fetchImages } = useImageURL();
+    const { fetchImages, getProductDescription } = useImageURL();
+    const [description, setDescription] = useState("");
+    const fetchDescription = (id) => {
+        getProductDescription(id, setDescription);
+
+    }
     const { verifySupplierAuth, hasPermission } = useSupplier();
     const canDestory = hasPermission("Product", "Permanent Delete");
     const canRestore = hasPermission("Product", "Restore");
@@ -32,7 +37,6 @@ export default function My() {
     });
     const [type, setType] = useState(false);
 
-    const [openDescriptionId, setOpenDescriptionId] = useState(null);
     const [showVariantPopup, setShowVariantPopup] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isTrashed, setIsTrashed] = useState(false);
@@ -54,7 +58,7 @@ export default function My() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/supplier/product/inventory?type=my`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/inventory?type=my`,
                 {
                     method: "GET",
                     headers: {
@@ -198,7 +202,7 @@ export default function My() {
             form.append('variants', JSON.stringify(simplifiedVariants));
 
 
-            const url = `/api/supplier/product/my-inventory/${inventoryData.id}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${inventoryData.id}`;
 
             const response = await fetch(url, {
                 method: 'PUT',
@@ -296,7 +300,7 @@ export default function My() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/supplier/product/my-inventory/${item.id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -378,7 +382,7 @@ export default function My() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/supplier/product/my-inventory/${item.id}/destroy`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -440,7 +444,7 @@ export default function My() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/supplier/product/my-inventory/${item?.id}/restore`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -499,7 +503,7 @@ export default function My() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/supplier/product/my-inventory/${item.id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${item.id}`,
                 {
                     method: "GET",
                     headers: {
@@ -593,8 +597,8 @@ export default function My() {
                 <>
 
 
-                      <div className="grid xl:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-3 productsSection">
-                        {products.map((product,index) => {
+                    <div className="grid xl:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-3 productsSection">
+                        {products.map((product, index) => {
                             const variantsImage = product?.variants || [];
                             const imageString = variantsImage[0]?.variant?.image || "";
                             const imageUrl = imageString.split(",")[0]?.trim() || "/default-image.jpg";
@@ -661,13 +665,13 @@ export default function My() {
                                         <div onClick={() => viewProduct(product.id)} className="relative h-[200px]  perspective">
                                             <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                                                 {/* FRONT */}
-                                                  <Image
-                                                src={fetchImages(imageUrl)}
-                                                alt={productName}
-                                                height={200}
-                                                width={100}
-                                                className="w-full h-full object-cover backface-hidden"
-                                            />
+                                                <Image
+                                                    src={fetchImages(imageUrl)}
+                                                    alt={productName}
+                                                    height={200}
+                                                    width={100}
+                                                    className="w-full h-full object-cover backface-hidden"
+                                                />
                                                 {/* BACK */}
                                                 <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
                                                     <span className="text-sm">Back View</span>
@@ -688,7 +692,7 @@ export default function My() {
                                             <FileText size={16} />
                                             <span className='text-sm'>
                                                 <button
-                                                    onClick={() => setOpenDescriptionId(product?.product?.description)}
+                                                    onClick={() => fetchDescription(product?.product?.id)}
                                                     className="text-blue-600"
                                                 >
                                                     View Description
@@ -1067,19 +1071,19 @@ export default function My() {
 
                 </>
             )}
-            {openDescriptionId && (
+            {description && (
                 <div className="fixed p-4 inset-0 z-50 m-auto flex items-center justify-center bg-black/50">
                     <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
                         <button
-                            onClick={() => setOpenDescriptionId(null)}
+                            onClick={() => setDescription(null)}
                             className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
                         >
                             &times;
                         </button>
-                        {openDescriptionId ? (
+                        {description ? (
                             <div
                                 className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                                dangerouslySetInnerHTML={{ __html: openDescriptionId }}
+                                dangerouslySetInnerHTML={{ __html: description }}
                             />
                         ) : (
                             <p className="text-gray-500">NIL</p>

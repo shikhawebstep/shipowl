@@ -19,8 +19,12 @@ const tabs = [
   { key: "my", label: "Listed Products" },
 ];
 const ProductDetails = () => {
-  const { fetchImages } = useImageURL();
-  const [openDescriptionId, setOpenDescriptionId] = useState(null);
+  const { fetchImages,getProductDescription } = useImageURL();
+    const [description, setDescription] = useState("");
+        const fetchDescription = (id) => {
+            getProductDescription(id, setDescription);
+    
+        }
 
   const router = useRouter();
   const { hasPermission } = useSupplier();
@@ -172,9 +176,9 @@ const ProductDetails = () => {
       setLoading(true);
       let url;
       if (type === "notmy") {
-        url = `/api/supplier/product/inventory/${id}`;
+        url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/inventory/${id}`;
       } else {
-        url = `/api/supplier/product/my-inventory/${id}`;
+        url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${id}`;
 
       }
       const response = await fetch(url, {
@@ -337,7 +341,7 @@ const ProductDetails = () => {
 
 
 
-      const url = isEdit ? `/api/supplier/product/my-inventory/${id}` : "/api/supplier/product/my-inventory";
+      const url = isEdit ? `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${id}` : `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory`;
 
       const response = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
@@ -1034,19 +1038,19 @@ const ProductDetails = () => {
           </div>
         </div>
       )}
-      {openDescriptionId && (
+      {description && (
         <div className="fixed p-4 inset-0 z-50 m-auto flex items-center justify-center bg-black/50">
           <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
             <button
-              onClick={() => setOpenDescriptionId(null)}
+              onClick={() => setDescription(null)}
               className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
             >
               &times;
             </button>
-            {openDescriptionId ? (
+            {description ? (
               <div
                 className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                dangerouslySetInnerHTML={{ __html: openDescriptionId }}
+                dangerouslySetInnerHTML={{ __html: description }}
               />
             ) : (
               <p className="text-gray-500">NIL</p>
@@ -1176,7 +1180,7 @@ const ProductDetails = () => {
                       <FileText size={16} />
                       <span className='text-sm'>
                         <button
-                          onClick={() => setOpenDescriptionId(product.description)}
+                          onClick={() => fetchDescription(product.id)}
                           className="text-blue-600"
                         >
                           View Description

@@ -34,7 +34,7 @@ const BrandProvider = ({ children }) => {
 
         try {
             const response = await fetch(
-                `/api/admin/brand`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/brand`,
                 {
                     method: "GET",
                     headers: {

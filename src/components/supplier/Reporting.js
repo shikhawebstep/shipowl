@@ -48,7 +48,7 @@ function Reporting() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/supplier/order/report?from=${formatDate(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/order/report?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {

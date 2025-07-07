@@ -29,7 +29,7 @@ export default function RTO() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/dropshipper/product/rto/inventory`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/product/rto/inventory`,
                 {
                     method: "GET",
                     headers: {

@@ -11,14 +11,19 @@ import { MdInventory } from "react-icons/md";
 
 import { useImageURL } from "@/components/ImageURLContext";
 export default function NewProducts() {
-  const { fetchImages } = useImageURL();
+  const { fetchImages, getProductDescription } = useImageURL();
   const { verifySupplierAuth, hasPermission } = useSupplier();
   const [productsRequest, setProductsRequest] = useState([]);
   const [loading, setLoading] = useState(null);
   const router = useRouter();
   const [type, setType] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [openDescriptionId, setOpenDescriptionId] = useState(null);
+  const [description, setDescription] = useState(null);
+  const fetchDescription = (id) => {
+    getProductDescription(id, setDescription);
+
+  }
+
   const [inventoryData, setInventoryData] = useState({
     productId: "",
     variant: [],
@@ -152,7 +157,7 @@ export default function NewProducts() {
 
 
 
-      const url = "/api/supplier/product/my-inventory";
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -273,7 +278,7 @@ export default function NewProducts() {
                 >
                   <div className="p-3">
                     {/* FLIP CARD */}
-                    <div   onClick={() => viewProduct(product.id)} className="relative h-[200px]  perspective">
+                    <div onClick={() => viewProduct(product.id)} className="relative h-[200px]  perspective">
                       <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                         {/* FRONT */}
                         <Image
@@ -303,7 +308,7 @@ export default function NewProducts() {
                       <FileText size={16} />
                       <span className='text-sm'>
                         <button
-                          onClick={() => setOpenDescriptionId(product.description)}
+                          onClick={() => fetchDescription(product.id)}
                           className="text-blue-600"
                         >
                           View Description
@@ -541,19 +546,19 @@ export default function NewProducts() {
           </div>
         </div>
       )}
-      {openDescriptionId && (
+      {description && (
         <div className="fixed p-4 inset-0 z-50 m-auto flex items-center justify-center bg-black/50">
           <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
             <button
-              onClick={() => setOpenDescriptionId(null)}
+              onClick={() => setDescription(null)}
               className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
             >
               &times;
             </button>
-            {openDescriptionId ? (
+            {description ? (
               <div
                 className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                dangerouslySetInnerHTML={{ __html: openDescriptionId }}
+                dangerouslySetInnerHTML={{ __html: description }}
               />
             ) : (
               <p className="text-gray-500">NIL</p>

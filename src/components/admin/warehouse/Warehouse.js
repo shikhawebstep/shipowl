@@ -44,7 +44,7 @@ export default function Warehouse() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/warehouse`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse`,
         {
           method: "GET",
           headers: {
@@ -98,7 +98,7 @@ export default function Warehouse() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/warehouse/trashed`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/trashed`,
         {
           method: "GET",
           headers: {
@@ -224,7 +224,7 @@ export default function Warehouse() {
       setLoading(true);
 
       const response = await fetch(
-        `/api/warehouse/${item.id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/${item.id}`,
         {
           method: "DELETE",
           headers: {
@@ -295,7 +295,7 @@ export default function Warehouse() {
 
       const results = await Promise.all(
         selected.map(id =>
-          fetch(`/api/warehouse/${id}`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/${id}`, {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
@@ -340,7 +340,7 @@ export default function Warehouse() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/warehouse/${item?.id}/restore`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/${item?.id}/restore`,
         {
           method: "PATCH",
           headers: {
@@ -420,7 +420,7 @@ export default function Warehouse() {
       setLoading(true);
 
       const response = await fetch(
-        `/api/warehouse/${item.id}/destroy`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/${item.id}/destroy`,
         {
           method: "DELETE",
           headers: {

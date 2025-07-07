@@ -33,7 +33,7 @@ export default function ProductList() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/dropshipper/product/request/my`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/product/request/my`,
                 {
                     method: "GET",
                     headers: {
@@ -94,7 +94,7 @@ export default function ProductList() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/product/request/my/trashed`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/product/request/my/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -169,7 +169,7 @@ export default function ProductList() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/product/request/my/${item.id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/product/request/my/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -237,7 +237,7 @@ export default function ProductList() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/product/request/my/${item?.id}/restore`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/product/request/my/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -315,7 +315,7 @@ export default function ProductList() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/product/request/my/${item.id}/destroy`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/product/request/my/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

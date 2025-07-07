@@ -49,7 +49,7 @@ export default function Payments() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/payment`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/payment`,
                 {
                     method: "GET",
                     headers: {
@@ -96,7 +96,7 @@ export default function Payments() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/payment/trashed`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/payment/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -231,7 +231,7 @@ export default function Payments() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/payment/${item.id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/payment/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -292,7 +292,7 @@ export default function Payments() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/payment/${item?.id}/restore`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/payment/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -371,7 +371,7 @@ export default function Payments() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/payment/${item.id}/destroy`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/payment/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

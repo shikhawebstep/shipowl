@@ -55,7 +55,7 @@ export default function Update() {
 
     try {
       const response = await fetch(
-        `/api/location/state/${id}/cities`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${id}/cities`,
         {
           method: "GET",
           headers: {
@@ -100,7 +100,7 @@ export default function Update() {
 
     try {
       const response = await fetch(
-        `/api/location/country/${value}/states`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${value}/states`,
         {
           method: "GET",
           headers: {
@@ -153,7 +153,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/location/country`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country`,
         {
           method: "GET",
           headers: {
@@ -238,7 +238,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/warehouse/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/${id}`,
         {
           method: "GET",
           headers: {
@@ -320,7 +320,7 @@ export default function Update() {
         }
       });
 
-      const url = `/api/warehouse/${id}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/${id}`;
       const form = new FormData();
       for (const key in formData) {
         if (formData[key]) {

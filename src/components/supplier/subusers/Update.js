@@ -59,7 +59,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/supplier/staff/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/staff/${id}`,
         {
           method: "GET",
           headers: {
@@ -298,7 +298,7 @@ const handleSubmit = async (e) => {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `/api/location/country/${countryId}/states`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -307,7 +307,7 @@ const handleSubmit = async (e) => {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `/api/location/state/${stateId}/cities`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities

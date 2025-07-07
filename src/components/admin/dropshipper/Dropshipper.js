@@ -145,7 +145,7 @@ const Dropshipper = () => {
 
 
 
-            const url = `/api/admin/dropshipper/${expandPassModal}/password/reset`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/dropshipper/${expandPassModal}/password/reset`;
 
             const response = await fetch(url, requestOptions);
 

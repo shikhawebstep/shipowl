@@ -78,7 +78,7 @@ const Payment = () => {
         }
       });
 
-      const url = `/api/admin/dropshipper/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/dropshipper/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -168,7 +168,7 @@ const Payment = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      const url = `/api/admin/dropshipper/${id}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/dropshipper/${id}`;
       const form = new FormData();
 
       // Append uploaded files

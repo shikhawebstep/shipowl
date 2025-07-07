@@ -67,7 +67,7 @@ const BusinessInfo = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/location/country/${id}/states`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {
@@ -164,7 +164,7 @@ const BusinessInfo = () => {
         }
       });
 
-      const url = `/api/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -238,7 +238,7 @@ const BusinessInfo = () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const url = `/api/supplier/profile/update`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/profile/update`;
       const form = new FormData();
 
       // Step 1: Append files from files state

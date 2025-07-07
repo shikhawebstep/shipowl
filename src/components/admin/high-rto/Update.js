@@ -60,7 +60,7 @@ export default function Update() {
     try {
         setLoading(true);
         const response = await fetch(
-            `/api/high-rto/${id}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}api/high-rto/${id}`,
             {
                 method: "GET",
                 headers: {

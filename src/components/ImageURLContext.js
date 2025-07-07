@@ -1,7 +1,7 @@
 // contexts/ImageURLContext.js
 'use client';
 import React, { createContext, useContext } from 'react';
-
+import Swal from 'sweetalert2';
 const ImageURLContext = createContext();
 
 export const ImageURLProvider = ({ children }) => {
@@ -24,11 +24,55 @@ export const ImageURLProvider = ({ children }) => {
 
     let imagePath = splitPart[1].replace(/^\/+/, ''); // remove leading slashes
 
-    return `https://sleeping-owl-we0m.onrender.com/api/images/tmp/${imagePath}`;
+    return `${process.env.NEXT_PUBLIC_API_BASE_URL}api/images/tmp/${imagePath}`;
   }
+  const getProductDescription = async (productId, setDescription) => {
+  try {
+    Swal.fire({
+    
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    const myHeaders = new Headers();
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/product/${productId}/description`,
+      {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Failed to fetch description");
+    }
+
+    const result = await response.json(); // ✅ FIXED
+
+    setDescription(result.product?.description); // ✅ Now works
+
+    Swal.close();
+
+  } catch (error) {
+    Swal.close();
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: error.message || "Something went wrong",
+    });
+    console.error("Fetch Error:", error);
+  }
+};
+
+
+
 
   return (
-    <ImageURLContext.Provider value={{ fetchImages }}>
+    <ImageURLContext.Provider value={{ fetchImages, getProductDescription }}>
       {children}
     </ImageURLContext.Provider>
   );

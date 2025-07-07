@@ -81,7 +81,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/admin/brand/${id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/brand/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -178,7 +178,7 @@ export default function Update() {
                 });
             }
 
-            const url = `/api/admin/brand/${id}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/brand/${id}`;
 
             const response = await fetch(url, {
                 method: "PUT",
@@ -256,7 +256,7 @@ export default function Update() {
                 }
             });
 
-            const url = `/api/admin/brand/${id}/image/${index}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/brand/${id}/image/${index}`;
 
             const response = await fetch(url, {
                 method: "DELETE",

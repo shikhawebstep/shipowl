@@ -264,9 +264,9 @@ export default function ProductDetails() {
       setLoading(true);
       let url;
       if (type === "notmy") {
-        url = `/api/dropshipper/product/inventory/${id}`;
+        url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/product/inventory/${id}`;
       } else {
-        url = `/api/dropshipper/product/my-inventory/${id}`;
+        url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/product/my-inventory/${id}`;
 
       }
       const response = await fetch(url, {
@@ -377,7 +377,7 @@ export default function ProductDetails() {
       form.append("shopifyApp", inventoryData.shopifyApp);
       form.append("variants", JSON.stringify(simplifiedVariants));
 
-      const url = "/api/dropshipper/product/my-inventory";
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/product/my-inventory`;
 
       const response = await fetch(url, {
         method: "POST",

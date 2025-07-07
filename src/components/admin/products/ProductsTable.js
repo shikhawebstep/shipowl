@@ -16,7 +16,7 @@ import { Trash2, RotateCcw, Pencil } from "lucide-react";
 import { useImageURL } from "@/components/ImageURLContext";
 
 const ProductTable = () => {
-    const { fetchImages } = useImageURL();
+    const { fetchImages, getProductDescription } = useImageURL();
     const { setActiveTab } = useContext(ProductContextEdit);
     const { setActiveTabs } = useContext(ProductContext)
     const [showVariantPopup, setShowVariantPopup] = useState(false);
@@ -31,7 +31,12 @@ const ProductTable = () => {
     const [isTrashed, setIsTrashed] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [openDescriptionId, setOpenDescriptionId] = useState(null);
+    const [description, setDescription] = useState("");
+    const fetchDescription = (id) => {
+        getProductDescription(id, setDescription);
+
+    }
+    console.log('description',description)
 
     const [selected, setSelected] = useState([]);
     const [selectedMonth, setSelectedMonth] = useState(() => {
@@ -81,7 +86,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/admin/category`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category`,
                 {
                     method: "GET",
                     headers: {
@@ -241,14 +246,14 @@ const ProductTable = () => {
                             <Link href="/admin/products/create">Add New</Link>
                         </button>
                     }
-                      {
-                                    canViewTrashed && <button
-                                        className={`text-sm p-2  gap-2 flex md:hidden items-center text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
-                                        onClick={handleToggleTrash}
-                                    >
-                                        <Trash2 className="text-sm" /> {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
-                                    </button>
-                                }
+                    {
+                        canViewTrashed && <button
+                            className={`text-sm p-2  gap-2 flex md:hidden items-center text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                            onClick={handleToggleTrash}
+                        >
+                            <Trash2 className="text-sm" /> {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
+                        </button>
+                    }
                     <button className="bg-[#4285F4] text-white px-4 py-2 rounded-lg text-sm">Filters</button></div>
             </div>
 
@@ -385,14 +390,14 @@ const ProductTable = () => {
                                                 </td>
                                                 <td className="p-2 px-5 text-left whitespace-nowrap">
                                                     <button
-                                                        onClick={() => setOpenDescriptionId(item.description)}
+                                                        onClick={() => fetchDescription(item.id)}
                                                         className="text-blue-600"
                                                     >
                                                         View Description
                                                     </button>
 
                                                 </td>
-                                               
+
 
 
 
@@ -540,29 +545,29 @@ const ProductTable = () => {
 
                 </div>
             )}
-             {openDescriptionId && (
-                                                    <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
-                                                        <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
-                                                            {/* Close Button */}
-                                                            <button
-                                                                onClick={() => setOpenDescriptionId(null)}
-                                                                className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
-                                                            >
-                                                                &times;
-                                                            </button>
+            {description && (
+                <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
+                    <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
+                        {/* Close Button */}
+                        <button
+                            onClick={() => setDescription(null)}
+                            className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+                        >
+                            &times;
+                        </button>
 
-                                                            {/* HTML Description Content */}
-                                                            {openDescriptionId ? (
-                                                                <div
-                                                                    className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                                                                    dangerouslySetInnerHTML={{ __html: openDescriptionId }}
-                                                                />
-                                                            ) : (
-                                                                <p className="text-gray-500">NIL</p>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
+                        {/* HTML Description Content */}
+                        {description ? (
+                            <div
+                                className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                                dangerouslySetInnerHTML={{ __html: description }}
+                            />
+                        ) : (
+                            <p className="text-gray-500">NIL</p>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
 
     );

@@ -54,7 +54,7 @@ function OrderPermission() {
 
     const fetchPermission = useCallback(() => {
         fetchProtected(
-            "/api/admin/supplier/order/permission",
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/order/permission`,
             setPermission,
             "permissions",
             setLoading

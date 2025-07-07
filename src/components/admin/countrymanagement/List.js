@@ -45,7 +45,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/location/country`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country`,
                 {
                     method: "GET",
                     headers: {
@@ -99,7 +99,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/location/country/trashed`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -237,7 +237,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/location/country/${item.id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -308,7 +308,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`/api/location/country/${id}`, {
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -353,7 +353,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/location/country/${item?.id}/restore`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -432,7 +432,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/location/country/${item.id}/destroy`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

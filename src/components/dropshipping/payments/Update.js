@@ -111,7 +111,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/payment/${id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/payment/${id}`,
                 {
                     method: "GET",
                     headers: {

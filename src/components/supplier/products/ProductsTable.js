@@ -170,7 +170,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/supplier/category`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/category`,
                 {
                     method: "GET",
                     headers: {
@@ -242,7 +242,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `/api/supplier/product/my-inventory/${item.id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -324,7 +324,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `/api/supplier/product/my-inventory/${item.id}/destroy`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -386,7 +386,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/supplier/product/my-inventory/${item?.id}/restore`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -495,7 +495,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/supplier/product/my-inventory/${item.id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${item.id}`,
                 {
                     method: "GET",
                     headers: {
@@ -584,7 +584,7 @@ const ProductTable = () => {
 
 
 
-            const url = isEdit ? `/api/supplier/product/my-inventory/${inventoryData.id}` : "/api/supplier/product/my-inventory";
+            const url = isEdit ? `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory/${inventoryData.id}` : `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory`;
 
             const response = await fetch(url, {
                 method: isEdit ? 'PUT' : "POST",

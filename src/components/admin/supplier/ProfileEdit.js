@@ -87,7 +87,7 @@ const ProfileEdit = () => {
     try {
       setStateLoading(true);
       const response = await fetch(
-        `/api/location/country/${id}/states`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {

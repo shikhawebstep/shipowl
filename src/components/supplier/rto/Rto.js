@@ -164,7 +164,7 @@ export default function RTO() {
       setLoading(true);
 
       const response = await fetch(
-        `/api/supplier/order/warehouse-collected`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/order/warehouse-collected`,
         {
           method: "POST",
           headers: {
@@ -222,7 +222,7 @@ export default function RTO() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/supplier/order/${activeTab}?from=${formatDate(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/order/${activeTab}?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {
@@ -285,7 +285,7 @@ export default function RTO() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/supplier/order/need-to-raise/${id}/dispute-1`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/order/need-to-raise/${id}/dispute-1`,
         {
           method: "POST",
           headers: {
@@ -422,7 +422,7 @@ export default function RTO() {
       const formdata = new FormData();
       formdata.append('orders', Array.isArray(selected) ? selected.join(',') : selected);
 
-      const url = `/api/supplier/order/need-to-raise/dispute-1`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/order/need-to-raise/dispute-1`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -514,7 +514,7 @@ export default function RTO() {
       formdata.append("status", status);
 
 
-      const url = `/api/supplier/order/need-to-raise/${disputeCase2}/dispute-2`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/order/need-to-raise/${disputeCase2}/dispute-2`;
 
       const response = await fetch(url, {
         method: "POST",

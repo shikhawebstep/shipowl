@@ -66,7 +66,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/admin/category/${id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -142,7 +142,7 @@ export default function Update() {
                 }
             });
 
-            const url = `/api/admin/category/${id}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/${id}`;
             const form = new FormData();
             form.append('name', formData.name);
             form.append('description', formData.description);
@@ -236,7 +236,7 @@ export default function Update() {
                 }
             });
 
-            const url = `/api/admin/category/${id}/image/${index}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/${id}/image/${index}`;
 
             const response = await fetch(url, {
                 method: "DELETE",
@@ -353,7 +353,7 @@ export default function Update() {
                                             slidesPerView={2}
                                             loop={formData.image?.split(',').length > 1}
                                             navigation={true}
-                                            className="mySwiper w-full lg:w-[300px] md:w-[200px] w-[60px] ms-2 md:h-[200px] h-[60px]"
+                                            className="mySwiper w-full lg:w-[300px] md:w-[200px]  ms-2 md:h-[200px] h-[60px]"
                                         >
                                             {formData.image?.split(',').map((img, index) => (
                                                 <SwiperSlide key={index} className="relative gap-3">

@@ -74,7 +74,7 @@ const handleChange = (e) => {
       didOpen: () => Swal.showLoading(),
     });
 
-    const url = "/api/supplier/profile/bank-account/change-request";
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/profile/bank-account/change-request`;
     const form = new FormData();
 
     for (const key in formData) {

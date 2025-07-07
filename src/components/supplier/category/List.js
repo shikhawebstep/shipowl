@@ -50,7 +50,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/admin/category`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category`,
                 {
                     method: "GET",
                     headers: {
@@ -104,7 +104,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/admin/category/trashed`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -230,7 +230,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/admin/category/${item.id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -301,7 +301,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`/api/admin/category/${id}`, {
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -346,7 +346,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/admin/category/${item?.id}/restore`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -425,7 +425,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `/api/admin/category/${item.id}/destroy`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

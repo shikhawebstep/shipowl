@@ -96,7 +96,7 @@ export default function Create() {
                 });
             }
 
-            const url = "/api/admin/category";
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category`;
 
             const response = await fetch(url, {
                 method: "POST",

@@ -50,7 +50,7 @@ export default function Update() {
     try {
         setLoading(true);
         const response = await fetch(
-            `/api/bad-pincode/${id}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}api/bad-pincode/${id}`,
             {
                 method: "GET",
                 headers: {

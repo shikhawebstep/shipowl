@@ -51,7 +51,7 @@ const ProductList = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/dropshipper/product/inventory?type=all`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/product/inventory?type=all`,
         {
           method: "GET",
           headers: {
@@ -136,7 +136,7 @@ const ProductList = () => {
       form.append('variants', JSON.stringify(simplifiedVariants));
 
 
-      const url = "/api/dropshipper/product/my-inventory";
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/product/my-inventory`;
 
       const response = await fetch(url, {
         method: "POST",

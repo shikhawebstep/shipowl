@@ -62,7 +62,7 @@ function Permission() {
 
   const fetchPermission = useCallback(() => {
     fetchProtected(
-      "/api/admin/global-permission",
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/global-permission`,
       setPermission,
       "permissions",
       setLoading

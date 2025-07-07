@@ -183,7 +183,7 @@ export default function Profile() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/location/country/${formData?.permanentCountry || id}/states`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${formData?.permanentCountry || id}/states`,
         {
           method: "GET",
           headers: {

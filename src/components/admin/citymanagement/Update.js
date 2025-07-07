@@ -70,7 +70,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/location/city/${id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/city/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -149,7 +149,7 @@ export default function Update() {
                 }
             });
 
-            const url = `/api/location/city/${id}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/city/${id}`;
             const form = new FormData();
             for (const key in formData) {
                 if (formData[key]) {

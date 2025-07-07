@@ -97,7 +97,7 @@ export default function Create() {
                 });
             }
     
-            const url = "/api/admin/brand";
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/brand`;
     
             const response = await fetch(url, {
                 method: "POST",

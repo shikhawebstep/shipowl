@@ -128,7 +128,7 @@ export default function AddShopifyStore() {
             form.append('shop', formData.shop);
 
 
-            const url = "/api/dropshipper/shopify/connect";
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/shopify/connect`;
 
             const response = await fetch(url, {
                 method: "POST",
@@ -235,7 +235,7 @@ export default function AddShopifyStore() {
 
 
 
-            const url = `/api/dropshipper/shopify/${selectedShop?.id}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/shopify/${selectedShop?.id}`;
 
             const response = await fetch(url, {
                 method: "PUT",

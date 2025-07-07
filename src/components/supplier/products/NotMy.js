@@ -8,9 +8,10 @@ import { useEffect, useState, useCallback } from 'react';
 import Swal from 'sweetalert2';
 import { HashLoader } from 'react-spinners';
 import { X, FileText, Tag, Truck } from "lucide-react"; // Icons
+import { useImageURL } from "@/components/ImageURLContext";
 
 export default function NotMy() {
-  const [openDescriptionId, setOpenDescriptionId] = useState(null);
+    const { fetchImages, getProductDescription } = useImageURL();
   const { verifySupplierAuth } = useSupplier();
   const [productsRequest, setProductsRequest] = useState([]);
   const [loading, setLoading] = useState(null);
@@ -30,6 +31,11 @@ export default function NotMy() {
       ),
     }));
   };
+    const [description, setDescription] = useState("");
+      const fetchDescription = (id) => {
+          getProductDescription(id, setDescription);
+  
+      }
   const fetchProducts = useCallback(async () => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -138,7 +144,7 @@ export default function NotMy() {
 
 
 
-      const url = "/api/supplier/product/my-inventory";
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/product/my-inventory`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -244,17 +250,17 @@ export default function NotMy() {
                         <FileText size={16} />
                          <span>
                           <button
-                            onClick={() => setOpenDescriptionId(product.id)}
+                            onClick={() => fetchDescription(product.id)}
                             className="text-blue-600"
                           >
                             View Description
                           </button>
-                          {openDescriptionId === product.id && (
+                          {description === product.id && (
                             <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
                               <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
                                 {/* Close Button */}
                                 <button
-                                  onClick={() => setOpenDescriptionId(null)}
+                                  onClick={() => setDescription(null)}
                                   className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
                                 >
                                   &times;

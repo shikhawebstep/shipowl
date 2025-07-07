@@ -96,7 +96,7 @@ export default function Banner() {
                 });
             }
 
-            const url = "/api/admin/Banner";
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/Banner`;
 
             const response = await fetch(url, {
                 method: "POST",

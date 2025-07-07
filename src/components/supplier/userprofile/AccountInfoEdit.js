@@ -175,7 +175,7 @@ const AccountInfoEdit = () => {
                 didOpen: () => Swal.showLoading(),
             });
 
-            const url = "/api/supplier/profile/bank-account/change-request";
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/profile/bank-account/change-request`;
             const form = new FormData();
             // Append all formData key-value pairs
             Object.entries(formData).forEach(([key, value]) => {
@@ -274,7 +274,7 @@ const AccountInfoEdit = () => {
                 }
             });
 
-            const url = `/api/supplier/${dropshipperData.supplier.id}/bank-account/${formData.id}/image/${index}?type=${type}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/${dropshipperData.supplier.id}/bank-account/${formData.id}/image/${index}?type=${type}`;
             const response = await fetch(url, {
                 method: "DELETE",
                 headers: {

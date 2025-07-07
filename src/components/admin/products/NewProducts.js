@@ -31,7 +31,7 @@ export default function NewProducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/admin/product/inventory?type=notmy`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/product/inventory?type=notmy`,
                 {
                     method: "GET",
                     headers: {

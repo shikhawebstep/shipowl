@@ -78,7 +78,7 @@ const Update = () => {
                 form.append('image', file);
             });
 
-            const url = `/api/product/request/${id}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/product/request/${id}`;
 
             const response = await fetch(url, {
                 method: "PUT",
@@ -163,7 +163,7 @@ const Update = () => {
                 }
             });
 
-            const url = `/api/product/request/my/${id}/image/${index}`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/product/request/my/${id}/image/${index}`;
 
             const response = await fetch(url, {
                 method: "DELETE",
@@ -228,7 +228,7 @@ const Update = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/product/request/my/${id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/product/request/my/${id}`,
                 {
                     method: "GET",
                     headers: {

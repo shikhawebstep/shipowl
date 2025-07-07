@@ -11,11 +11,9 @@ export default function Connecting() {
   const shop = searchParams.get("shop");
 
   const fetchStores = useCallback(async () => {
-
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
     if (dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.setItem("shop", shop);
       localStorage.removeItem("shippingData");
       router.push("/dropshipping/auth/login");
       return;
@@ -27,11 +25,12 @@ export default function Connecting() {
       return;
     }
 
+
     try {
       const form = new FormData();
       form.append("shop", shop);
 
-      const url = "/api/dropshipper/shopify/connect";
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/shopify/connect`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -43,16 +42,6 @@ export default function Connecting() {
 
       const result = await response.json();
 
-      if (
-        typeof result.message === "string" && (
-          (result.message.includes("used") &&
-            result.message.includes("verified")) || (result.message.includes("registered") &&
-              result.message.includes("verified")))
-      ) {
-        localStorage.removeItem("shop");
-        router.push("/dropshipping");
-      }
-
       if (!response.ok) {
         router.push("/dropshipping/shopify/failed");
       } else {
@@ -62,7 +51,7 @@ export default function Connecting() {
       console.error("Error:", error);
       router.push("/dropshipping/shopify/failed");
     } finally {
-
+      
     }
   }, [router, shop]);
 
@@ -82,7 +71,7 @@ export default function Connecting() {
         Please wait while we establish a secure connection.
       </p>
 
-
+      
     </div>
   );
 }

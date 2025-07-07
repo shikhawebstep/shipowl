@@ -170,7 +170,7 @@ const SupplierList = () => {
                 redirect: "follow"
             };
 
-            const url = `/api/admin/supplier/${expandPassModal}/password/reset`;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/${expandPassModal}/password/reset`;
 
             const response = await fetch(url, requestOptions);
 

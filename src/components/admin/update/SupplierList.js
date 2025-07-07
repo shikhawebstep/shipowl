@@ -193,7 +193,7 @@ const SupplierList = () => {
             setLoading(true);
 
             const response = await fetch(
-                `/api/admin/supplier/${item.id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -275,7 +275,7 @@ const SupplierList = () => {
             setLoading(true);
 
             const response = await fetch(
-                `/api/admin/supplier/${item.id}/destroy`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -337,7 +337,7 @@ const SupplierList = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/admin/supplier/${item?.id}/restore`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {

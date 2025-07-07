@@ -147,7 +147,7 @@ export default function VariantDetails() {
         }
       });
 
-      const url = `/api/admin/product/${productId}/variant/${variantId}/image/${index}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/product/${productId}/variant/${variantId}/image/${index}`;
 
       const response = await fetch(url, {
         method: "DELETE",

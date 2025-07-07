@@ -61,7 +61,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/dropshipper/staff/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/staff/${id}`,
         {
           method: "GET",
           headers: {
@@ -300,7 +300,7 @@ export default function Update() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `/api/location/country/${countryId}/states`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -309,7 +309,7 @@ export default function Update() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `/api/location/state/${stateId}/cities`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities

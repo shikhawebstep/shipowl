@@ -62,7 +62,7 @@ export default function OtherDetails() {
         },
       });
 
-      const url = `/api/admin/product/${id}`;
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/product/${id}`;
       const form = new FormData();
 
       const combinedData = { ...formData, ...files };

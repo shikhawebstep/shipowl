@@ -74,7 +74,7 @@ const BusinessInfo = () => {
     try {
       setStateLoading(true);
       const response = await fetch(
-        `/api/location/country/${id}/states`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {
@@ -174,7 +174,7 @@ const BusinessInfo = () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const url = "/api/admin/supplier";
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier`;
       const form = new FormData();
 
       for (const key in formData) {
