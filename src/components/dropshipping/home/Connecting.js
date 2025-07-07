@@ -16,40 +16,11 @@ export default function Connecting() {
       return;
     }
 
-    // ✅ Use NEXT_PUBLIC_ variables for client-side access
-    const {
-      NEXT_PUBLIC_APP_HOST: APP_HOST,
-      NEXT_PUBLIC_SHOPIFY_API_KEY: SHOPIFY_API_KEY,
-      NEXT_PUBLIC_SHOPIFY_API_SECRET: SHOPIFY_API_SECRET,
-      NEXT_PUBLIC_SHOPIFY_SCOPES: SHOPIFY_SCOPES,
-      NEXT_PUBLIC_SHOPIFY_REDIRECT_URL: SHOPIFY_REDIRECT_URL,
-      NEXT_PUBLIC_SHOPIFY_API_VERSION: SHOPIFY_API_VERSION,
-    } = process.env;
-
-    const requiredVars = {
-      APP_HOST,
-      SHOPIFY_API_KEY,
-      SHOPIFY_API_SECRET,
-      SHOPIFY_SCOPES,
-      SHOPIFY_REDIRECT_URL,
-      SHOPIFY_API_VERSION,
-    };
-
-    const missingVars = Object.entries(requiredVars)
-      .filter(([_, val]) => !val || val.trim() === "")
-      .map(([key]) => key);
-
-    if (missingVars.length > 0) {
-      console.error("Missing environment variables:", missingVars);
-      router.push("/error?reason=missing_env");
-      return;
-    }
-
     const installUrl =
       `https://${shop}/admin/oauth/authorize` +
-      `?client_id=${SHOPIFY_API_KEY}` +
-      `&scope=${SHOPIFY_SCOPES}` +
-      `&redirect_uri=${encodeURIComponent(SHOPIFY_REDIRECT_URL)}` +
+      `?client_id=${process.env.NEXT_PUBLIC_SHOPIFY_API_KEY}` +
+      `&scope=${process.env.NEXT_PUBLIC_SHOPIFY_SCOPES}` +
+      `&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_SHOPIFY_REDIRECT_URL)}` +
       `&grant_options[]=per-user`;
 
     window.location.href = installUrl;
