@@ -1,22 +1,25 @@
-"use client"
+"use client";
 
-
-import { useDropshipper } from '../middleware/DropshipperMiddleWareContext'
-import Banner from './Banner'
-
-import NewlyLaunched from './NewlyLaunched'
-import React, { useEffect } from 'react'
+import { useDropshipper } from '../middleware/DropshipperMiddleWareContext';
+import Banner from './Banner';
+import NewlyLaunched from './NewlyLaunched';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const Home = () => {
-    const shopifyStore = localStorage.getItem("shopifyStore")
+    console.log(`Step 1111`);
+    const [loading, setLoading] = useState(true);
     const { verifyDropShipperAuth } = useDropshipper();
+    const router = useRouter();
+
+    const shopifyStore = localStorage.getItem("shopifyStore") || null;
+
     const fetchShopifyStore = () => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
-        // ✅ Fix: Use localStorage.removeItem, not clear (which clears all keys!)
         if (dropshipperData?.project?.active_panel !== "dropshipper") {
             localStorage.removeItem("shippingData");
-            router.push("/dropshipping/auth/login"); // corrected path consistency
+            router.push("/dropshipping/auth/login");
             return;
         }
 
@@ -29,7 +32,7 @@ const Home = () => {
         const myHeaders = new Headers();
         myHeaders.append("Authorization", `Bearer ${token}`);
 
-        const formdata = new FormData(); // If needed, you can append values here
+        const formdata = new FormData();
 
         const requestOptions = {
             method: "POST",
@@ -45,31 +48,45 @@ const Home = () => {
             })
             .then((result) => {
                 console.log("Success:", result);
-                localStorage.removeItem("shopifyStore")
+                localStorage.removeItem("shopifyStore");
             })
             .catch((error) => {
                 console.error("Error:", error);
-                // ✅ Optional: show alert
+                // Optionally, handle error or redirect
+            })
+            .finally(() => {
+                setLoading(false); // ✅ Stop loading whether success or fail
             });
     };
 
     useEffect(() => {
         const checkAuthAndFetch = async () => {
             const isValid = await verifyDropShipperAuth();
+            console.log('isValid && shopifyStore', isValid, shopifyStore)
             if (isValid && shopifyStore) {
                 fetchShopifyStore();
+            } else {
+                setLoading(false); // still allow page to load if no shopifyStore
             }
         };
 
         checkAuthAndFetch();
     }, [verifyDropShipperAuth]);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <p className="text-lg font-semibold text-gray-600">Loading...</p>
+            </div>
+        );
+    }
+
     return (
         <>
             <Banner />
             <NewlyLaunched />
         </>
+    );
+};
 
-    )
-}
-
-export default Home
+export default Home;
