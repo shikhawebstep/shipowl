@@ -180,7 +180,7 @@ export async function verifyDropshipperShopifyStore(
         const existing = await isShopUsedAndVerified(shop);
 
         // 🚫 If already verified, return early
-        if (existing.status && existing.shopifyStore && existing.verified) {
+        if (existing.status && existing.shopifyStore && existing.verified && existing.shopifyStore.adminId) {
             return {
                 status: true,
                 message: "Shop already verified and connected.",
@@ -221,7 +221,7 @@ export async function verifyDropshipperShopifyStore(
             // 🆕 If no record exists, create a new one
             const newStore = await prisma.shopifyStore.create({
                 data: {
-                    adminId: dropshipperId ?? undefined,
+                    adminId: dropshipperId ?? null,
                     accessToken,
                     verificationStatus: true,
                     email,
@@ -523,3 +523,52 @@ export async function deleteShopifyStoreById(storeId: number) {
     }
 }
 
+export async function assignStoreToDropshipper(storeId: number, dropshipperId: number) {
+    try {
+        console.log(`Assigning Shopify store. Store ID: ${storeId}, Dropshipper ID: ${dropshipperId}`);
+
+        // Fetch the Shopify store by ID
+        const storeResult = await getShopifyStoreById(storeId);
+
+        if (!storeResult.status || !storeResult.shopifyStore) {
+            return {
+                status: false,
+                message: storeResult.message || 'The Shopify store could not be found.',
+                shopifyStore: null
+            };
+        }
+
+        const store = storeResult.shopifyStore;
+
+        // Check if the store is already assigned
+        if (store.adminId) {
+            return {
+                status: false,
+                message: 'This Shopify store is already assigned to a dropshipper.',
+                shopifyStore: null
+            };
+        }
+
+        // Assign the store to the dropshipper
+        const updatedStore = await prisma.shopifyStore.update({
+            where: { id: storeId },
+            data: {
+                adminId: dropshipperId
+            }
+        });
+
+        return {
+            status: true,
+            message: 'Shopify store successfully assigned to the dropshipper.',
+            shopifyStore: updatedStore
+        };
+
+    } catch (error) {
+        console.error('Error while assigning Shopify store:', error);
+        return {
+            status: false,
+            message: 'An unexpected error occurred while assigning the Shopify store.',
+            shopifyStore: null
+        };
+    }
+}

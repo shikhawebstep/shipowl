@@ -63,25 +63,24 @@ export default function DropshipperMiddleWareProvider({ children }) {
     };
 
 
-    const verifyDropShipperAuth = useCallback(async () => {
+   const verifyDropShipperAuth = useCallback(async () => {
         setLoading(true);
-        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        const dropshipper_token = dropshipperData?.security?.token;
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        const dropshipper_token = supplierData?.security?.token;
 
-        // ✅ Corrected the condition for active panel
-        if (dropshipperData?.project?.active_panel !== "dropshipper") {
-            localStorage.removeItem("shippingData"); // Correct way to remove item
+        if (supplierData?.project?.active_panel !== "dropshipper") {
+            localStorage.removeItem("shippingData");
             router.push("/dropshipping/auth/login");
-            return; // Stop further execution
+            return false;
         }
 
         if (!dropshipper_token) {
             router.push("/dropshipping/auth/login");
-            return; // Stop further execution
+            return false;
         }
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/auth/verify`, {
+            const response = await fetch(`https://shipowl-kd06.onrender.com/api/dropshipper/auth/verify`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -94,32 +93,35 @@ export default function DropshipperMiddleWareProvider({ children }) {
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+                    text: errorMessage.error || errorMessage.message || "Session expired. Please log in again.",
                 });
-                throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
+                return false;
             }
 
             const result = await response.json();
 
-            if (result.message !== "Token is valid") {
+            if (result.message === "Token is valid") {
+                return true;
+            } else {
                 Swal.fire({
                     icon: "error",
                     title: "Unauthorized",
                     text: "Invalid token or unauthorized access.",
                 });
                 router.push("/dropshipping/auth/login");
-                return;
+                return false;
             }
-
-
         } catch (error) {
             console.error("Error:", error);
             setError(error.message || "Something went wrong");
             router.push("/dropshipping/auth/login");
+            return false;
         } finally {
             setLoading(false);
         }
     }, [router, setLoading]);
+
+
 
 
     return (

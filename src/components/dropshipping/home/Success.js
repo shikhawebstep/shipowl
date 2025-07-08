@@ -30,6 +30,9 @@ export default function Success() {
       });
 
       const result = await response.json();
+      if(result.shopifyStore){
+        localStorage.setItem("shopifyStore",result.shopifyStore?.id)
+      }
 
       if (!response.ok) {
         setStatus(false);
