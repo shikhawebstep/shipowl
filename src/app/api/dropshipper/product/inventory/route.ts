@@ -102,8 +102,9 @@ export async function GET(req: NextRequest) {
         if (
           !('shopifyProductId' in product) ||
           !('shopifyStore' in product) ||
-          !product.shopifyStore?.shop ||
-          !product.shopifyStore?.accessToken
+          typeof product.shopifyStore !== 'object' ||
+          !('shop' in product.shopifyStore) ||
+          !('accessToken' in product.shopifyStore)
         ) {
           continue;
         }

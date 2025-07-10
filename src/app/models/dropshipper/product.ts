@@ -275,6 +275,7 @@ export const getProductsByFiltersAndStatus = async (
                             shippingOwlProductId: true,
                             categoryId: true,
                             name: true,
+                            gallery: true,
                             slug: true,
                             main_sku: true,
                             tags: true,
@@ -353,6 +354,7 @@ export const getProductsByFiltersAndStatus = async (
                             shippingOwlProductId: true,
                             categoryId: true,
                             name: true,
+                            gallery: true,
                             slug: true,
                             main_sku: true,
                             tags: true,
@@ -403,7 +405,6 @@ export const getProductsByFiltersAndStatus = async (
                                 select: {
                                     id: true,
                                     name: true,
-                                    image: true,
                                     color: true,
                                     model: true,
                                     sku: true
@@ -505,6 +506,7 @@ export const getProductsByStatus = async (
                             shippingOwlProductId: true,
                             categoryId: true,
                             name: true,
+                            gallery: true,
                             slug: true,
                             main_sku: true,
                             tags: true,
@@ -559,6 +561,7 @@ export const getProductsByStatus = async (
                             shippingOwlProductId: true,
                             categoryId: true,
                             name: true,
+                            gallery: true,
                             slug: true,
                             main_sku: true,
                             tags: true,
@@ -636,6 +639,7 @@ export const getProductsByStatus = async (
                             shippingOwlProductId: true,
                             categoryId: true,
                             name: true,
+                            gallery: true,
                             slug: true,
                             main_sku: true,
                             tags: true,
@@ -686,7 +690,6 @@ export const getProductsByStatus = async (
                                 select: {
                                     id: true,
                                     name: true,
-                                    image: true,
                                     color: true,
                                     model: true,
                                     sku: true
@@ -1028,7 +1031,6 @@ export const checkSupplierProductForDropshipper = async (
                             select: {
                                 id: true,
                                 name: true,
-                                image: true,
                                 color: true,
                                 model: true,
                                 sku: true
@@ -1068,7 +1070,6 @@ export const checkSupplierProductForDropshipper = async (
                             select: {
                                 id: true,
                                 name: true,
-                                image: true,
                                 color: true,
                                 model: true,
                                 sku: true
