@@ -24,11 +24,41 @@ export default function ProductDetails() {
     brandData,
     fetchBrand,
     setActiveTab,
+    setFiles,
+    files,
     errors, setErrors, validateFields,
 
   } = useContext(ProductContextEdit);
-
+  const [galleryPreviews, setGalleryPreviews] = useState([]);
   const { fetchSupplier, suppliers } = useAdmin();
+  const handleGalleryChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    // Save preview URLs
+    const previews = files.map(file => URL.createObjectURL(file));
+    setGalleryPreviews(previews);
+
+    // Save files to formData
+    setFiles((prev) => ({
+      ...prev,
+      gallary: files, // or `galleryFiles`, if you want to keep it in separate state
+    }));
+
+    setErrors((prev) => ({ ...prev, gallary: '' }));
+  };
+  const handleGalleryImageDelete = (index) => {
+    const updatedPreviews = [...galleryPreviews];
+    const updatedFiles = [...formData.gallary];
+
+    updatedPreviews.splice(index, 1);
+    updatedFiles.splice(index, 1);
+
+    setGalleryPreviews(updatedPreviews);
+    setFiles((prev) => ({
+      ...prev,
+      gallary: updatedFiles,
+    }));
+  };
   useEffect(() => {
     fetchCategory();
     fetchBrand();
@@ -114,6 +144,60 @@ export default function ProductDetails() {
           />
           {errors.main_sku && <p className="text-red-500 text-sm mt-1">{errors.main_sku}</p>}
         </div>
+      </div>
+      <div>
+        <label className="block mt-3 text-[#232323] font-semibold">
+          Image Gallary <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="file"
+          name="gallary"
+          accept="image/*"
+          multiple
+          className={`w-full border ${errors.gallary ? 'border-red-500' : 'border-[#DFEAF2]'} p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0`}
+          onChange={handleGalleryChange}
+        />
+
+        {/* ✅ Show previews from either File objects or image URLs */}
+        <div className="flex gap-4 mt-2 flex-wrap">
+          {Array.isArray(formData.gallary) &&
+            formData.gallary.map((img, index) => {
+              const imageUrl = typeof img === 'string' ? img : URL.createObjectURL(img);
+              return (
+                <div key={index} className="relative w-24 h-24">
+                  <img
+                    src={imageUrl}
+                    alt={`Gallery ${index}`}
+                    className="w-full h-full object-cover rounded shadow"
+                  />
+                </div>
+              );
+            })}
+        </div>
+
+        {errors.gallary && <p className="text-red-500 text-sm mt-1">{errors.gallary}</p>}
+
+        {galleryPreviews.length > 0 && (
+          <div className="flex gap-4 mt-4 overflow-x-auto">
+            {galleryPreviews.map((src, index) => (
+              <div key={index} className="relative min-w-[100px] max-w-[150px]">
+                <button
+                  type="button"
+                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                  onClick={() => handleGalleryImageDelete(index)}
+                >
+                  ✕
+                </button>
+                <img
+                  src={src}
+                  alt={`Preview ${index + 1}`}
+                  className="w-full h-24 object-cover rounded shadow"
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
       </div>
 
       <div className="mt-4">

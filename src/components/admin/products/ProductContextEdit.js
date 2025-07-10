@@ -30,6 +30,7 @@ const ProductProviderEdit = ({ children }) => {
     video_url: '',
     list_as: '',
     variant_images_0: '',
+    gallary:'',
     variants: [
       {
         color: '',

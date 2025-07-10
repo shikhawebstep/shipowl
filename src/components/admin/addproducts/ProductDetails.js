@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ProductContext } from './ProductContext';
 import "@pathofdev/react-tag-input/build/index.css"; // Required styles
 import ReactTagInput from "@pathofdev/react-tag-input";
@@ -28,7 +28,9 @@ export default function ProductDetails() {
     validateFields,
     errors, setErrors, loading
   } = useContext(ProductContext);
- const router = useRouter();
+  const [galleryPreviews, setGalleryPreviews] = useState([]);
+
+  const router = useRouter();
   const { fetchSupplier, suppliers } = useAdmin();
   const handleEditorChange = (value, field) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -51,10 +53,40 @@ export default function ProductDetails() {
   const handleChangeTags = (newTags) => {
 
 
+
     setFormData((prevData) => {
       const updatedData = { ...prevData, tags: newTags };
       return updatedData;
     });
+  };
+
+  const handleGalleryChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    // Save preview URLs
+    const previews = files.map(file => URL.createObjectURL(file));
+    setGalleryPreviews(previews);
+
+    // Save files to formData
+    setFormData((prev) => ({
+      ...prev,
+      gallary: files, // or `galleryFiles`, if you want to keep it in separate state
+    }));
+
+    setErrors((prev) => ({ ...prev, gallary: '' }));
+  };
+  const handleGalleryImageDelete = (index) => {
+    const updatedPreviews = [...galleryPreviews];
+    const updatedFiles = [...formData.gallary];
+
+    updatedPreviews.splice(index, 1);
+    updatedFiles.splice(index, 1);
+
+    setGalleryPreviews(updatedPreviews);
+    setFormData((prev) => ({
+      ...prev,
+      gallary: updatedFiles,
+    }));
   };
 
 
@@ -63,6 +95,9 @@ export default function ProductDetails() {
       setActiveTabs('variants-details')
     }
   };
+
+
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -107,6 +142,7 @@ export default function ProductDetails() {
           {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
         </div>
 
+
         <div>
           <label className="block text-[#232323] font-semibold">
             Product Main SKU <span className="text-red-500">*</span>
@@ -122,6 +158,53 @@ export default function ProductDetails() {
           {errors.main_sku && <p className="text-red-500 text-sm mt-1">{errors.main_sku}</p>}
         </div>
       </div>
+      <div>
+        <label className="block mt-3 text-[#232323] font-semibold">
+          Image Gallary <span className="text-red-500">*</span>
+        </label>
+
+        <div className="mt-2 grid grid-cols-4 gap-4 ">
+          
+          {galleryPreviews.length > 0 &&
+            galleryPreviews.map((src, index) => (
+              <div key={index} className="relative w-full p-4 h-[300px] rounded overflow-hidden border border-gray-300">
+                <button
+                  type="button"
+                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs z-10"
+                  onClick={() => handleGalleryImageDelete(index)}
+                >
+                  ✕
+                </button>
+                <img
+                  src={src}
+                  alt={`Preview ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+
+          {/* "+" Add button */}
+          <label
+            htmlFor="gallery-upload"
+            className="flex items-center justify-center min-w-[100px] h-[100px] border border-dashed border-gray-400 text-3xl text-gray-500 cursor-pointer rounded"
+          >
+            +
+            <input
+              id="gallery-upload"
+              type="file"
+              name="gallary"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleGalleryChange}
+            />
+          </label>
+        </div>
+
+        {/* Error message */}
+        {errors.gallary && <p className="text-red-500 text-sm mt-1">{errors.gallary}</p>}
+      </div>
+
 
       <div className="mt-4">
         <label className="block text-[#232323] font-semibold">

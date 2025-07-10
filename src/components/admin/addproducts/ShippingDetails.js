@@ -1,22 +1,47 @@
 'use client';
 
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { UploadCloud } from 'lucide-react';
 import { ProductContext } from './ProductContext';
 import { useRouter } from 'next/navigation';
 
 export default function ShippingDetails() {
+  const [filePreviews, setFilePreviews] = useState({});
+
   const { formData, validateForm2, setFormData, shippingErrors, fileFields, setActiveTabs, videoFields } = useContext(ProductContext);
   const router = useRouter();
   const handleFileChange = (event, key) => {
     const selectedFiles = Array.from(event.target.files);
 
-    // Update formData state with the actual File objects
     setFormData((prev) => ({
       ...prev,
       [key]: selectedFiles,
     }));
+
+    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
+    setFilePreviews((prev) => ({
+      ...prev,
+      [key]: newPreviews,
+    }));
   };
+  const handleFileDelete = (key, index) => {
+    const updatedFiles = [...formData[key]];
+    const updatedPreviews = [...filePreviews[key]];
+
+    updatedFiles.splice(index, 1);
+    updatedPreviews.splice(index, 1);
+
+    setFormData((prev) => ({
+      ...prev,
+      [key]: updatedFiles,
+    }));
+
+    setFilePreviews((prev) => ({
+      ...prev,
+      [key]: updatedPreviews,
+    }));
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -133,33 +158,56 @@ export default function ShippingDetails() {
         </div>
 
 
-        <div className="flex flex-wrap gap-8 my-8">
+        <div className="md:grid grid-cols-5 flex-wrap gap-6 my-8">
           {fileFields.map(({ label, key }) => (
-            <div key={key} className="flex flex-col space-y-2">
+            <div key={key} className="flex flex-col ">
               <label className="text-[#232323] font-bold block">
                 {label} <span className="text-red-500">*</span>
               </label>
-              <div className="border-1 relative border-dashed border-red-300 rounded-xl p-6 w-48 h-32 flex flex-col items-center justify-center">
+
+              <div className="border-1 relative border-dashed border-red-300 rounded-xl p-6 w-full h-32 flex flex-col items-center justify-center">
                 <UploadCloud className="w-8 h-8 text-[#232323]" />
                 <span className="text-xs text-[#232323] text-center">
                   {Array.isArray(formData?.[key]) && formData[key].length > 0
-                    ? formData[key]
-                      .map((file, i) => file.name || `File ${i + 1}`)
-                      .join(', ')
+                    ? formData[key].map((file, i) => file.name || `File ${i + 1}`).join(', ')
                     : 'Upload'}
                 </span>
                 <input
                   type="file"
                   multiple
-                  accept="image/*"
+                  accept="image/*,application/pdf,text/plain,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.csv"
                   className="absolute opacity-0 w-full h-full cursor-pointer"
                   onChange={(e) => handleFileChange(e, key)}
                 />
               </div>
 
+              {/* ✅ Preview for this field only */}
+              {filePreviews[key]?.length > 0 && (
+                <div className="flex gap-4 mt-2 overflow-x-auto">
+                  {filePreviews[key].map((src, index) => (
+                    <div key={index} className="relative min-w-[100px] max-w-[150px]">
+                      <button
+                        type="button"
+                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                        onClick={() => handleFileDelete(key, index)}
+                      >
+                        ✕
+                      </button>
+                      <img
+                        src={src}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-24 object-cover rounded shadow"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {shippingErrors[key] && <p className="text-red-500 text-sm">{shippingErrors[key]}</p>}
             </div>
           ))}
+
+
           {videoFields.map(({ label, key }) => (
             <div key={key} className="flex flex-col space-y-2 w-full md:w-[250px]">
               <label className="text-[#232323] font-bold block mb-1">
@@ -181,7 +229,7 @@ export default function ShippingDetails() {
                   className="absolute inset-0 opacity-0 cursor-pointer"
                   onChange={(e) => handleFileChange(e, key)}
                 />
-                 {shippingErrors[key] && <p className="text-red-500 text-sm">{shippingErrors[key]}</p>}
+                {shippingErrors[key] && <p className="text-red-500 text-sm">{shippingErrors[key]}</p>}
               </div>
             </div>
           ))}

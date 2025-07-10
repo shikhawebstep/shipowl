@@ -84,6 +84,7 @@ const AddProduct = () => {
         brand: products.brandId || '',
         origin_country: products.originCountryId || '',
         shipping_country: products.shippingCountryId || '',
+        gallary: products.gallary || '',
         video_url: products.video_url || '',
         list_as: products.list_as || '',
         variant_images_0: '',

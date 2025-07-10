@@ -282,7 +282,7 @@ export default function VariantDetails() {
                           <input
                             type="file"
                             multiple
-                            accept="image/*"
+                            accept="image/*,application/pdf,text/plain,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.csv"
                             className="absolute opacity-0 w-full h-full cursor-pointer"
                             onChange={(e) => handleFileChange(e, index)}
                           />

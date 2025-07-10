@@ -123,7 +123,7 @@ const EditAdminModal = ({ item, onClose, onSave }) => {
             {formData.profilePicture && (
               <Image height={100} width={100} src={formData.profilePicture} alt="Preview" className="w-20 h-20 rounded-full mb-2" />
             )}
-            <input type="file" accept="image/*" onChange={handleImageChange} />
+            <input type="file" accept="image/*,application/pdf,text/plain,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.csv" onChange={handleImageChange} />
           </div>
 
           <div>

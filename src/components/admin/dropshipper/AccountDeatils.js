@@ -72,7 +72,7 @@ const AccountDetails = () => {
           type="file"
           id="upload"
           name="profilePicture"
-          accept="image/*"
+          accept="image/*,application/pdf,text/plain,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.csv"
           onChange={handleChange}
           className="hidden"
           />

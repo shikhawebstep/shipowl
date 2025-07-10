@@ -356,7 +356,7 @@ const handleSubmit = async (e) => {
         <input
           type="file"
           name="profilePicture"
-          accept="image/*"
+          accept="image/*,application/pdf,text/plain,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.csv"
           onChange={handleChange}
           className={`w-full p-3  file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100  border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]
                   }`}

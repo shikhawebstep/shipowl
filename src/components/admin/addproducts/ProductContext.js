@@ -56,6 +56,7 @@ const ProductProvider = ({ children }) => {
     isVarientExists: '',
     supplierIds: '',
     status: true,
+    gallary:'',
   });
 
   const fetchCategory = useCallback(async () => {
@@ -215,6 +216,7 @@ const ProductProvider = ({ children }) => {
     shipping_country: 'Shipping Country',
     video: 'Product Video URL',
     list_as: 'List As',
+    gallary:"Gallary Images"
   };
  const validateForm2 = () => {
   const newErrors = {};
@@ -262,6 +264,7 @@ const ProductProvider = ({ children }) => {
       'shipping_country',
       'list_as',
       'isVisibleToAll',
+      'gallary'
     ];
 
     // ✅ Push to requiredFields, not validateFields
