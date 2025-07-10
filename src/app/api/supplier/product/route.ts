@@ -285,9 +285,16 @@ export async function POST(req: NextRequest) {
 
     const uploadedFiles: Record<string, string> = {};
     for (const field of fileFields) {
+
+      let pattern: 'slug' | 'slug-unique' | 'original' | 'custom' = 'slug-unique';
+
+      if (field == 'gallery') {
+        pattern = 'original';
+      }
+
       const fileData = await saveFilesFromFormData(formData, field, {
         dir: uploadDir,
-        pattern: 'slug-unique',
+        pattern,
         multiple: true,
       });
 
