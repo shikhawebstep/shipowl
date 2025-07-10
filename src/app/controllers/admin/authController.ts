@@ -40,6 +40,13 @@ export async function handleLogin(req: NextRequest, adminRole: string, adminStaf
 
         const admin = adminResponse.admin;
 
+        let adminData = {
+            id: admin.id,
+            name: admin.name,
+            email: admin.email,
+            role: admin.role,
+        };
+
         console.log(`admin - `, admin);
 
         // Correct usage of .toLowerCase() as a function
@@ -71,6 +78,11 @@ export async function handleLogin(req: NextRequest, adminRole: string, adminStaf
                     { status: 403 }
                 );
             }
+
+            // Safely assign companyName to adminData if it exists
+            if ('companyDetail' in admin && admin.companyDetail?.companyName) {
+                (adminData as any).companyName = admin.companyDetail.companyName;
+            }
         }
 
         if (type === 'sub' && 'admin' in admin && admin.admin?.role === 'supplier') {
@@ -101,12 +113,7 @@ export async function handleLogin(req: NextRequest, adminRole: string, adminStaf
         return NextResponse.json({
             message: "Login successful",
             token,
-            admin: {
-                id: admin.id,
-                name: admin.name,
-                email: admin.email,
-                role: admin.role,
-            },
+            admin: adminData,
             assignedPermissions
         });
     } catch (error) {
@@ -677,6 +684,11 @@ export async function adminByUsernameRole(username: string, role: string) {
                     status: true,
                     isVerified: true,
                     isEmailVerified: true,
+                    companyDetail: {
+                        select: {
+                            companyName: true
+                        }
+                    }
                 },
             });
         } else {

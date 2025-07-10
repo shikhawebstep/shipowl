@@ -50,7 +50,6 @@ interface Variant {
   sku: string;
   suggested_price?: number;
   product_link: string;
-  images: string;
   model: string;
 }
 
@@ -346,7 +345,8 @@ export async function PUT(req: NextRequest) {
       'package_width_image',
       'package_height_image',
       'product_detail_video',
-      'training_guidance_video'
+      'training_guidance_video',
+      'gallery'
     ];
 
     const uploadedFiles: Record<string, string> = {};
@@ -377,6 +377,7 @@ export async function PUT(req: NextRequest) {
       rtoAddress: extractString('rto_address') || '',
       pickupAddress: extractString('pickup_address') || '',
       description: extractString('description'),
+      gallery: uploadedFiles['gallery'],
       tags: extractString('tags') || '',
       brandId: extractNumber('brand') || 0,
       originCountryId,
@@ -402,34 +403,6 @@ export async function PUT(req: NextRequest) {
       updatedBy: adminId,
       updatedByRole: adminRole,
     };
-
-    if (Array.isArray(productPayload.variants) && productPayload.variants.length > 0) {
-      for (let index = 0; index < productPayload.variants.length; index++) {
-        console.log(`🔁 Index: ${index}`);
-        const variantImagesIndex = `variant_images_${index}`;
-
-        // File upload
-        const fileData = await saveFilesFromFormData(formData, variantImagesIndex, {
-          dir: uploadDir,
-          pattern: 'slug-unique',
-          multiple: true,
-        });
-
-        let image = '';
-
-        if (fileData) {
-          logMessage('info', 'uploaded fileData:', fileData);
-
-          if (Array.isArray(fileData)) {
-            image = fileData.map((file: UploadedFileInfo) => file.url).join(', ');
-          } else {
-            image = (fileData as UploadedFileInfo).url;
-          }
-        }
-
-        productPayload.variants[index].images = image;
-      }
-    }
 
     logMessage('info', 'Product payload updated:', productPayload);
 

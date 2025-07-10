@@ -1,11 +1,15 @@
-# 1️⃣ Install Project Dependencies
+# Install project dependencies
 npm install
 
-# 2️⃣ Generate the Prisma Client
+# Generate Prisma Client from schema
 npx prisma generate
 
-# 3️⃣ Reset the Database (WARNING: This will delete all existing data!)
+# Reset the DB (⚠️ deletes all data)
 npx prisma migrate reset --force
 
-# 4️⃣ Apply Migrations and Create Tables
+# Apply migrations and create tables
 npx prisma migrate dev --name init
+
+# Update Prisma CLI and Client
+npm i --save-dev prisma@latest
+npm i @prisma/client@latest

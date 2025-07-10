@@ -20,12 +20,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.10.1
- * Query Engine version: 9b628578b3b7cae625e8c927178f15a170e74a9c
+ * Prisma Client JS version: 6.11.1
+ * Query Engine version: f40f79ec31188888a2e33acda0ecc8fd10a853a9
  */
 Prisma.prismaVersion = {
-  client: "6.10.1",
-  engine: "9b628578b3b7cae625e8c927178f15a170e74a9c"
+  client: "6.11.1",
+  engine: "f40f79ec31188888a2e33acda0ecc8fd10a853a9"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -129,6 +129,7 @@ exports.Prisma.AppConfigScalarFieldEnum = {
 exports.Prisma.EmailConfigScalarFieldEnum = {
   id: 'id',
   panel: 'panel',
+  panel1: 'panel1',
   module: 'module',
   subject: 'subject',
   action: 'action',
@@ -584,6 +585,7 @@ exports.Prisma.ProductScalarFieldEnum = {
   slug: 'slug',
   main_sku: 'main_sku',
   description: 'description',
+  gallery: 'gallery',
   tags: 'tags',
   brandId: 'brandId',
   originCountryId: 'originCountryId',
@@ -624,7 +626,6 @@ exports.Prisma.ProductVariantScalarFieldEnum = {
   id: 'id',
   name: 'name',
   productId: 'productId',
-  image: 'image',
   color: 'color',
   model: 'model',
   sku: 'sku',
@@ -963,6 +964,7 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.emailConfigOrderByRelevanceFieldEnum = {
   panel: 'panel',
+  panel1: 'panel1',
   module: 'module',
   subject: 'subject',
   action: 'action',
@@ -1232,6 +1234,7 @@ exports.Prisma.productOrderByRelevanceFieldEnum = {
   slug: 'slug',
   main_sku: 'main_sku',
   description: 'description',
+  gallery: 'gallery',
   hsnCode: 'hsnCode',
   rtoAddress: 'rtoAddress',
   pickupAddress: 'pickupAddress',
@@ -1251,7 +1254,6 @@ exports.Prisma.productOrderByRelevanceFieldEnum = {
 
 exports.Prisma.productVariantOrderByRelevanceFieldEnum = {
   name: 'name',
-  image: 'image',
   color: 'color',
   model: 'model',
   sku: 'sku',

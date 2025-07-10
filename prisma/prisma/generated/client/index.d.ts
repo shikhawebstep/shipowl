@@ -736,8 +736,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.10.1
-   * Query Engine version: 9b628578b3b7cae625e8c927178f15a170e74a9c
+   * Prisma Client JS version: 6.11.1
+   * Query Engine version: f40f79ec31188888a2e33acda0ecc8fd10a853a9
    */
   export type PrismaVersion = {
     client: string
@@ -5642,6 +5642,7 @@ export namespace Prisma {
   export type EmailConfigMinAggregateOutputType = {
     id: bigint | null
     panel: string | null
+    panel1: string | null
     module: string | null
     subject: string | null
     action: string | null
@@ -5665,6 +5666,7 @@ export namespace Prisma {
   export type EmailConfigMaxAggregateOutputType = {
     id: bigint | null
     panel: string | null
+    panel1: string | null
     module: string | null
     subject: string | null
     action: string | null
@@ -5688,6 +5690,7 @@ export namespace Prisma {
   export type EmailConfigCountAggregateOutputType = {
     id: number
     panel: number
+    panel1: number
     module: number
     subject: number
     action: number
@@ -5731,6 +5734,7 @@ export namespace Prisma {
   export type EmailConfigMinAggregateInputType = {
     id?: true
     panel?: true
+    panel1?: true
     module?: true
     subject?: true
     action?: true
@@ -5754,6 +5758,7 @@ export namespace Prisma {
   export type EmailConfigMaxAggregateInputType = {
     id?: true
     panel?: true
+    panel1?: true
     module?: true
     subject?: true
     action?: true
@@ -5777,6 +5782,7 @@ export namespace Prisma {
   export type EmailConfigCountAggregateInputType = {
     id?: true
     panel?: true
+    panel1?: true
     module?: true
     subject?: true
     action?: true
@@ -5891,6 +5897,7 @@ export namespace Prisma {
   export type EmailConfigGroupByOutputType = {
     id: bigint
     panel: string
+    panel1: string
     module: string
     subject: string
     action: string
@@ -5937,6 +5944,7 @@ export namespace Prisma {
   export type emailConfigSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     panel?: boolean
+    panel1?: boolean
     module?: boolean
     subject?: boolean
     action?: boolean
@@ -5966,6 +5974,7 @@ export namespace Prisma {
   export type emailConfigSelectScalar = {
     id?: boolean
     panel?: boolean
+    panel1?: boolean
     module?: boolean
     subject?: boolean
     action?: boolean
@@ -5990,7 +5999,7 @@ export namespace Prisma {
     updatedByRole?: boolean
   }
 
-  export type emailConfigOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "panel" | "module" | "subject" | "action" | "html_template" | "smtp_host" | "smtp_secure" | "smtp_port" | "smtp_username" | "smtp_password" | "from_email" | "from_name" | "status" | "variables" | "to" | "cc" | "bcc" | "createdAt" | "createdBy" | "createdByRole" | "updatedAt" | "updatedBy" | "updatedByRole", ExtArgs["result"]["emailConfig"]>
+  export type emailConfigOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "panel" | "panel1" | "module" | "subject" | "action" | "html_template" | "smtp_host" | "smtp_secure" | "smtp_port" | "smtp_username" | "smtp_password" | "from_email" | "from_name" | "status" | "variables" | "to" | "cc" | "bcc" | "createdAt" | "createdBy" | "createdByRole" | "updatedAt" | "updatedBy" | "updatedByRole", ExtArgs["result"]["emailConfig"]>
 
   export type $emailConfigPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "emailConfig"
@@ -5998,6 +6007,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: bigint
       panel: string
+      panel1: string
       module: string
       subject: string
       action: string
@@ -6391,6 +6401,7 @@ export namespace Prisma {
   interface emailConfigFieldRefs {
     readonly id: FieldRef<"emailConfig", 'BigInt'>
     readonly panel: FieldRef<"emailConfig", 'String'>
+    readonly panel1: FieldRef<"emailConfig", 'String'>
     readonly module: FieldRef<"emailConfig", 'String'>
     readonly subject: FieldRef<"emailConfig", 'String'>
     readonly action: FieldRef<"emailConfig", 'String'>
@@ -28994,6 +29005,7 @@ export namespace Prisma {
     slug: string | null
     main_sku: string | null
     description: string | null
+    gallery: string | null
     brandId: number | null
     originCountryId: bigint | null
     hsnCode: string | null
@@ -29037,6 +29049,7 @@ export namespace Prisma {
     slug: string | null
     main_sku: string | null
     description: string | null
+    gallery: string | null
     brandId: number | null
     originCountryId: bigint | null
     hsnCode: string | null
@@ -29080,6 +29093,7 @@ export namespace Prisma {
     slug: number
     main_sku: number
     description: number
+    gallery: number
     tags: number
     brandId: number
     originCountryId: number
@@ -29160,6 +29174,7 @@ export namespace Prisma {
     slug?: true
     main_sku?: true
     description?: true
+    gallery?: true
     brandId?: true
     originCountryId?: true
     hsnCode?: true
@@ -29203,6 +29218,7 @@ export namespace Prisma {
     slug?: true
     main_sku?: true
     description?: true
+    gallery?: true
     brandId?: true
     originCountryId?: true
     hsnCode?: true
@@ -29246,6 +29262,7 @@ export namespace Prisma {
     slug?: true
     main_sku?: true
     description?: true
+    gallery?: true
     tags?: true
     brandId?: true
     originCountryId?: true
@@ -29377,6 +29394,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description: string | null
+    gallery: string
     tags: JsonValue | null
     brandId: number
     originCountryId: bigint
@@ -29440,6 +29458,7 @@ export namespace Prisma {
     slug?: boolean
     main_sku?: boolean
     description?: boolean
+    gallery?: boolean
     tags?: boolean
     brandId?: boolean
     originCountryId?: boolean
@@ -29497,6 +29516,7 @@ export namespace Prisma {
     slug?: boolean
     main_sku?: boolean
     description?: boolean
+    gallery?: boolean
     tags?: boolean
     brandId?: boolean
     originCountryId?: boolean
@@ -29533,7 +29553,7 @@ export namespace Prisma {
     deletedByRole?: boolean
   }
 
-  export type productOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shippingOwlProductId" | "categoryId" | "name" | "slug" | "main_sku" | "description" | "tags" | "brandId" | "originCountryId" | "hsnCode" | "taxRate" | "rtoAddress" | "pickupAddress" | "shippingCountryId" | "video_url" | "list_as" | "shipping_time" | "weight" | "package_length" | "package_width" | "package_height" | "chargeable_weight" | "package_weight_image" | "package_length_image" | "package_width_image" | "package_height_image" | "product_detail_video" | "training_guidance_video" | "isVisibleToAll" | "status" | "isVarientExists" | "createdAt" | "createdBy" | "createdByRole" | "updatedAt" | "updatedBy" | "updatedByRole" | "deletedAt" | "deletedBy" | "deletedByRole", ExtArgs["result"]["product"]>
+  export type productOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shippingOwlProductId" | "categoryId" | "name" | "slug" | "main_sku" | "description" | "gallery" | "tags" | "brandId" | "originCountryId" | "hsnCode" | "taxRate" | "rtoAddress" | "pickupAddress" | "shippingCountryId" | "video_url" | "list_as" | "shipping_time" | "weight" | "package_length" | "package_width" | "package_height" | "chargeable_weight" | "package_weight_image" | "package_length_image" | "package_width_image" | "package_height_image" | "product_detail_video" | "training_guidance_video" | "isVisibleToAll" | "status" | "isVarientExists" | "createdAt" | "createdBy" | "createdByRole" | "updatedAt" | "updatedBy" | "updatedByRole" | "deletedAt" | "deletedBy" | "deletedByRole", ExtArgs["result"]["product"]>
   export type productInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | categoryDefaultArgs<ExtArgs>
     brand?: boolean | brandDefaultArgs<ExtArgs>
@@ -29570,6 +29590,7 @@ export namespace Prisma {
       slug: string
       main_sku: string
       description: string | null
+      gallery: string
       tags: Prisma.JsonValue | null
       brandId: number
       originCountryId: bigint
@@ -29990,6 +30011,7 @@ export namespace Prisma {
     readonly slug: FieldRef<"product", 'String'>
     readonly main_sku: FieldRef<"product", 'String'>
     readonly description: FieldRef<"product", 'String'>
+    readonly gallery: FieldRef<"product", 'String'>
     readonly tags: FieldRef<"product", 'Json'>
     readonly brandId: FieldRef<"product", 'Int'>
     readonly originCountryId: FieldRef<"product", 'BigInt'>
@@ -30563,7 +30585,6 @@ export namespace Prisma {
     id: number | null
     name: string | null
     productId: number | null
-    image: string | null
     color: string | null
     model: string | null
     sku: string | null
@@ -30584,7 +30605,6 @@ export namespace Prisma {
     id: number | null
     name: string | null
     productId: number | null
-    image: string | null
     color: string | null
     model: string | null
     sku: string | null
@@ -30605,7 +30625,6 @@ export namespace Prisma {
     id: number
     name: number
     productId: number
-    image: number
     color: number
     model: number
     sku: number
@@ -30646,7 +30665,6 @@ export namespace Prisma {
     id?: true
     name?: true
     productId?: true
-    image?: true
     color?: true
     model?: true
     sku?: true
@@ -30667,7 +30685,6 @@ export namespace Prisma {
     id?: true
     name?: true
     productId?: true
-    image?: true
     color?: true
     model?: true
     sku?: true
@@ -30688,7 +30705,6 @@ export namespace Prisma {
     id?: true
     name?: true
     productId?: true
-    image?: true
     color?: true
     model?: true
     sku?: true
@@ -30796,7 +30812,6 @@ export namespace Prisma {
     id: number
     name: string
     productId: number
-    image: string
     color: string
     model: string
     sku: string
@@ -30836,7 +30851,6 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     productId?: boolean
-    image?: boolean
     color?: boolean
     model?: boolean
     sku?: boolean
@@ -30862,7 +30876,6 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     productId?: boolean
-    image?: boolean
     color?: boolean
     model?: boolean
     sku?: boolean
@@ -30879,7 +30892,7 @@ export namespace Prisma {
     deletedByRole?: boolean
   }
 
-  export type productVariantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "productId" | "image" | "color" | "model" | "sku" | "product_link" | "suggested_price" | "createdAt" | "createdBy" | "createdByRole" | "updatedAt" | "updatedBy" | "updatedByRole" | "deletedAt" | "deletedBy" | "deletedByRole", ExtArgs["result"]["productVariant"]>
+  export type productVariantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "productId" | "color" | "model" | "sku" | "product_link" | "suggested_price" | "createdAt" | "createdBy" | "createdByRole" | "updatedAt" | "updatedBy" | "updatedByRole" | "deletedAt" | "deletedBy" | "deletedByRole", ExtArgs["result"]["productVariant"]>
   export type productVariantInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     product?: boolean | productDefaultArgs<ExtArgs>
     supplierProductVariants?: boolean | productVariant$supplierProductVariantsArgs<ExtArgs>
@@ -30896,7 +30909,6 @@ export namespace Prisma {
       id: number
       name: string
       productId: number
-      image: string
       color: string
       model: string
       sku: string
@@ -31285,7 +31297,6 @@ export namespace Prisma {
     readonly id: FieldRef<"productVariant", 'Int'>
     readonly name: FieldRef<"productVariant", 'String'>
     readonly productId: FieldRef<"productVariant", 'Int'>
-    readonly image: FieldRef<"productVariant", 'String'>
     readonly color: FieldRef<"productVariant", 'String'>
     readonly model: FieldRef<"productVariant", 'String'>
     readonly sku: FieldRef<"productVariant", 'String'>
@@ -48241,6 +48252,7 @@ export namespace Prisma {
   export const EmailConfigScalarFieldEnum: {
     id: 'id',
     panel: 'panel',
+    panel1: 'panel1',
     module: 'module',
     subject: 'subject',
     action: 'action',
@@ -48753,6 +48765,7 @@ export namespace Prisma {
     slug: 'slug',
     main_sku: 'main_sku',
     description: 'description',
+    gallery: 'gallery',
     tags: 'tags',
     brandId: 'brandId',
     originCountryId: 'originCountryId',
@@ -48796,7 +48809,6 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     productId: 'productId',
-    image: 'image',
     color: 'color',
     model: 'model',
     sku: 'sku',
@@ -49195,6 +49207,7 @@ export namespace Prisma {
 
   export const emailConfigOrderByRelevanceFieldEnum: {
     panel: 'panel',
+    panel1: 'panel1',
     module: 'module',
     subject: 'subject',
     action: 'action',
@@ -49521,6 +49534,7 @@ export namespace Prisma {
     slug: 'slug',
     main_sku: 'main_sku',
     description: 'description',
+    gallery: 'gallery',
     hsnCode: 'hsnCode',
     rtoAddress: 'rtoAddress',
     pickupAddress: 'pickupAddress',
@@ -49543,7 +49557,6 @@ export namespace Prisma {
 
   export const productVariantOrderByRelevanceFieldEnum: {
     name: 'name',
-    image: 'image',
     color: 'color',
     model: 'model',
     sku: 'sku',
@@ -49810,6 +49823,7 @@ export namespace Prisma {
     NOT?: emailConfigWhereInput | emailConfigWhereInput[]
     id?: BigIntFilter<"emailConfig"> | bigint | number
     panel?: StringFilter<"emailConfig"> | string
+    panel1?: StringFilter<"emailConfig"> | string
     module?: StringFilter<"emailConfig"> | string
     subject?: StringFilter<"emailConfig"> | string
     action?: StringFilter<"emailConfig"> | string
@@ -49837,6 +49851,7 @@ export namespace Prisma {
   export type emailConfigOrderByWithRelationInput = {
     id?: SortOrder
     panel?: SortOrder
+    panel1?: SortOrder
     module?: SortOrder
     subject?: SortOrder
     action?: SortOrder
@@ -49868,6 +49883,7 @@ export namespace Prisma {
     OR?: emailConfigWhereInput[]
     NOT?: emailConfigWhereInput | emailConfigWhereInput[]
     panel?: StringFilter<"emailConfig"> | string
+    panel1?: StringFilter<"emailConfig"> | string
     module?: StringFilter<"emailConfig"> | string
     subject?: StringFilter<"emailConfig"> | string
     action?: StringFilter<"emailConfig"> | string
@@ -49895,6 +49911,7 @@ export namespace Prisma {
   export type emailConfigOrderByWithAggregationInput = {
     id?: SortOrder
     panel?: SortOrder
+    panel1?: SortOrder
     module?: SortOrder
     subject?: SortOrder
     action?: SortOrder
@@ -49930,6 +49947,7 @@ export namespace Prisma {
     NOT?: emailConfigScalarWhereWithAggregatesInput | emailConfigScalarWhereWithAggregatesInput[]
     id?: BigIntWithAggregatesFilter<"emailConfig"> | bigint | number
     panel?: StringWithAggregatesFilter<"emailConfig"> | string
+    panel1?: StringWithAggregatesFilter<"emailConfig"> | string
     module?: StringWithAggregatesFilter<"emailConfig"> | string
     subject?: StringWithAggregatesFilter<"emailConfig"> | string
     action?: StringWithAggregatesFilter<"emailConfig"> | string
@@ -52563,6 +52581,7 @@ export namespace Prisma {
     slug?: StringFilter<"product"> | string
     main_sku?: StringFilter<"product"> | string
     description?: StringNullableFilter<"product"> | string | null
+    gallery?: StringFilter<"product"> | string
     tags?: JsonNullableFilter<"product">
     brandId?: IntFilter<"product"> | number
     originCountryId?: BigIntFilter<"product"> | bigint | number
@@ -52617,6 +52636,7 @@ export namespace Prisma {
     slug?: SortOrder
     main_sku?: SortOrder
     description?: SortOrderInput | SortOrder
+    gallery?: SortOrder
     tags?: SortOrderInput | SortOrder
     brandId?: SortOrder
     originCountryId?: SortOrder
@@ -52675,6 +52695,7 @@ export namespace Prisma {
     categoryId?: IntFilter<"product"> | number
     name?: StringFilter<"product"> | string
     description?: StringNullableFilter<"product"> | string | null
+    gallery?: StringFilter<"product"> | string
     tags?: JsonNullableFilter<"product">
     brandId?: IntFilter<"product"> | number
     originCountryId?: BigIntFilter<"product"> | bigint | number
@@ -52729,6 +52750,7 @@ export namespace Prisma {
     slug?: SortOrder
     main_sku?: SortOrder
     description?: SortOrderInput | SortOrder
+    gallery?: SortOrder
     tags?: SortOrderInput | SortOrder
     brandId?: SortOrder
     originCountryId?: SortOrder
@@ -52781,6 +52803,7 @@ export namespace Prisma {
     slug?: StringWithAggregatesFilter<"product"> | string
     main_sku?: StringWithAggregatesFilter<"product"> | string
     description?: StringNullableWithAggregatesFilter<"product"> | string | null
+    gallery?: StringWithAggregatesFilter<"product"> | string
     tags?: JsonNullableWithAggregatesFilter<"product">
     brandId?: IntWithAggregatesFilter<"product"> | number
     originCountryId?: BigIntWithAggregatesFilter<"product"> | bigint | number
@@ -52824,7 +52847,6 @@ export namespace Prisma {
     id?: IntFilter<"productVariant"> | number
     name?: StringFilter<"productVariant"> | string
     productId?: IntFilter<"productVariant"> | number
-    image?: StringFilter<"productVariant"> | string
     color?: StringFilter<"productVariant"> | string
     model?: StringFilter<"productVariant"> | string
     sku?: StringFilter<"productVariant"> | string
@@ -52847,7 +52869,6 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     productId?: SortOrder
-    image?: SortOrder
     color?: SortOrder
     model?: SortOrder
     sku?: SortOrder
@@ -52875,7 +52896,6 @@ export namespace Prisma {
     NOT?: productVariantWhereInput | productVariantWhereInput[]
     name?: StringFilter<"productVariant"> | string
     productId?: IntFilter<"productVariant"> | number
-    image?: StringFilter<"productVariant"> | string
     color?: StringFilter<"productVariant"> | string
     model?: StringFilter<"productVariant"> | string
     product_link?: StringNullableFilter<"productVariant"> | string | null
@@ -52897,7 +52917,6 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     productId?: SortOrder
-    image?: SortOrder
     color?: SortOrder
     model?: SortOrder
     sku?: SortOrder
@@ -52926,7 +52945,6 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"productVariant"> | number
     name?: StringWithAggregatesFilter<"productVariant"> | string
     productId?: IntWithAggregatesFilter<"productVariant"> | number
-    image?: StringWithAggregatesFilter<"productVariant"> | string
     color?: StringWithAggregatesFilter<"productVariant"> | string
     model?: StringWithAggregatesFilter<"productVariant"> | string
     sku?: StringWithAggregatesFilter<"productVariant"> | string
@@ -54831,6 +54849,7 @@ export namespace Prisma {
   export type emailConfigCreateInput = {
     id?: bigint | number
     panel: string
+    panel1: string
     module: string
     subject: string
     action: string
@@ -54858,6 +54877,7 @@ export namespace Prisma {
   export type emailConfigUncheckedCreateInput = {
     id?: bigint | number
     panel: string
+    panel1: string
     module: string
     subject: string
     action: string
@@ -54885,6 +54905,7 @@ export namespace Prisma {
   export type emailConfigUpdateInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     panel?: StringFieldUpdateOperationsInput | string
+    panel1?: StringFieldUpdateOperationsInput | string
     module?: StringFieldUpdateOperationsInput | string
     subject?: StringFieldUpdateOperationsInput | string
     action?: StringFieldUpdateOperationsInput | string
@@ -54912,6 +54933,7 @@ export namespace Prisma {
   export type emailConfigUncheckedUpdateInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     panel?: StringFieldUpdateOperationsInput | string
+    panel1?: StringFieldUpdateOperationsInput | string
     module?: StringFieldUpdateOperationsInput | string
     subject?: StringFieldUpdateOperationsInput | string
     action?: StringFieldUpdateOperationsInput | string
@@ -54939,6 +54961,7 @@ export namespace Prisma {
   export type emailConfigCreateManyInput = {
     id?: bigint | number
     panel: string
+    panel1: string
     module: string
     subject: string
     action: string
@@ -54966,6 +54989,7 @@ export namespace Prisma {
   export type emailConfigUpdateManyMutationInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     panel?: StringFieldUpdateOperationsInput | string
+    panel1?: StringFieldUpdateOperationsInput | string
     module?: StringFieldUpdateOperationsInput | string
     subject?: StringFieldUpdateOperationsInput | string
     action?: StringFieldUpdateOperationsInput | string
@@ -54993,6 +55017,7 @@ export namespace Prisma {
   export type emailConfigUncheckedUpdateManyInput = {
     id?: BigIntFieldUpdateOperationsInput | bigint | number
     panel?: StringFieldUpdateOperationsInput | string
+    panel1?: StringFieldUpdateOperationsInput | string
     module?: StringFieldUpdateOperationsInput | string
     subject?: StringFieldUpdateOperationsInput | string
     action?: StringFieldUpdateOperationsInput | string
@@ -58103,6 +58128,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -58154,6 +58180,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -58202,6 +58229,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -58253,6 +58281,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -58303,6 +58332,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -58345,6 +58375,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -58386,6 +58417,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -58424,7 +58456,6 @@ export namespace Prisma {
 
   export type productVariantCreateInput = {
     name: string
-    image: string
     color: string
     model: string
     sku: string
@@ -58447,7 +58478,6 @@ export namespace Prisma {
     id?: number
     name: string
     productId: number
-    image: string
     color: string
     model: string
     sku: string
@@ -58467,7 +58497,6 @@ export namespace Prisma {
 
   export type productVariantUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     model?: StringFieldUpdateOperationsInput | string
     sku?: StringFieldUpdateOperationsInput | string
@@ -58490,7 +58519,6 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     productId?: IntFieldUpdateOperationsInput | number
-    image?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     model?: StringFieldUpdateOperationsInput | string
     sku?: StringFieldUpdateOperationsInput | string
@@ -58512,7 +58540,6 @@ export namespace Prisma {
     id?: number
     name: string
     productId: number
-    image: string
     color: string
     model: string
     sku: string
@@ -58531,7 +58558,6 @@ export namespace Prisma {
 
   export type productVariantUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     model?: StringFieldUpdateOperationsInput | string
     sku?: StringFieldUpdateOperationsInput | string
@@ -58552,7 +58578,6 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     productId?: IntFieldUpdateOperationsInput | number
-    image?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     model?: StringFieldUpdateOperationsInput | string
     sku?: StringFieldUpdateOperationsInput | string
@@ -60773,6 +60798,7 @@ export namespace Prisma {
   export type emailConfigCountOrderByAggregateInput = {
     id?: SortOrder
     panel?: SortOrder
+    panel1?: SortOrder
     module?: SortOrder
     subject?: SortOrder
     action?: SortOrder
@@ -60807,6 +60833,7 @@ export namespace Prisma {
   export type emailConfigMaxOrderByAggregateInput = {
     id?: SortOrder
     panel?: SortOrder
+    panel1?: SortOrder
     module?: SortOrder
     subject?: SortOrder
     action?: SortOrder
@@ -60830,6 +60857,7 @@ export namespace Prisma {
   export type emailConfigMinOrderByAggregateInput = {
     id?: SortOrder
     panel?: SortOrder
+    panel1?: SortOrder
     module?: SortOrder
     subject?: SortOrder
     action?: SortOrder
@@ -62997,6 +63025,7 @@ export namespace Prisma {
     slug?: SortOrder
     main_sku?: SortOrder
     description?: SortOrder
+    gallery?: SortOrder
     tags?: SortOrder
     brandId?: SortOrder
     originCountryId?: SortOrder
@@ -63058,6 +63087,7 @@ export namespace Prisma {
     slug?: SortOrder
     main_sku?: SortOrder
     description?: SortOrder
+    gallery?: SortOrder
     brandId?: SortOrder
     originCountryId?: SortOrder
     hsnCode?: SortOrder
@@ -63101,6 +63131,7 @@ export namespace Prisma {
     slug?: SortOrder
     main_sku?: SortOrder
     description?: SortOrder
+    gallery?: SortOrder
     brandId?: SortOrder
     originCountryId?: SortOrder
     hsnCode?: SortOrder
@@ -63184,7 +63215,6 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     productId?: SortOrder
-    image?: SortOrder
     color?: SortOrder
     model?: SortOrder
     sku?: SortOrder
@@ -63214,7 +63244,6 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     productId?: SortOrder
-    image?: SortOrder
     color?: SortOrder
     model?: SortOrder
     sku?: SortOrder
@@ -63235,7 +63264,6 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     productId?: SortOrder
-    image?: SortOrder
     color?: SortOrder
     model?: SortOrder
     sku?: SortOrder
@@ -73391,6 +73419,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -73441,6 +73470,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     hsnCode?: string | null
@@ -73498,6 +73528,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -73548,6 +73579,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -74165,6 +74197,7 @@ export namespace Prisma {
     slug?: StringFilter<"product"> | string
     main_sku?: StringFilter<"product"> | string
     description?: StringNullableFilter<"product"> | string | null
+    gallery?: StringFilter<"product"> | string
     tags?: JsonNullableFilter<"product">
     brandId?: IntFilter<"product"> | number
     originCountryId?: BigIntFilter<"product"> | bigint | number
@@ -76599,6 +76632,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -76648,6 +76682,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -76808,6 +76843,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -76858,6 +76894,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     originCountryId: bigint | number
     hsnCode?: string | null
@@ -77233,7 +77270,6 @@ export namespace Prisma {
 
   export type productVariantCreateWithoutProductInput = {
     name: string
-    image: string
     color: string
     model: string
     sku: string
@@ -77254,7 +77290,6 @@ export namespace Prisma {
   export type productVariantUncheckedCreateWithoutProductInput = {
     id?: number
     name: string
-    image: string
     color: string
     model: string
     sku: string
@@ -77784,7 +77819,6 @@ export namespace Prisma {
     id?: IntFilter<"productVariant"> | number
     name?: StringFilter<"productVariant"> | string
     productId?: IntFilter<"productVariant"> | number
-    image?: StringFilter<"productVariant"> | string
     color?: StringFilter<"productVariant"> | string
     model?: StringFilter<"productVariant"> | string
     sku?: StringFilter<"productVariant"> | string
@@ -77887,6 +77921,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -77937,6 +77972,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -78051,6 +78087,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -78101,6 +78138,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -78164,6 +78202,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -78214,6 +78253,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -78385,6 +78425,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -78435,6 +78476,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -79097,6 +79139,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -79147,6 +79190,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -79495,6 +79539,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -79545,6 +79590,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -79785,6 +79831,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -79835,6 +79882,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -79883,7 +79931,6 @@ export namespace Prisma {
 
   export type productVariantCreateWithoutSupplierProductVariantsInput = {
     name: string
-    image: string
     color: string
     model: string
     sku: string
@@ -79905,7 +79952,6 @@ export namespace Prisma {
     id?: number
     name: string
     productId: number
-    image: string
     color: string
     model: string
     sku: string
@@ -80167,6 +80213,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -80217,6 +80264,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -80271,7 +80319,6 @@ export namespace Prisma {
 
   export type productVariantUpdateWithoutSupplierProductVariantsInput = {
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     model?: StringFieldUpdateOperationsInput | string
     sku?: StringFieldUpdateOperationsInput | string
@@ -80293,7 +80340,6 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     productId?: IntFieldUpdateOperationsInput | number
-    image?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     model?: StringFieldUpdateOperationsInput | string
     sku?: StringFieldUpdateOperationsInput | string
@@ -80596,6 +80642,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -80646,6 +80693,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -81188,6 +81236,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -81238,6 +81287,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -81569,6 +81619,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -81619,6 +81670,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -82016,6 +82068,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -82066,6 +82119,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -86419,6 +86473,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     hsnCode?: string | null
@@ -86462,6 +86517,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -87115,6 +87171,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -87165,6 +87222,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -87214,6 +87272,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -87255,6 +87314,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -87305,6 +87365,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -87354,6 +87415,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -89930,6 +89992,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -89991,6 +90054,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -90040,6 +90104,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -90089,6 +90154,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -90189,6 +90255,7 @@ export namespace Prisma {
     slug: string
     main_sku: string
     description?: string | null
+    gallery: string
     tags?: NullableJsonNullValueInput | InputJsonValue
     originCountryId: bigint | number
     hsnCode?: string | null
@@ -90230,6 +90297,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -90280,6 +90348,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -90329,6 +90398,7 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    gallery?: StringFieldUpdateOperationsInput | string
     tags?: NullableJsonNullValueInput | InputJsonValue
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -90367,7 +90437,6 @@ export namespace Prisma {
   export type productVariantCreateManyProductInput = {
     id?: number
     name: string
-    image: string
     color: string
     model: string
     sku: string
@@ -90472,7 +90541,6 @@ export namespace Prisma {
 
   export type productVariantUpdateWithoutProductInput = {
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     model?: StringFieldUpdateOperationsInput | string
     sku?: StringFieldUpdateOperationsInput | string
@@ -90493,7 +90561,6 @@ export namespace Prisma {
   export type productVariantUncheckedUpdateWithoutProductInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     model?: StringFieldUpdateOperationsInput | string
     sku?: StringFieldUpdateOperationsInput | string
@@ -90514,7 +90581,6 @@ export namespace Prisma {
   export type productVariantUncheckedUpdateManyWithoutProductInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    image?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
     model?: StringFieldUpdateOperationsInput | string
     sku?: StringFieldUpdateOperationsInput | string

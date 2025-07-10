@@ -23,6 +23,7 @@ model appConfig {
 model emailConfig {
   id             BigInt   @id @default(autoincrement())
   panel          String
+  panel1          String
   module         String
   subject        String
   action         String
@@ -596,6 +597,7 @@ model product {
   slug                            String           @unique
   main_sku                        String           @unique
   description                     String?          @db.LongText
+  gallery                         String           @db.LongText
   tags                            Json?
   brandId                         Int
   originCountryId                 BigInt
@@ -653,7 +655,6 @@ model productVariant {
   id                        Int              @id @default(autoincrement())
   name                      String
   productId                 Int
-  image                     String          @db.LongText
   color                     String
   model                     String
   sku                       String           @unique
