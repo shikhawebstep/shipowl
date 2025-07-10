@@ -64,7 +64,8 @@ type ImageType =
     | 'package_weight_image'
     | 'package_length_image'
     | 'package_width_image'
-    | 'package_height_image';
+    | 'package_height_image'
+    | 'gallery';
 
 type ProductFilters = {
     categoryId?: number;
@@ -775,6 +776,7 @@ export const removeProductImageByIndex = async (
             package_length_image: product.package_length_image,
             package_width_image: product.package_width_image,
             package_height_image: product.package_height_image,
+            gallery: product.gallery,
         };
 
         const images = allowedImages[type]; // ✅ No TS error now

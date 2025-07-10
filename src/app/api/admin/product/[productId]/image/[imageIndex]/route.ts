@@ -9,7 +9,8 @@ type ImageType =
   | 'package_weight_image'
   | 'package_length_image'
   | 'package_width_image'
-  | 'package_height_image';
+  | 'package_height_image'
+  | 'gallery';
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -79,6 +80,7 @@ export async function DELETE(req: NextRequest) {
       'package_length_image',
       'package_width_image',
       'package_height_image',
+      'gallery'
     ];
 
     // Validate the type before calling
