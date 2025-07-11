@@ -193,6 +193,7 @@ export async function POST(req: NextRequest) {
     }
 
     const rawVariants = extractJSON('variants');
+    const imageSortingIndex = extractJSON('imageSortingIndex');
 
     console.log(`rawVariants`, rawVariants);
     if (!Array.isArray(rawVariants) || rawVariants.length === 0) {
@@ -290,6 +291,7 @@ export async function POST(req: NextRequest) {
       pickupAddress: extractString('pickup_address') || '',
       description: extractString('description'),
       gallery: uploadedFiles['gallery'],
+      imageSortingIndex,
       tags: extractString('tags') || '',
       brandId: extractNumber('brand') || 0,
       originCountryId,

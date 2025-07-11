@@ -11,6 +11,7 @@ CREATE TABLE `appConfig` (
 CREATE TABLE `emailConfig` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `panel` VARCHAR(191) NOT NULL,
+    `panel1` VARCHAR(191) NOT NULL,
     `module` VARCHAR(191) NOT NULL,
     `subject` VARCHAR(191) NOT NULL,
     `action` VARCHAR(191) NOT NULL,
@@ -579,6 +580,7 @@ CREATE TABLE `product` (
     `main_sku` VARCHAR(191) NOT NULL,
     `description` LONGTEXT NULL,
     `gallery` LONGTEXT NOT NULL,
+    `imageSortingIndex` JSON NULL,
     `tags` JSON NULL,
     `brandId` INTEGER NOT NULL,
     `originCountryId` BIGINT NOT NULL,

@@ -21,6 +21,7 @@ interface VariantSKUInput {
 interface Product {
     name: string;
     categoryId: number;
+    imageSortingIndex: string;
     main_sku: string;
     hsnCode: string | null;
     taxRate: number | null;
@@ -291,6 +292,7 @@ export async function createProduct(adminId: number, adminRole: string, product:
             pickupAddress,
             description,
             gallery,
+            imageSortingIndex,
             tags,
             brandId,
             originCountryId,
@@ -335,6 +337,7 @@ export async function createProduct(adminId: number, adminRole: string, product:
                 pickupAddress,
                 description,
                 gallery,
+                imageSortingIndex,
                 tags,
                 brandId,  // Use brandId here
                 originCountryId,  // Use originCountryId here
@@ -625,6 +628,8 @@ export const getProductsByFiltersAndStatus = async (productFilters: ProductFilte
                 name: true,
                 slug: true,
                 main_sku: true,
+                gallery: true,
+                imageSortingIndex: true,
                 tags: true,
                 brandId: true,
                 originCountryId: true,
@@ -706,6 +711,8 @@ export const getProductsByStatus = async (status: "active" | "inactive" | "delet
                 name: true,
                 slug: true,
                 main_sku: true,
+                gallery: true,
+                imageSortingIndex: true,
                 tags: true,
                 brandId: true,
                 originCountryId: true,
@@ -907,7 +914,7 @@ export const updateProduct = async (
             rtoAddress,
             pickupAddress,
             description,
-            gallery,
+            imageSortingIndex,
             tags,
             brandId,
             originCountryId,
@@ -931,12 +938,17 @@ export const updateProduct = async (
             video_url,
         } = product;
 
+        let {
+            gallery
+        } = product;
+
         // Image fields to process
-        const imageFields: Array<'package_weight_image' | 'package_length_image' | 'package_width_image' | 'package_height_image'> = [
+        const imageFields: Array<'package_weight_image' | 'package_length_image' | 'package_width_image' | 'package_height_image' | 'gallery'> = [
             'package_weight_image',
             'package_length_image',
             'package_width_image',
             'package_height_image',
+            'gallery'
         ];
 
         // Fetch existing product once
@@ -951,56 +963,77 @@ export const updateProduct = async (
         const existingProduct = productResponse.product;
 
         for (const field of imageFields) {
+            console.log(`\n🔄 Processing field: ${field}`);
+
             const newValue = product[field];
+            const existingValue = existingProduct[field];
 
-            if (typeof newValue === 'string' && newValue.trim()) {
-                const newImages = newValue.split(',').map(img => img.trim()).filter(Boolean);
+            console.log(`📥 New value (product[${field}]):`, newValue);
+            console.log(`📦 Existing value (existingProduct[${field}]):`, existingValue);
 
-                const existingValue = existingProduct[field];
-                const existingImages = typeof existingValue === 'string'
+            const isValidString = (val: unknown): val is string =>
+                typeof val === 'string' && val.trim() !== '';
+
+            if (isValidString(newValue)) {
+                const newImages = newValue
+                    .split(',')
+                    .map(img => img.trim())
+                    .filter(Boolean);
+                console.log(`🆕 Parsed new images:`, newImages);
+
+                const existingImages = isValidString(existingValue)
                     ? existingValue.split(',').map(img => img.trim()).filter(Boolean)
                     : [];
+                console.log(`📂 Parsed existing images:`, existingImages);
 
                 const mergedImages = Array.from(new Set([...existingImages, ...newImages]));
+                console.log(`🔗 Merged & deduplicated images:`, mergedImages);
 
-                // ✅ Type-safe update
                 product[field] = mergedImages.join(',');
+                console.log(`✅ Updated product[${field}] =`, product[field]);
+
+            } else {
+                product[field] = existingValue ?? '';
+                console.log(`⚠️ No new valid images. Using fallback: product[${field}] =`, product[field]);
             }
+
+            console.log('---------------------------------------------');
         }
 
         // Update the product details
         const updatedProduct = await prisma.product.update({
             where: { id: productId },
             data: {
-                name,
-                categoryId,
-                main_sku,
-                hsnCode,
-                taxRate,
-                rtoAddress,
-                pickupAddress,
-                description,
-                gallery,
-                tags,
-                brandId,
-                originCountryId,
-                shippingCountryId,
-                list_as,
-                shipping_time,
-                weight,
-                package_length,
-                package_width,
-                package_height,
-                chargeable_weight,
-                product_detail_video,
-                training_guidance_video,
-                status,
-                isVarientExists,
-                package_weight_image,
-                package_length_image,
-                package_width_image,
-                package_height_image,
-                video_url,
+                name: product.name,
+                categoryId: product.categoryId,
+                main_sku: product.main_sku,
+                hsnCode: product.hsnCode,
+                taxRate: product.taxRate,
+                rtoAddress: product.rtoAddress,
+                pickupAddress: product.pickupAddress,
+                description: product.description,
+                gallery: product.gallery,
+                imageSortingIndex: product.imageSortingIndex,
+                tags: product.tags,
+                brandId: product.brandId,
+                originCountryId: product.originCountryId,
+                shippingCountryId: product.shippingCountryId,
+                list_as: product.list_as,
+                shipping_time: product.shipping_time,
+                weight: product.weight,
+                package_length: product.package_length,
+                package_width: product.package_width,
+                package_height: product.package_height,
+                chargeable_weight: product.chargeable_weight,
+                product_detail_video: product.product_detail_video,
+                training_guidance_video: product.training_guidance_video,
+                status: product.status,
+                isVarientExists: product.isVarientExists,
+                package_weight_image: product.package_weight_image,
+                package_length_image: product.package_length_image,
+                package_width_image: product.package_width_image,
+                package_height_image: product.package_height_image,
+                video_url: product.video_url,
                 updatedBy: adminId,
                 updatedByRole: adminRole,
                 updatedAt: new Date(),

@@ -586,6 +586,7 @@ exports.Prisma.ProductScalarFieldEnum = {
   main_sku: 'main_sku',
   description: 'description',
   gallery: 'gallery',
+  imageSortingIndex: 'imageSortingIndex',
   tags: 'tags',
   brandId: 'brandId',
   originCountryId: 'originCountryId',

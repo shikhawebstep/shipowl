@@ -55,6 +55,7 @@ const ProductProvider = ({ children }) => {
     supplierIds: '',
     status: true,
     gallery:'',
+    
   });
 
   const fetchCategory = useCallback(async () => {

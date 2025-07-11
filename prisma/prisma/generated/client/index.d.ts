@@ -29094,6 +29094,7 @@ export namespace Prisma {
     main_sku: number
     description: number
     gallery: number
+    imageSortingIndex: number
     tags: number
     brandId: number
     originCountryId: number
@@ -29263,6 +29264,7 @@ export namespace Prisma {
     main_sku?: true
     description?: true
     gallery?: true
+    imageSortingIndex?: true
     tags?: true
     brandId?: true
     originCountryId?: true
@@ -29395,6 +29397,7 @@ export namespace Prisma {
     main_sku: string
     description: string | null
     gallery: string
+    imageSortingIndex: JsonValue | null
     tags: JsonValue | null
     brandId: number
     originCountryId: bigint
@@ -29459,6 +29462,7 @@ export namespace Prisma {
     main_sku?: boolean
     description?: boolean
     gallery?: boolean
+    imageSortingIndex?: boolean
     tags?: boolean
     brandId?: boolean
     originCountryId?: boolean
@@ -29517,6 +29521,7 @@ export namespace Prisma {
     main_sku?: boolean
     description?: boolean
     gallery?: boolean
+    imageSortingIndex?: boolean
     tags?: boolean
     brandId?: boolean
     originCountryId?: boolean
@@ -29553,7 +29558,7 @@ export namespace Prisma {
     deletedByRole?: boolean
   }
 
-  export type productOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shippingOwlProductId" | "categoryId" | "name" | "slug" | "main_sku" | "description" | "gallery" | "tags" | "brandId" | "originCountryId" | "hsnCode" | "taxRate" | "rtoAddress" | "pickupAddress" | "shippingCountryId" | "video_url" | "list_as" | "shipping_time" | "weight" | "package_length" | "package_width" | "package_height" | "chargeable_weight" | "package_weight_image" | "package_length_image" | "package_width_image" | "package_height_image" | "product_detail_video" | "training_guidance_video" | "isVisibleToAll" | "status" | "isVarientExists" | "createdAt" | "createdBy" | "createdByRole" | "updatedAt" | "updatedBy" | "updatedByRole" | "deletedAt" | "deletedBy" | "deletedByRole", ExtArgs["result"]["product"]>
+  export type productOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shippingOwlProductId" | "categoryId" | "name" | "slug" | "main_sku" | "description" | "gallery" | "imageSortingIndex" | "tags" | "brandId" | "originCountryId" | "hsnCode" | "taxRate" | "rtoAddress" | "pickupAddress" | "shippingCountryId" | "video_url" | "list_as" | "shipping_time" | "weight" | "package_length" | "package_width" | "package_height" | "chargeable_weight" | "package_weight_image" | "package_length_image" | "package_width_image" | "package_height_image" | "product_detail_video" | "training_guidance_video" | "isVisibleToAll" | "status" | "isVarientExists" | "createdAt" | "createdBy" | "createdByRole" | "updatedAt" | "updatedBy" | "updatedByRole" | "deletedAt" | "deletedBy" | "deletedByRole", ExtArgs["result"]["product"]>
   export type productInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | categoryDefaultArgs<ExtArgs>
     brand?: boolean | brandDefaultArgs<ExtArgs>
@@ -29591,6 +29596,7 @@ export namespace Prisma {
       main_sku: string
       description: string | null
       gallery: string
+      imageSortingIndex: Prisma.JsonValue | null
       tags: Prisma.JsonValue | null
       brandId: number
       originCountryId: bigint
@@ -30012,6 +30018,7 @@ export namespace Prisma {
     readonly main_sku: FieldRef<"product", 'String'>
     readonly description: FieldRef<"product", 'String'>
     readonly gallery: FieldRef<"product", 'String'>
+    readonly imageSortingIndex: FieldRef<"product", 'Json'>
     readonly tags: FieldRef<"product", 'Json'>
     readonly brandId: FieldRef<"product", 'Int'>
     readonly originCountryId: FieldRef<"product", 'BigInt'>
@@ -48766,6 +48773,7 @@ export namespace Prisma {
     main_sku: 'main_sku',
     description: 'description',
     gallery: 'gallery',
+    imageSortingIndex: 'imageSortingIndex',
     tags: 'tags',
     brandId: 'brandId',
     originCountryId: 'originCountryId',
@@ -52582,6 +52590,7 @@ export namespace Prisma {
     main_sku?: StringFilter<"product"> | string
     description?: StringNullableFilter<"product"> | string | null
     gallery?: StringFilter<"product"> | string
+    imageSortingIndex?: JsonNullableFilter<"product">
     tags?: JsonNullableFilter<"product">
     brandId?: IntFilter<"product"> | number
     originCountryId?: BigIntFilter<"product"> | bigint | number
@@ -52637,6 +52646,7 @@ export namespace Prisma {
     main_sku?: SortOrder
     description?: SortOrderInput | SortOrder
     gallery?: SortOrder
+    imageSortingIndex?: SortOrderInput | SortOrder
     tags?: SortOrderInput | SortOrder
     brandId?: SortOrder
     originCountryId?: SortOrder
@@ -52696,6 +52706,7 @@ export namespace Prisma {
     name?: StringFilter<"product"> | string
     description?: StringNullableFilter<"product"> | string | null
     gallery?: StringFilter<"product"> | string
+    imageSortingIndex?: JsonNullableFilter<"product">
     tags?: JsonNullableFilter<"product">
     brandId?: IntFilter<"product"> | number
     originCountryId?: BigIntFilter<"product"> | bigint | number
@@ -52751,6 +52762,7 @@ export namespace Prisma {
     main_sku?: SortOrder
     description?: SortOrderInput | SortOrder
     gallery?: SortOrder
+    imageSortingIndex?: SortOrderInput | SortOrder
     tags?: SortOrderInput | SortOrder
     brandId?: SortOrder
     originCountryId?: SortOrder
@@ -52804,6 +52816,7 @@ export namespace Prisma {
     main_sku?: StringWithAggregatesFilter<"product"> | string
     description?: StringNullableWithAggregatesFilter<"product"> | string | null
     gallery?: StringWithAggregatesFilter<"product"> | string
+    imageSortingIndex?: JsonNullableWithAggregatesFilter<"product">
     tags?: JsonNullableWithAggregatesFilter<"product">
     brandId?: IntWithAggregatesFilter<"product"> | number
     originCountryId?: BigIntWithAggregatesFilter<"product"> | bigint | number
@@ -58129,6 +58142,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -58181,6 +58195,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -58230,6 +58245,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -58282,6 +58298,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -58333,6 +58350,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -58376,6 +58394,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -58418,6 +58437,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -63026,6 +63046,7 @@ export namespace Prisma {
     main_sku?: SortOrder
     description?: SortOrder
     gallery?: SortOrder
+    imageSortingIndex?: SortOrder
     tags?: SortOrder
     brandId?: SortOrder
     originCountryId?: SortOrder
@@ -73420,6 +73441,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -73471,6 +73493,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     hsnCode?: string | null
@@ -73529,6 +73552,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -73580,6 +73604,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -74198,6 +74223,7 @@ export namespace Prisma {
     main_sku?: StringFilter<"product"> | string
     description?: StringNullableFilter<"product"> | string | null
     gallery?: StringFilter<"product"> | string
+    imageSortingIndex?: JsonNullableFilter<"product">
     tags?: JsonNullableFilter<"product">
     brandId?: IntFilter<"product"> | number
     originCountryId?: BigIntFilter<"product"> | bigint | number
@@ -76633,6 +76659,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -76683,6 +76710,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -76844,6 +76872,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -76895,6 +76924,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     originCountryId: bigint | number
     hsnCode?: string | null
@@ -77922,6 +77952,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -77973,6 +78004,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -78088,6 +78120,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -78139,6 +78172,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -78203,6 +78237,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -78254,6 +78289,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -78426,6 +78462,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -78477,6 +78514,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -79140,6 +79178,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -79191,6 +79230,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -79540,6 +79580,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -79591,6 +79632,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -79832,6 +79874,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -79883,6 +79926,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -80214,6 +80258,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -80265,6 +80310,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -80643,6 +80689,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -80694,6 +80741,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -81237,6 +81285,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -81288,6 +81337,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -81620,6 +81670,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: string | null
     taxRate?: number | null
@@ -81671,6 +81722,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -82069,6 +82121,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -82120,6 +82173,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -86474,6 +86528,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     hsnCode?: string | null
@@ -86518,6 +86573,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -87172,6 +87228,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -87223,6 +87280,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -87273,6 +87331,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -87315,6 +87374,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -87366,6 +87426,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -87416,6 +87477,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -89993,6 +90055,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId: number
     originCountryId: bigint | number
@@ -90055,6 +90118,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -90105,6 +90169,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -90155,6 +90220,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     brandId?: IntFieldUpdateOperationsInput | number
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
@@ -90256,6 +90322,7 @@ export namespace Prisma {
     main_sku: string
     description?: string | null
     gallery: string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     originCountryId: bigint | number
     hsnCode?: string | null
@@ -90298,6 +90365,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxRate?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -90349,6 +90417,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -90399,6 +90468,7 @@ export namespace Prisma {
     main_sku?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     gallery?: StringFieldUpdateOperationsInput | string
+    imageSortingIndex?: NullableJsonNullValueInput | InputJsonValue
     tags?: NullableJsonNullValueInput | InputJsonValue
     originCountryId?: BigIntFieldUpdateOperationsInput | bigint | number
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null

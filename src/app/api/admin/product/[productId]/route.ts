@@ -279,6 +279,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const rawVariants = extractJSON('variants');
+    const imageSortingIndex = extractJSON('imageSortingIndex');
 
     console.log(`rawVariants`, rawVariants);
     if (!Array.isArray(rawVariants) || rawVariants.length === 0) {
@@ -351,15 +352,9 @@ export async function PUT(req: NextRequest) {
 
     const uploadedFiles: Record<string, string> = {};
     for (const field of fileFields) {
-      let pattern: 'slug' | 'slug-unique' | 'original' | 'custom' = 'slug-unique';
-
-      if (field == 'gallery') {
-        pattern = 'original';
-      }
-
       const fileData = await saveFilesFromFormData(formData, field, {
         dir: uploadDir,
-        pattern,
+        pattern: 'slug-unique',
         multiple: true,
       });
 
@@ -384,6 +379,7 @@ export async function PUT(req: NextRequest) {
       pickupAddress: extractString('pickup_address') || '',
       description: extractString('description'),
       gallery: uploadedFiles['gallery'],
+      imageSortingIndex: imageSortingIndex ? JSON.stringify(imageSortingIndex) : '',
       tags: extractString('tags') || '',
       brandId: extractNumber('brand') || 0,
       originCountryId,

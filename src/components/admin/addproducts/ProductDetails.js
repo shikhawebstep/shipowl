@@ -95,9 +95,7 @@ export default function ProductDetails() {
       setActiveTabs('variants-details')
     }
   };
-
-
-
+ 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -167,6 +165,7 @@ export default function ProductDetails() {
 
           {galleryPreviews.length > 0 &&
             galleryPreviews.map((src, index) => (
+              <div>
               <div key={index} className="relative w-full p-4 h-[300px] rounded overflow-hidden border border-gray-300">
                 <button
                   type="button"
@@ -180,6 +179,7 @@ export default function ProductDetails() {
                   alt={`Preview ${index + 1}`}
                   className="w-full h-full object-cover"
                 />
+              </div>
               </div>
             ))}
 
@@ -198,6 +198,7 @@ export default function ProductDetails() {
               className="hidden"
               onChange={handleGalleryChange}
             />
+
           </label>
         </div>
 

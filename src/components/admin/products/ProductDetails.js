@@ -5,9 +5,9 @@ import { ProductContextEdit } from './ProductContextEdit';
 import "@pathofdev/react-tag-input/build/index.css"; // Required styles
 import ReactTagInput from "@pathofdev/react-tag-input";
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
-
+import Swal from 'sweetalert2';
 import dynamic from 'next/dynamic';
-
+import { useSearchParams } from 'next/navigation';
 // Dynamically import TinyMCE Editor with SSR disabled
 const Editor = dynamic(() => import('@tinymce/tinymce-react').then(mod => mod.Editor), {
   ssr: false,
@@ -46,7 +46,8 @@ export default function ProductDetails() {
 
     setErrors((prev) => ({ ...prev, gallery: '' }));
   };
-  const handleGalleryImageDelete = (index) => {
+
+ const handleGalleryImageDelete = (index) => {
     const updatedPreviews = [...galleryPreviews];
     const updatedFiles = [...formData.gallery];
 
@@ -59,6 +60,144 @@ export default function ProductDetails() {
       gallery: updatedFiles,
     }));
   };
+
+  const searchParams = useSearchParams();
+
+
+  const id = searchParams.get("id");
+
+  const handleImageDelete = async (index, type) => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const id = searchParams.get("id");
+
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    if (dropshipperData?.project?.active_panel !== "admin") {
+      localStorage.removeItem("shippingData");
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    const token = dropshipperData?.security?.token;
+    if (!token) {
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: 'Deleting Image...',
+        text: 'Please wait while we remove the image.',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/product/${id}/image/${index}?type=${type}`;
+
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        Swal.close();
+        const errorMessage = await response.json();
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: errorMessage.message || "An error occurred",
+        });
+        return;
+      }
+
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: "Image Deleted",
+        text: `The image has been deleted successfully!`,
+        showConfirmButton: true,
+      }).then(() => {
+        const updatedImages = typeof formData[type] === 'string'
+          ? formData[type].split(',').map((img) => img.trim())
+          : Array.isArray(formData[type])
+            ? [...formData[type]]
+            : [];
+
+        updatedImages.splice(index, 1);
+
+        setFormData((prev) => ({
+          ...prev,
+          [type]: updatedImages.join(','),
+        }));
+
+        removeSortingIndex(index, type);
+      });
+
+    } catch (error) {
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Something went wrong.",
+      });
+    }
+  };
+
+  const handleSortingIndexChange = (idx, type, value) => {
+    setFormData((prev) => {
+      // Clone existing state
+      const imageSortingIndex = { ...(prev.imageSortingIndex || {}) };
+      const typeArray = [...(imageSortingIndex[type] || [])];
+
+      // Check if the index already exists
+      const existingIndex = typeArray.findIndex(item => item.index === idx);
+
+      if (existingIndex !== -1) {
+        // Update the value
+        typeArray[existingIndex].value = value;
+      } else {
+        // Add a new entry
+        typeArray.push({ index: idx, value });
+      }
+
+      // Assign updated array back
+      imageSortingIndex[type] = typeArray;
+
+      return {
+        ...prev,
+        imageSortingIndex
+      };
+    });
+  };
+
+  const removeSortingIndex = (idx, type) => {
+    setFormData((prev) => {
+      const imageSortingIndex = { ...(prev.imageSortingIndex || {}) };
+      const typeArray = [...(imageSortingIndex[type] || [])];
+
+      // Remove the entry with the given index
+      let updatedTypeArray = typeArray.filter(item => item.index !== idx);
+
+      // Reassign all entries after the removed one with updated index
+      updatedTypeArray = updatedTypeArray.map(item => {
+        if (item.index > idx) {
+          return { ...item, index: item.index - 1 }; // shift left
+        }
+        return item;
+      });
+
+      imageSortingIndex[type] = updatedTypeArray;
+
+      return {
+        ...prev,
+        imageSortingIndex
+      };
+    });
+  };
+
+  console.log(`FormData - `, formData);
+
   useEffect(() => {
     fetchCategory();
     fetchBrand();
@@ -147,32 +286,81 @@ export default function ProductDetails() {
       </div>
       <div>
         <label className="block mt-3 text-[#232323] font-semibold">
-          Image Gallary <span className="text-red-500">*</span>
+          Image Gallery <span className="text-red-500">*</span>
         </label>
-        <div className="flex gap-4 mt-2 flex-wrap">
-          {(Array.isArray(formData.gallery)
-            ? formData.gallery
-            : typeof formData.gallery === 'string'
-              ? formData.gallery.split(',').map((url) => url.trim())
-              : []
-          ).map((img, index) => {
-            const imageUrl = typeof img === 'string' ? img : URL.createObjectURL(img);
-            return (
-              <div key={index} className="relative w-24 h-24">
-                <img
-                  src={imageUrl}
-                  alt={`Gallery ${index}`}
-                  className="w-full h-full object-cover rounded shadow"
-                />
-              </div>
-            );
-          })}
-        </div>
 
+        <div className="mt-2 grid grid-cols-4 gap-4">
+          {(() => {
+            const serverImages = typeof formData.gallery === 'string'
+              ? formData.gallery.split(',').map((url) => url.trim()).filter(Boolean)
+              : Array.isArray(formData.gallery)
+                ? formData.gallery
+                : [];
 
-        <div className="mt-2 grid grid-cols-4 gap-4 ">
+            const totalServerImages = serverImages.length;
 
-          {galleryPreviews.length > 0 &&
+            return [...serverImages].map((img, index) => {
+              const isFile = index >= totalServerImages;
+              const fileIndex = index - totalServerImages;
+              const imageUrl = typeof img === 'string' ? img : URL.createObjectURL(img);
+
+              return (
+                <div>
+                  <div
+                    key={index}
+                    className="relative w-full h-[300px] rounded overflow-hidden border border-gray-300"
+                  >
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10 hover:opacity-100 opacity-90"
+                      onClick={() => {
+                        Swal.fire({
+                          title: 'Are you sure?',
+                          text: 'Do you want to delete this image?',
+                          icon: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#d33',
+                          cancelButtonColor: '#3085d6',
+                          confirmButtonText: 'Yes, delete it!',
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            if (isFile) {
+                              handleGalleryImageDelete(fileIndex);
+                            } else {
+                              handleImageDelete(index, 'gallery');
+                            }
+                          }
+                        });
+                      }}
+                    >
+                      ✕
+                    </button>
+
+                    <img
+                      src={imageUrl}
+                      alt={`Gallery ${index}`}
+                      className="w-full h-full object-cover"
+                    />
+
+                  </div>
+                  {
+                    !isFile && <input
+                      className='border w-full border-gray-200 rounded-md p-2 mt-1'
+                      type='number'
+                      name="sorting_index"
+                      placeholder='Sorting Index'
+                      value={
+                        formData.imageSortingIndex?.gallery?.find(item => item.index === index)?.value || ''
+                      }
+                      onChange={(e) => handleSortingIndexChange(index, 'gallery', e.target.value)}
+                    />
+                  }
+                </div>
+              );
+            });
+          })()}
+
+            {galleryPreviews.length > 0 &&
             galleryPreviews.map((src, index) => (
               <div key={index} className="relative w-full p-4 h-[300px] rounded overflow-hidden border border-gray-300">
                 <button
@@ -208,9 +396,13 @@ export default function ProductDetails() {
           </label>
         </div>
 
+
+
+
         {/* Error message */}
         {errors.gallery && <p className="text-red-500 text-sm mt-1">{errors.gallery}</p>}
       </div>
+
 
 
       <div className="mt-4">

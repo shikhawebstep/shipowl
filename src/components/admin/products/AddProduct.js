@@ -140,6 +140,7 @@ const AddProduct = () => {
           Array.isArray(products.supplierVisibility) && products.supplierVisibility.length > 0
             ? products.supplierVisibility.map((item) => item.supplierId).join(',')
             : '',
+        imageSortingIndex: products.imageSortingIndex
       });
 
 

@@ -610,6 +610,7 @@ model product {
   main_sku                   String                      @unique
   description                String?                     @db.LongText
   gallery                    String                      @db.LongText
+  imageSortingIndex          Json?
   tags                       Json?
   brandId                    Int
   originCountryId            BigInt
