@@ -27,7 +27,6 @@ const ProductProvider = ({ children }) => {
     shipping_country: '',
     video_url: '',
     list_as: '',
-    variant_images_0: '',
     variants: [
       {
         color: '',
@@ -36,7 +35,6 @@ const ProductProvider = ({ children }) => {
         product_link: '',
         name: '',
         suggested_price: 0,
-        image: null,
       },
     ],
     shipping_time: '24 Hours',
@@ -56,7 +54,7 @@ const ProductProvider = ({ children }) => {
     isVarientExists: '',
     supplierIds: '',
     status: true,
-    gallary:'',
+    gallery:'',
   });
 
   const fetchCategory = useCallback(async () => {
@@ -216,7 +214,7 @@ const ProductProvider = ({ children }) => {
     shipping_country: 'Shipping Country',
     video: 'Product Video URL',
     list_as: 'List As',
-    gallary:"Gallary Images"
+    gallery:"Gallary Images"
   };
  const validateForm2 = () => {
   const newErrors = {};
@@ -264,7 +262,7 @@ const ProductProvider = ({ children }) => {
       'shipping_country',
       'list_as',
       'isVisibleToAll',
-      'gallary'
+      'gallery'
     ];
 
     // ✅ Push to requiredFields, not validateFields

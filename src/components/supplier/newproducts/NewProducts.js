@@ -221,7 +221,7 @@ export default function NewProducts() {
         {productsRequest.length > 0 ? (
           <div className="grid xl:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-3 productsSection">
             {productsRequest.map((product, index) => {
-              const imageUrl = product.variants?.[0]?.image?.split(',') || [];
+              const imageUrl = product?.gallery?.split(',') || [];
 
               const productName = product.name || "Unnamed Product";
 
@@ -393,9 +393,7 @@ export default function NewProducts() {
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
                     {inventoryData.variant?.map((variant, idx) => {
-                      const imageUrls = variant.image
-                        ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
-                        : [];
+
 
                       return (
                         <div
@@ -404,29 +402,8 @@ export default function NewProducts() {
                         >
                           <div className='flex gap-2 relative'>
                             {/* Image Preview */}
-                            <div className="flex items-center gap-2 overflow-x-auto h-[200px] w-full object-cover  border border-[#E0E2E7] rounded-md p-3shadow bg-white">
-                              {imageUrls.length > 0 ? (
-                                imageUrls.map((url, i) => (
-                                  <Image
-                                    key={i}
-                                    height={100}
-                                    width={100}
-                                    src={fetchImages(url)}
-                                    alt={variant.name || 'NIL'}
-                                    className="h-full w-full object-cover"
-                                  />
-                                ))
-                              ) : (
-                                <Image
-                                  height={40}
-                                  width={40}
-                                  src="https://placehold.com/600x400"
-                                  alt="Placeholder"
-                                  className="rounded shrink-0"
-                                />
-                              )}
-                            </div>
-                            <div className="absolute top-0 left-0 w-full text-center bg-orange-500 p-2 text-white ">Suggested Price :{variant.suggested_price}</div>
+
+                            <div className="w-full text-center bg-orange-500 p-2 text-white ">Suggested Price :{variant.suggested_price}</div>
 
 
                           </div>

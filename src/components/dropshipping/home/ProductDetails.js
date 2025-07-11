@@ -47,7 +47,7 @@ export default function ProductDetails() {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [activeModal, setActiveModal] = useState('Shipowl');
   const [activeModalPushToShopify, setActiveModalPushToShopify] = useState('Shipowl');
-  const images = selectedVariant?.variant?.image?.split(",") || selectedVariant?.supplierProductVariant?.variant?.image?.split(",") || [];
+  const images = productDetails?.gallery?.split(",") || productDetails?.gallery?.split(",") || [];
   const [selectedImage, setSelectedImage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [inventoryData, setInventoryData] = useState({
@@ -58,7 +58,6 @@ export default function ProductDetails() {
     isVarientExists: '',
     shopifyStore: '',
   });
-  console.log('selectedImage', selectedImage)
 
   const [tooltipIndex, setTooltipIndex] = useState(null);
 
@@ -68,8 +67,8 @@ export default function ProductDetails() {
   console.log('selectedVariant', selectedVariant)
   useEffect(() => {
     const images =
-      selectedVariant?.supplierProductVariant?.variant?.image?.split(",") ||
-      selectedVariant?.variant?.image?.split(",") ||
+      productDetails?.gallery?.split(",") ||
+      productDetails?.gallery?.split(",") ||
       [];
 
     setSelectedImage(images[0] ?? "");
@@ -144,7 +143,6 @@ export default function ProductDetails() {
     name: v?.variant?.name || v?.supplierProductVariant?.variant?.name || "NIL",
     model: v?.variant?.model || v?.supplierProductVariant?.variant?.model || "Unknown",
     color: v?.variant?.color || v?.supplierProductVariant?.variant?.color || "NIL",
-    image: (v?.variant?.image || v?.supplierProductVariant?.variant?.image || "").split(",")[0],
     suggested_price: v?.price || v?.suggested_price,
     full: v,
   });
@@ -362,7 +360,6 @@ export default function ProductDetails() {
     name: v?.variant?.name || v?.supplierProductVariant?.variant?.name || "NIL",
     model: v?.variant?.model || v?.supplierProductVariant?.variant?.model || "Unknown",
     color: v?.variant?.color || v?.supplierProductVariant?.variant?.color || "NIL",
-    image: (v?.variant?.image || v?.supplierProductVariant?.variant?.image || "").split(",")[0],
     suggested_price: v?.price || v?.suggested_price,
     full: v,
     selected: v?.selected || false
@@ -647,15 +644,7 @@ export default function ProductDetails() {
                                       >
 
                                         <div className="">
-                                          <div className="bg-[#F7F5F5] overflow-hidden flex justify-center items-center rounded mb-4 mx-auto">
-                                            <Image
-                                              src={fetchImages(variant.image)}
-                                              alt={variant.name}
-                                              width={140}
-                                              height={140}
-                                              className="object-cover w-full h-full"
-                                            />
-                                          </div>
+                                        
                                           <div className=" text-gray-700 space-y-1 text-left">
                                             <div>Name: <span className="font-medium">{variant.name}</span></div>
                                             <div className="flex items-center gap-1 text-sm text-gray-700">
@@ -753,15 +742,7 @@ export default function ProductDetails() {
                                           }`}
                                       >
                                         <div className="">
-                                          <div className="bg-[#F7F5F5] overflow-hidden flex justify-center items-center rounded mb-4 mx-auto">
-                                            <Image
-                                              src={fetchImages(variant.image)}
-                                              alt={variant.name}
-                                              width={140}
-                                              height={140}
-                                              className="object-cover w-full h-full"
-                                            />
-                                          </div>
+                                        
                                           <div className=" text-gray-700 space-y-1 text-left">
                                             <div>Name: <span className="font-medium">{variant.name}</span></div>
                                             <div className="flex items-center gap-1 text-sm text-gray-700">
@@ -1020,7 +1001,7 @@ export default function ProductDetails() {
                             {/* Image */}
                             <div className="w-24 h-24 rounded-md overflow-hidden flex-shrink-0">
                               <Image
-                                src={fetchImages(variant?.image || '')}
+                                src={fetchImages(sup?.gallery || '')}
                                 alt={variant?.name || 'Variant Image'}
                                 width={100}
                                 onClick={() => viewProduct(sup?.id)}
@@ -1228,7 +1209,6 @@ export default function ProductDetails() {
                         <VariantCard
                           variant={variant}
                           handleVariantChange={handleVariantChange}
-                          fetchImages={fetchImages}
                         />
                       );
                     }
@@ -1253,7 +1233,6 @@ export default function ProductDetails() {
                                   <VariantCard
                                     variant={variant}
                                     handleVariantChange={handleVariantChange}
-                                    fetchImages={fetchImages}
                                   />
                                 </div>
                               ))}
@@ -1283,7 +1262,6 @@ export default function ProductDetails() {
                                   <VariantCard
                                     variant={variant}
                                     handleVariantChange={handleVariantChange}
-                                    fetchImages={fetchImages}
                                   />
                                 )}
                               </label>
@@ -1329,7 +1307,6 @@ export default function ProductDetails() {
                                   <VariantCard
                                     variant={variant}
                                     handleVariantChange={handleVariantChange}
-                                    fetchImages={fetchImages}
                                   />
                                 </div>
                               ))}
@@ -1387,8 +1364,8 @@ export default function ProductDetails() {
               const variants = item.variants || [];
 
               const firstVariantImageString =
-                variants[0]?.supplierProductVariant?.variant?.image || // case 1
-                variants[0]?.variant?.image ||                         // case 2
+               product?.gallery || // case 1
+                product?.gallery||                         // case 2
                 "";
 
               const imageUrl = firstVariantImageString.split(",")[0]?.trim() || "/default-image.jpg";
@@ -1494,19 +1471,12 @@ export default function ProductDetails() {
     </>
   )
 }
-const VariantCard = ({ variant, handleVariantChange, fetchImages }) => {
+const VariantCard = ({ variant, handleVariantChange }) => {
   if (!variant) return null;
 
   return (
     <div key={variant.id} className="space-y-5 border p-4 rounded-lg shadow-sm">
       <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
-        <Image
-          src={fetchImages(variant.image)}
-          alt="Product"
-          width={64}
-          height={64}
-          className="rounded border object-cover"
-        />
         <div>
           <p className="text-sm font-medium leading-5 line-clamp-2">
             {variant.name || 'Stainless Steel Cable Lock Ties'}

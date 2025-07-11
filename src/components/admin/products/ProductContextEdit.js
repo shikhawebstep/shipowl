@@ -29,8 +29,7 @@ const ProductProviderEdit = ({ children }) => {
     shipping_country: '',
     video_url: '',
     list_as: '',
-    variant_images_0: '',
-    gallary:'',
+    gallery:'',
     variants: [
       {
         color: '',
@@ -39,7 +38,6 @@ const ProductProviderEdit = ({ children }) => {
         name: '',
         model: '',
         suggested_price: 0,
-        image: null,
       },
     ],
     shipping_time: '24 Hours',

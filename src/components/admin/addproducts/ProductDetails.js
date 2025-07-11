@@ -70,14 +70,14 @@ export default function ProductDetails() {
     // Save files to formData
     setFormData((prev) => ({
       ...prev,
-      gallary: files, // or `galleryFiles`, if you want to keep it in separate state
+      gallery: files, // or `galleryFiles`, if you want to keep it in separate state
     }));
 
-    setErrors((prev) => ({ ...prev, gallary: '' }));
+    setErrors((prev) => ({ ...prev, gallery: '' }));
   };
   const handleGalleryImageDelete = (index) => {
     const updatedPreviews = [...galleryPreviews];
-    const updatedFiles = [...formData.gallary];
+    const updatedFiles = [...formData.gallery];
 
     updatedPreviews.splice(index, 1);
     updatedFiles.splice(index, 1);
@@ -85,7 +85,7 @@ export default function ProductDetails() {
     setGalleryPreviews(updatedPreviews);
     setFormData((prev) => ({
       ...prev,
-      gallary: updatedFiles,
+      gallery: updatedFiles,
     }));
   };
 
@@ -164,7 +164,7 @@ export default function ProductDetails() {
         </label>
 
         <div className="mt-2 grid grid-cols-4 gap-4 ">
-          
+
           {galleryPreviews.length > 0 &&
             galleryPreviews.map((src, index) => (
               <div key={index} className="relative w-full p-4 h-[300px] rounded overflow-hidden border border-gray-300">
@@ -192,7 +192,7 @@ export default function ProductDetails() {
             <input
               id="gallery-upload"
               type="file"
-              name="gallary"
+              name="gallery"
               accept="image/*"
               multiple
               className="hidden"
@@ -202,7 +202,7 @@ export default function ProductDetails() {
         </div>
 
         {/* Error message */}
-        {errors.gallary && <p className="text-red-500 text-sm mt-1">{errors.gallary}</p>}
+        {errors.gallery && <p className="text-red-500 text-sm mt-1">{errors.gallery}</p>}
       </div>
 
 

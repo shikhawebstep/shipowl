@@ -350,7 +350,7 @@ function ProductsByCategory() {
                 className="bg-white focus-within:z-10 rounded-xl group overflow-hidden cursor-pointer shadow-sm relative transition-transform duration-300 hover:shadow-lg hover:scale-[1.02] outline-none"
               >
                 {/* FLIP CARD */}
-                <div onClick={() => viewProduct(product.id)} className={`relative h-[200px] h-[150px] perspective z-40`}>
+                <div onClick={() => viewProduct(product.id)} className={`relative h-[200px]  perspective z-40`}>
                   <div className="relative overflow-hidden w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                     {/* FRONT */}
                     <Image
@@ -708,7 +708,7 @@ function ProductsByCategory() {
                         )}
 
                       </div>
-                      <div className="absolute top-0 left-0 w-full text-center bg-orange-500 p-2 text-white ">Suggested Price : {v.price || v?.supplierProductVariant?.price || "—"}</div>
+                      <div className="w-full text-center bg-orange-500 p-2 text-white ">Suggested Price : {v.price || v?.supplierProductVariant?.price || "—"}</div>
 
 
                     </div>

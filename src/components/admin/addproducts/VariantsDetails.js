@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext, useState } from 'react';
-import { Plus, Minus, ImageIcon } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 import { ProductContext } from './ProductContext';
 
 export default function VariantDetails() {
@@ -28,7 +28,6 @@ export default function VariantDetails() {
         sku: '',
         product_link: '',
         name: '', suggested_price: '',
-        image: null,
       };
 
       if (formData.list_as === 'both') {
@@ -45,7 +44,6 @@ export default function VariantDetails() {
         product_link: '',
         suggested_price: '',
         sku: '',
-        image: null,
       };
 
       if (formData.list_as === 'both') {
@@ -68,16 +66,7 @@ export default function VariantDetails() {
 
 
 
-  const handleFileChange = (event, index) => {
-    const selectedFiles = Array.from(event.target.files);
-    if (selectedFiles.length > 0) {
-      const imageKey = `variant_images_${index}`;
-      setFormData((prev) => ({
-        ...prev,
-        [imageKey]: [...(prev[imageKey] || []), ...selectedFiles],
-      }));
-    }
-  };
+ 
 
   const addVariant = () => {
     const newVariant = {
@@ -86,7 +75,6 @@ export default function VariantDetails() {
       product_link: '',
       name: '',
       suggested_price: '',
-      image: null,
     };
 
     let updatedVariants = [...formData.variants];
@@ -175,7 +163,6 @@ export default function VariantDetails() {
               <span className="text-[#A3AED0] whitespace-nowrap">SKU</span>
               <span className="text-[#A3AED0] whitespace-nowrap">Suggested Price</span>
               <span className="text-[#A3AED0] whitespace-nowrap">Product Link</span>
-              <span className="text-[#A3AED0] whitespace-nowrap text-right">Images</span>
             </>
           )}
           {showAddButton && (
@@ -263,30 +250,6 @@ export default function VariantDetails() {
                           value={variant.product_link || ''}
                           onChange={(e) => handleChange(index, 'product_link', e.target.value)}
                         />
-                      </div>
-
-                      <div className="md:flex justify-end">
-                        <span className="text-orange-500 font-semibold lg:hidden block">Images</span>
-                        <div className="relative overflow-auto border border-[#DFEAF2] rounded-lg p-2 w-16 h-16 flex items-center justify-center">
-                          {(() => {
-                            const imageKey = `variant_images_${index}`;
-                            const files = formData[imageKey] || [];
-                            return files.length > 0 ? (
-                              <span className="text-[10px] text-center text-gray-600">
-                                {files.map((file, i) => file.name || `File ${i + 1}`).join(', ')}
-                              </span>
-                            ) : (
-                              <ImageIcon className="w-8 h-8 text-gray-400 overflow-auto" />
-                            );
-                          })()}
-                          <input
-                            type="file"
-                            multiple
-                            accept="image/*,application/pdf,text/plain,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.csv"
-                            className="absolute opacity-0 w-full h-full cursor-pointer"
-                            onChange={(e) => handleFileChange(e, index)}
-                          />
-                        </div>
                       </div>
 
                     </>

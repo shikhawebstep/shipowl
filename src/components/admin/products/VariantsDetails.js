@@ -8,15 +8,12 @@ import { Navigation } from 'swiper/modules';
 import { useRouter, useSearchParams } from "next/navigation";
 import 'swiper/css';
 import 'swiper/css/navigation';
-import Image from 'next/image';
 import Swal from "sweetalert2";
-import { useImageURL } from "@/components/ImageURLContext";
 export default function VariantDetails() {
 
   const searchParams = useSearchParams();
 
   const productId = searchParams.get("id");
-  const { fetchImages } = useImageURL();
   const { formData, setFormData, setActiveTab } = useContext(ProductContextEdit);
   const [loading, setLoading] = useState(null);
   const numericFields = ['suggested_price'];
@@ -45,13 +42,13 @@ export default function VariantDetails() {
           product_link: '',
           name: '',
           suggested_price: 0,
-          image: null,
+         
         }
       value === 'no' && {
         product_link: '',
         sku: '',
         suggested_price: 0,
-        image: null,
+       
       };
 
       updatedVariants = isBoth
@@ -73,16 +70,7 @@ export default function VariantDetails() {
   const showAddButton = formData.isVarientExists === 'yes';
 
 
-  const handleFileChange = (event, index) => {
-    const selectedFiles = Array.from(event.target.files);
-    if (selectedFiles.length > 0) {
-      const imageKey = `variant_images_${index}`;
-      setFormData((prev) => ({
-        ...prev,
-        [imageKey]: [...(prev[imageKey] || []), ...selectedFiles],
-      }));
-    }
-  };
+
 
   const addVariant = () => {
     const newVariant = {
@@ -91,7 +79,7 @@ export default function VariantDetails() {
       product_link: '',
       name: '',
       suggested_price: 0,
-      image: null,
+     
     };
 
     let updatedVariants = [...formData.variants];
@@ -121,82 +109,7 @@ export default function VariantDetails() {
     setActiveTab('shipping-details');
   };
 
-  const handleImageDelete = async (index, type, variantId) => {
-    setLoading(true);
-
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-    if (dropshipperData?.project?.active_panel !== "admin") {
-      localStorage.removeItem("shippingData");
-      router.push("/admin/auth/login");
-      return;
-    }
-
-    const token = dropshipperData?.security?.token;
-    if (!token) {
-      router.push("/admin/auth/login");
-      return;
-    }
-
-    try {
-      Swal.fire({
-        title: 'Deleting Image...',
-        text: 'Please wait while we remove the image.',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
-
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/product/${productId}/variant/${variantId}/image/${index}`;
-
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        Swal.close();
-        const errorMessage = await response.json();
-        Swal.fire({
-          icon: "error",
-          title: "Delete Failed",
-          text: errorMessage.message || errorMessage.error || "An error occurred",
-        });
-        throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
-      }
-
-      const result = await response.json();
-      Swal.close();
-
-
-      if (result) {
-        Swal.fire({
-          icon: "success",
-          title: "Image Deleted",
-          text: `The image has been deleted successfully!`,
-          showConfirmButton: true,
-        }).then((res) => {
-          if (res.isConfirmed) {
-            window.location.reload(); // ✅ Works for Pages Router
-          }
-        });
-      }
-
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.close();
-      Swal.fire({
-        icon: "error",
-        title: "Submission Error",
-        text: error.message || "Something went wrong. Please try again.",
-      });
-      setError(error.message || "Submission failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
+ 
 
 
 
@@ -236,7 +149,7 @@ export default function VariantDetails() {
         )}
 
 
-        <div className={`mt-5 lg:grid  hidden overflow-auto grid-cols-1 gap-6 items-center justify-between border-b border-[#E9EDF7] pb-2 mb-4 text-gray-600 font-semibold ${!showAddButton ? 'lg:grid-cols-5' : 'lg:grid-cols-8'}`}>
+        <div className={`mt-5 lg:grid  hidden overflow-auto grid-cols-1 gap-6 items-center justify-between border-b border-[#E9EDF7] pb-2 mb-4 text-gray-600 font-semibold ${!showAddButton ? 'lg:grid-cols-4' : 'lg:grid-cols-7'}`}>
           {formData.isVarientExists && (
             <span className="text-[#A3AED0] whitespace-nowrap">Model</span>
 
@@ -253,7 +166,6 @@ export default function VariantDetails() {
               <span className="text-[#A3AED0] whitespace-nowrap">SKU</span>
               <span className="text-[#A3AED0] whitespace-nowrap">Suggested Price</span>
               <span className="text-[#A3AED0] whitespace-nowrap">Product Link</span>
-              <span className="text-[#A3AED0] whitespace-nowrap text-right">Images</span>
             </>
           )}
           {showAddButton && (
@@ -271,7 +183,7 @@ export default function VariantDetails() {
               formData.variants.map((variant, index) => (
                 <div
                   key={index}
-                  className={`md:grid p-3 rounded-md border  mt-5 border-dotted overflow-auto md:grid-cols-2 gap-6 justify-between mb-4 border-b border-[#E9EDF7] pb-4  ${!showAddButton ? 'lg:grid-cols-5' : 'lg:grid-cols-8'}`}
+                  className={`md:grid p-3 rounded-md border  mt-5 border-dotted overflow-auto md:grid-cols-2 gap-6 justify-between mb-4 border-b border-[#E9EDF7] pb-4  ${!showAddButton ? 'lg:grid-cols-4' : 'lg:grid-cols-7'}`}
                 >
                   {formData.isVarientExists && (
                     <div>
@@ -344,77 +256,7 @@ export default function VariantDetails() {
                         />
                       </div>
 
-                      <div className="md:flex flex-wrap justify-end">
-                        <span className="text-orange-500 font-semibold lg:hidden block">Images</span>
-                        <div className="relative border border-[#DFEAF2] rounded-lg p-2 w-16 h-16 flex items-center justify-center">
-                          <ImageIcon className="w-8 h-8 text-gray-400" />
-                          {Array.isArray(variant?.variant_images) && variant.variant_images.length > 0
-                            ? variant.variant_images.map((file, i) => file.name || `File ${i + 1}`).join(', ')
-                            : 'Upload'}
-
-                          <input
-                            type="file"
-                            multiple
-                            className="absolute opacity-0 w-full h-full cursor-pointer"
-                            onChange={(e) => handleFileChange(e, index)}
-                          />
-                        </div>
-                        {variant.variant_images && (
-                          <div className="mt-3 w-full">
-                            <Swiper
-                              key={index}
-                              modules={[Navigation]}
-                              slidesPerView={1}
-                              spaceBetween={12}
-                              loop={
-                                Array.isArray(variant.variant_images)
-                                  ? variant.variant_images.length > 1
-                                  : variant.variant_images.split(',').length > 1
-                              }
-                              navigation={true}
-                              className="mySwiper"
-                            >
-                              {(Array.isArray(variant.variant_images)
-                                ? variant.variant_images
-                                : variant.variant_images.split(',').map((url) => url.trim())
-                              ).map((file, index) => (
-                                <SwiperSlide key={index} className="relative group">
-                                  <button
-                                    type="button"
-                                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10 opacity-90 hover:opacity-100"
-                                    onClick={() => {
-                                      Swal.fire({
-                                        title: 'Are you sure?',
-                                        text: 'Do you want to delete this image?',
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonColor: '#d33',
-                                        cancelButtonColor: '#3085d6',
-                                        confirmButtonText: 'Yes, delete it!',
-                                      }).then((result) => {
-                                        if (result.isConfirmed) {
-                                          handleImageDelete(index, 'variant_image', variant.id);
-                                        }
-                                      });
-                                    }}
-                                  >
-                                    ✕
-                                  </button>
-
-                                  <Image
-                                    src={fetchImages(file)}
-                                    alt={`Image ${index + 1}`}
-                                    width={500}
-                                    height={500}
-                                    className="rounded-lg object-cover w-full h-32"
-                                  />
-                                </SwiperSlide>
-                              ))}
-                            </Swiper>
-                          </div>
-                        )}
-
-                      </div>
+                     
                     </>
                   )}
 

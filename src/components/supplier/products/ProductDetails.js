@@ -61,7 +61,7 @@ const ProductDetails = () => {
   const [openCalculator, setOpenCalculator] = useState(null);
   const [productDetails, setProductDetails] = useState({});
   const [otherSuppliers, setOtherSuppliers] = useState([]);
-  const images = selectedVariant?.variant?.image?.split(",") || selectedVariant?.image?.split(",") || [];
+  const images = productDetails?.gallery?.split(",") || selectedVariant?.image?.split(",") || [];
   const [shopifyStores, setShopifyStores] = useState([]);
 
   const [selectedImage, setSelectedImage] = useState("");
@@ -69,8 +69,8 @@ const ProductDetails = () => {
   // This will update selectedImage when selectedVariant changes
   useEffect(() => {
     const images =
-      selectedVariant?.variant?.image?.split(",") ||
-      selectedVariant?.image?.split(",") ||
+      productDetails?.gallery?.split(",") ||
+      selectedVariant?.gallery?.split(",") ||
       [];
 
     setSelectedImage(images[0] ?? "");
@@ -419,7 +419,6 @@ const ProductDetails = () => {
     name: v?.name || v?.variant?.name || "NIL",
     model: v?.model || v?.variant?.model || "Unknown",
     color: v?.color || v?.variant?.color || "NIL",
-    image: (v?.image || v?.variant?.image || "").split(",")[0],
     suggested_price: v?.price || v?.suggested_price,
     full: v,
   });
@@ -574,15 +573,7 @@ const ProductDetails = () => {
                                       >
 
                                         <div className="">
-                                          <div className="bg-[#F7F5F5] overflow-hidden flex justify-center items-center rounded mb-4 mx-auto">
-                                            <Image
-                                              src={fetchImages(variant.image)}
-                                              alt={variant.name}
-                                              width={140}
-                                              height={140}
-                                              className="object-cover w-full h-full"
-                                            />
-                                          </div>
+                                         
                                           <div className=" text-gray-700 space-y-1 text-left">
                                             <div>Name: <span className="font-medium">{variant.name}</span></div>
                                             <div className="flex items-center gap-1 text-sm text-gray-700">
@@ -680,15 +671,7 @@ const ProductDetails = () => {
                                           }`}
                                       >
                                         <div className="">
-                                          <div className="bg-[#F7F5F5] overflow-hidden flex justify-center items-center rounded mb-4 mx-auto">
-                                            <Image
-                                              src={fetchImages(variant.image)}
-                                              alt={variant.name}
-                                              width={140}
-                                              height={140}
-                                              className="object-cover w-full h-full"
-                                            />
-                                          </div>
+                                          
                                           <div className=" text-gray-700 space-y-1 text-left">
                                             <div>Name: <span className="font-medium">{variant.name}</span></div>
                                             <div className="flex items-center gap-1 text-sm text-gray-700">
@@ -884,12 +867,7 @@ const ProductDetails = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
                     {inventoryData.variant?.map((variant, idx) => {
 
-                      const imageUrls = variant?.variant?.image
-                        ? variant.variant.image.split(",").map((img) => img.trim()).filter(Boolean)
-                        : variant?.image
-                          ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
-                          : [];
-
+                     
                       return (
                         <div
                           key={variant.id || idx}
@@ -897,29 +875,8 @@ const ProductDetails = () => {
                         >
                           <div className='flex gap-2 relative'>
                             {/* Image Preview */}
-                            <div className="flex items-center gap-2 overflow-x-auto h-[200px] w-full object-cover  border border-[#E0E2E7] rounded-md p-3shadow bg-white">
-                              {imageUrls.length > 0 ? (
-                                imageUrls.map((url, i) => (
-                                  <Image
-                                    key={i}
-                                    height={100}
-                                    width={100}
-                                    src={fetchImages(url)}
-                                    alt={variant.name || 'NIL'}
-                                    className="h-full w-full object-cover"
-                                  />
-                                ))
-                              ) : (
-                                <Image
-                                  height={40}
-                                  width={40}
-                                  src="https://placehold.com/600x400"
-                                  alt="Placeholder"
-                                  className="rounded shrink-0"
-                                />
-                              )}
-                            </div>
-                            <div className="absolute top-0 left-0 w-full text-center bg-orange-500 p-2 text-white ">Suggested Price :{variant?.suggested_price || variant?.price}</div>
+                           
+                            <div className="w-full text-center bg-orange-500 p-2 text-white ">Suggested Price :{variant?.suggested_price || variant?.price}</div>
                           </div>
 
                           <div className="overflow-x-auto">
@@ -1130,7 +1087,6 @@ const ProductDetails = () => {
                   </>
                 );
               };
-              console.log('item?.variants', item?.variants)
 
 
               return (
@@ -1147,8 +1103,8 @@ const ProductDetails = () => {
                         <Image
                           src={
                             fetchImages(
-                              item?.variants?.[0]?.variant?.image?.split(',')[0].trim() ||
-                              item?.variants?.[0]?.image?.split(',')[0].trim() ||
+                              item?.gallery?.split(',')[0].trim() ||
+                              item?.gallery?.split(',')[0].trim() ||
                               ''
                             )
                           }

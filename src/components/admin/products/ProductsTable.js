@@ -473,38 +473,14 @@ const ProductTable = () => {
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                             {selectedProduct?.variants?.map((variant, idx) => {
-                                                const imageUrls = variant.image
-                                                    ? variant.image.split(',').map((img) => img.trim()).filter(Boolean)
-                                                    : [];
+                                               
 
                                                 const varinatExists = selectedProduct?.isVarientExists ? 'yes' : 'no';
                                                 const isExists = varinatExists === 'yes';
 
                                                 return (
                                                     <div key={variant.id || idx} className="border rounded-lg shadow-sm p-4 bg-white">
-                                                        {/* Image Carousel / Scroll */}
-                                                        <div className="flex space-x-2 overflow-x-auto mb-4">
-                                                            {imageUrls.length > 0 ? (
-                                                                imageUrls.map((url, i) => (
-                                                                    <Image
-                                                                        key={i}
-                                                                        height={100}
-                                                                        width={100}
-                                                                        src={fetchImages(url)}
-                                                                        alt={variant.name || 'NIL'}
-                                                                        className="shrink-0 rounded border"
-                                                                    />
-                                                                ))
-                                                            ) : (
-                                                                <Image
-                                                                    height={100}
-                                                                    width={100}
-                                                                    src="https://placehold.co/400"
-                                                                    alt="Placeholder"
-                                                                    className="shrink-0 rounded border"
-                                                                />
-                                                            )}
-                                                        </div>
+                                                      
 
                                                         {/* Details */}
                                                         <div className="space-y-2 text-sm text-gray-700">

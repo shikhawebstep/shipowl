@@ -84,10 +84,9 @@ const AddProduct = () => {
         brand: products.brandId || '',
         origin_country: products.originCountryId || '',
         shipping_country: products.shippingCountryId || '',
-        gallary: products.gallary || '',
+        gallery: products.gallery || '',
         video_url: products.video_url || '',
         list_as: products.list_as || '',
-        variant_images_0: '',
         variants: (() => {
           if (Array.isArray(products.variants) && products.variants.length > 0) {
             return products.variants.map((variant) => ({
@@ -97,7 +96,6 @@ const AddProduct = () => {
               sku: variant.sku || '',
               name: variant.name || '',
               suggested_price: variant.suggested_price || 0,
-              variant_images: variant.image || '',
               product_link: variant.product_link || '',
             }));
           } else {
@@ -109,7 +107,6 @@ const AddProduct = () => {
               sku: '',
               name: '',
               suggested_price: 0,
-              variant_images: '',
               product_link: '',
             };
 

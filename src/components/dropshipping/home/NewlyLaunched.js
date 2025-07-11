@@ -136,7 +136,6 @@ const NewlyLaunched = () => {
     name: v?.variant?.name || v?.supplierProductVariant?.variant?.name || "NIL",
     model: v?.variant?.model || v?.supplierProductVariant?.variant?.model || "Unknown",
     color: v?.variant?.color || v?.supplierProductVariant?.variant?.color || "NIL",
-    image: (v?.variant?.image || v?.supplierProductVariant?.variant?.image || "").split(",")[0],
     suggested_price: v?.price || v?.suggested_price,
     full: v,
     selected: v?.selected || false
@@ -424,10 +423,7 @@ const NewlyLaunched = () => {
                 const productName = product?.product?.name || "NIL";
                 const variants = product?.variants || [];
 
-                const firstVariantImageString =
-                  variants[0]?.supplierProductVariant?.variant?.image || // case 1
-                  variants[0]?.variant?.image ||                         // case 2
-                  "";
+                const firstVariantImageString =product?.product?.gallery
 
                 const imageUrl = firstVariantImageString.split(",")[0]?.trim() || "/default-image.jpg";
 
@@ -608,7 +604,7 @@ const NewlyLaunched = () => {
                           <VariantCard
                             variant={variant}
                             handleVariantChange={handleVariantChange}
-                            fetchImages={fetchImages}
+                           
                           />
                         );
                       }
@@ -633,7 +629,7 @@ const NewlyLaunched = () => {
                                     <VariantCard
                                       variant={variant}
                                       handleVariantChange={handleVariantChange}
-                                      fetchImages={fetchImages}
+                                     
                                     />
                                   </div>
                                 ))}
@@ -663,7 +659,7 @@ const NewlyLaunched = () => {
                                     <VariantCard
                                       variant={variant}
                                       handleVariantChange={handleVariantChange}
-                                      fetchImages={fetchImages}
+                                     
                                     />
                                   )}
                                 </label>
@@ -709,7 +705,7 @@ const NewlyLaunched = () => {
                                     <VariantCard
                                       variant={variant}
                                       handleVariantChange={handleVariantChange}
-                                      fetchImages={fetchImages}
+                                      
                                     />
                                   </div>
                                 ))}
@@ -768,11 +764,7 @@ const NewlyLaunched = () => {
                       ...v
                     };
                   }
-                  const rawImageString = variant?.variant?.image || variant?.image || "";
-                  const imageUrls = rawImageString
-                    .split(",")
-                    .map((img) => img.trim())
-                    .filter(Boolean);
+                  
 
                   const isExists = selectedProduct?.product?.isVarientExists;
 
@@ -782,32 +774,8 @@ const NewlyLaunched = () => {
                       className="bg-white p-4 rounded-md  border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
                     >
                       <div className='flex gap-2 relative'>
-                        {/* Image Preview */}
-                        <div className="flex items-center gap-2 overflow-x-auto h-[200px] w-full object-cover  border border-[#E0E2E7] rounded-md p-3shadow bg-white">
-                          {Array.isArray(imageUrls) && imageUrls.length > 0 ? (
-                            imageUrls.map((url, i) => (
-                              <Image
-                                key={i}
-                                height={100}
-                                width={100}
-                                src={fetchImages(url)}
-                                alt={variant?.name || 'NIL'}
-                                className="h-full w-full object-cover"
-                              />
-                            ))
-                          ) : (
-                            <Image
-                              height={40}
-                              width={40}
-                              src="https://placehold.co/400"
-                              alt="Placeholder"
-                              className="h-full w-full object-cover"
-                            />
-                          )}
-
-
-                        </div>
-                        <div className="absolute top-0 left-0 w-full text-center bg-orange-500 p-2 text-white ">Suggested Price : {v.price || v?.supplierProductVariant?.price || "—"}</div>
+                      
+                        <div className="w-full text-center bg-orange-500 p-2 text-white ">Suggested Price : {v.price || v?.supplierProductVariant?.price || "—"}</div>
 
 
                       </div>
@@ -853,19 +821,13 @@ const NewlyLaunched = () => {
 
 export default NewlyLaunched;
 
-const VariantCard = ({ variant, handleVariantChange, fetchImages }) => {
+const VariantCard = ({ variant, handleVariantChange }) => {
   if (!variant) return null;
 
   return (
     <div key={variant.id} className="space-y-5 border p-4 rounded-lg shadow-sm">
       <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
-        <Image
-          src={fetchImages(variant.image)}
-          alt="Product"
-          width={64}
-          height={64}
-          className="rounded border object-cover"
-        />
+        
         <div>
           <p className="text-sm font-medium leading-5 line-clamp-2">
             {variant.name || 'Stainless Steel Cable Lock Ties'}

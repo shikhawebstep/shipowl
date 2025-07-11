@@ -80,7 +80,7 @@ export default function DropshipperMiddleWareProvider({ children }) {
         }
 
         try {
-            const response = await fetch(`https://shipowl-kd06.onrender.com/api/dropshipper/auth/verify`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/auth/verify`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
