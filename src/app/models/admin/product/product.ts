@@ -963,13 +963,8 @@ export const updateProduct = async (
         const existingProduct = productResponse.product;
 
         for (const field of imageFields) {
-            console.log(`\n🔄 Processing field: ${field}`);
-
             const newValue = product[field];
             const existingValue = existingProduct[field];
-
-            console.log(`📥 New value (product[${field}]):`, newValue);
-            console.log(`📦 Existing value (existingProduct[${field}]):`, existingValue);
 
             const isValidString = (val: unknown): val is string =>
                 typeof val === 'string' && val.trim() !== '';
@@ -979,25 +974,14 @@ export const updateProduct = async (
                     .split(',')
                     .map(img => img.trim())
                     .filter(Boolean);
-                console.log(`🆕 Parsed new images:`, newImages);
-
                 const existingImages = isValidString(existingValue)
                     ? existingValue.split(',').map(img => img.trim()).filter(Boolean)
                     : [];
-                console.log(`📂 Parsed existing images:`, existingImages);
-
                 const mergedImages = Array.from(new Set([...existingImages, ...newImages]));
-                console.log(`🔗 Merged & deduplicated images:`, mergedImages);
-
                 product[field] = mergedImages.join(',');
-                console.log(`✅ Updated product[${field}] =`, product[field]);
-
             } else {
                 product[field] = existingValue ?? '';
-                console.log(`⚠️ No new valid images. Using fallback: product[${field}] =`, product[field]);
             }
-
-            console.log('---------------------------------------------');
         }
 
         // Update the product details
