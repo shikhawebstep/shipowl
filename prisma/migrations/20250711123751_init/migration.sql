@@ -1052,6 +1052,58 @@ CREATE TABLE `supplierOrderPermission` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `raiseTicket` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `dropshipperId` INTEGER NOT NULL,
+    `ticketNumber` VARCHAR(191) NOT NULL,
+    `description` LONGTEXT NULL,
+    `gallery` LONGTEXT NOT NULL,
+    `status` BOOLEAN NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `createdBy` INTEGER NULL,
+    `createdByRole` VARCHAR(191) NULL,
+    `updatedAt` DATETIME(3) NOT NULL,
+    `updatedBy` INTEGER NULL,
+    `updatedByRole` VARCHAR(191) NULL,
+    `deletedAt` DATETIME(3) NULL,
+    `deletedBy` INTEGER NULL,
+    `deletedByRole` VARCHAR(191) NULL,
+    `responseBy` INTEGER NULL,
+    `responseAt` DATETIME(3) NULL,
+    `responseByRole` VARCHAR(191) NULL,
+
+    UNIQUE INDEX `raiseTicket_ticketNumber_key`(`ticketNumber`),
+    INDEX `raiseTicket_dropshipperId_idx`(`dropshipperId`),
+    INDEX `raiseTicket_createdBy_idx`(`createdBy`),
+    INDEX `raiseTicket_updatedBy_idx`(`updatedBy`),
+    INDEX `raiseTicket_deletedAt_idx`(`deletedAt`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ticketOrder` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `raiseTicketId` INTEGER NOT NULL,
+    `orderId` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `createdBy` INTEGER NULL,
+    `createdByRole` VARCHAR(191) NULL,
+    `updatedAt` DATETIME(3) NOT NULL,
+    `updatedBy` INTEGER NULL,
+    `updatedByRole` VARCHAR(191) NULL,
+    `deletedAt` DATETIME(3) NULL,
+    `deletedBy` INTEGER NULL,
+    `deletedByRole` VARCHAR(191) NULL,
+
+    INDEX `ticketOrder_raiseTicketId_idx`(`raiseTicketId`),
+    INDEX `ticketOrder_orderId_idx`(`orderId`),
+    INDEX `ticketOrder_createdBy_idx`(`createdBy`),
+    INDEX `ticketOrder_updatedBy_idx`(`updatedBy`),
+    INDEX `ticketOrder_deletedAt_idx`(`deletedAt`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `admin` ADD CONSTRAINT `admin_permanentCityId_fkey` FOREIGN KEY (`permanentCityId`) REFERENCES `city`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -1258,3 +1310,15 @@ ALTER TABLE `rtoInventory` ADD CONSTRAINT `rtoInventory_dropshipperProductId_fke
 
 -- AddForeignKey
 ALTER TABLE `rtoInventory` ADD CONSTRAINT `rtoInventory_dropshipperProductVariantId_fkey` FOREIGN KEY (`dropshipperProductVariantId`) REFERENCES `dropshipperProductVariant`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `raiseTicket` ADD CONSTRAINT `raiseTicket_responseBy_fkey` FOREIGN KEY (`responseBy`) REFERENCES `admin`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `raiseTicket` ADD CONSTRAINT `raiseTicket_dropshipperId_fkey` FOREIGN KEY (`dropshipperId`) REFERENCES `admin`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ticketOrder` ADD CONSTRAINT `ticketOrder_raiseTicketId_fkey` FOREIGN KEY (`raiseTicketId`) REFERENCES `raiseTicket`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ticketOrder` ADD CONSTRAINT `ticketOrder_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

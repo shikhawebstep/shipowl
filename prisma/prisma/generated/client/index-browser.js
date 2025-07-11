@@ -937,6 +937,42 @@ exports.Prisma.SupplierOrderPermissionScalarFieldEnum = {
   billingCity: 'billingCity'
 };
 
+exports.Prisma.RaiseTicketScalarFieldEnum = {
+  id: 'id',
+  dropshipperId: 'dropshipperId',
+  ticketNumber: 'ticketNumber',
+  description: 'description',
+  gallery: 'gallery',
+  status: 'status',
+  createdAt: 'createdAt',
+  createdBy: 'createdBy',
+  createdByRole: 'createdByRole',
+  updatedAt: 'updatedAt',
+  updatedBy: 'updatedBy',
+  updatedByRole: 'updatedByRole',
+  deletedAt: 'deletedAt',
+  deletedBy: 'deletedBy',
+  deletedByRole: 'deletedByRole',
+  responseBy: 'responseBy',
+  responseAt: 'responseAt',
+  responseByRole: 'responseByRole'
+};
+
+exports.Prisma.TicketOrderScalarFieldEnum = {
+  id: 'id',
+  raiseTicketId: 'raiseTicketId',
+  orderId: 'orderId',
+  createdAt: 'createdAt',
+  createdBy: 'createdBy',
+  createdByRole: 'createdByRole',
+  updatedAt: 'updatedAt',
+  updatedBy: 'updatedBy',
+  updatedByRole: 'updatedByRole',
+  deletedAt: 'deletedAt',
+  deletedBy: 'deletedBy',
+  deletedByRole: 'deletedByRole'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1368,6 +1404,22 @@ exports.Prisma.rtoInventoryOrderByRelevanceFieldEnum = {
   deletedByRole: 'deletedByRole'
 };
 
+exports.Prisma.raiseTicketOrderByRelevanceFieldEnum = {
+  ticketNumber: 'ticketNumber',
+  description: 'description',
+  gallery: 'gallery',
+  createdByRole: 'createdByRole',
+  updatedByRole: 'updatedByRole',
+  deletedByRole: 'deletedByRole',
+  responseByRole: 'responseByRole'
+};
+
+exports.Prisma.ticketOrderOrderByRelevanceFieldEnum = {
+  createdByRole: 'createdByRole',
+  updatedByRole: 'updatedByRole',
+  deletedByRole: 'deletedByRole'
+};
+
 
 exports.Prisma.ModelName = {
   appConfig: 'appConfig',
@@ -1405,7 +1457,9 @@ exports.Prisma.ModelName = {
   order: 'order',
   orderItem: 'orderItem',
   rtoInventory: 'rtoInventory',
-  supplierOrderPermission: 'supplierOrderPermission'
+  supplierOrderPermission: 'supplierOrderPermission',
+  raiseTicket: 'raiseTicket',
+  ticketOrder: 'ticketOrder'
 };
 
 /**

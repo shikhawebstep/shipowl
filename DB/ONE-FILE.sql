@@ -11,6 +11,9 @@ INSERT INTO `adminStaff` (`id`, `admin_id`, `name`, `email`, `password`, `role`,
 (2, 2, 'Rohit Dropshipper Staff', 'rohitwebstep-drop-staff@gmail.com', '$2b$10$vws6emtcbykca5VJkQIsu.o3mzNY5Qj/g/2659P/uHooVQ79VQg5q', 'dropshipper_staff', 'active', '2025-04-07 06:32:17.000', '2025-04-07 06:32:20.000', NULL, NULL, NULL),
 (3, 3, 'Rohit Supplier Staff', 'rohitwebstep-sup-staff@gmail.com', '$2b$10$vws6emtcbykca5VJkQIsu.o3mzNY5Qj/g/2659P/uHooVQ79VQg5q', 'supplier_staff', 'active', '2025-04-07 06:32:17.000', '2025-04-07 06:32:20.000', NULL, NULL, NULL);
 
+INSERT INTO `shopifyStore` (`adminId`, `name`, `shop`, `accessToken`, `email`, `shopName`, `planName`, `country`, `shopOwner`, `domain`, `myshopifyDomain`, `province`, `city`, `phone`, `currency`, `moneyFormat`, `timezone`, `createdAtShop`, `userId`, `verificationStatus`, `status`, `createdAt`, `createdBy`, `createdByRole`, `updatedAt`, `updatedBy`, `updatedByRole`, `deletedAt`, `deletedBy`, `deletedByRole`) VALUES
+(2, 'webproductstore', 'webproductstore.myshopify.com', 'shpua_bef703b1286280a7fe39af702a42b09f', 'yashikawebstep@gmail.com', NULL, 'partner_test', 'India', 'Yashika Admin', 'webproductstore.myshopify.com', 'webproductstore.myshopify.com', NULL, NULL, NULL, 'INR', 'Rs. {{amount}}', 'America/New_York', '2025-05-16 12:26:51.000', NULL, 0, 0, '2025-05-30 11:44:13.371', 2, 'dropshipper', '2025-05-30 11:46:06.198', NULL, NULL, NULL, NULL, NULL);
+
 INSERT INTO `globalPermission` (`panel`, `module`, `action`, `status`, `createdAt`, `createdBy`, `createdByRole`, `updatedAt`, `updatedBy`, `updatedByRole`, `deletedAt`, `deletedBy`, `deletedByRole`) VALUES
 ('supplier', 'Product', 'Add to List', 1, '2025-05-09 15:38:39.000', NULL, NULL, '2025-05-09 15:39:07.000', NULL, NULL, NULL, NULL, NULL),
 ('supplier', 'Product', 'Update', 1, '2025-05-09 15:38:39.000', NULL, NULL, '2025-05-09 15:39:07.000', NULL, NULL, NULL, NULL, NULL),
@@ -412,19 +415,18 @@ INSERT INTO `product` (
 );
 
 INSERT INTO `productVariant` (
-  `id`, `name`, `productId`, `image`, `color`, `sku`,
+  `id`, `name`, `productId`, `color`, `sku`,
   `product_link`, `suggested_price`, `createdAt`, `createdBy`, `createdByRole`,
   `updatedAt`, `updatedBy`, `updatedByRole`, `deletedAt`, `deletedBy`, `deletedByRole`
-) VALUES (
-  1, 'Black Color - Wireless Edition', 1,
-  'https://example.com/images/variant-black.jpg', 'Black', 'WH-BLK-01',
+) VALUES 
+(
+  1, 'Black Color - Wireless Edition', 1, 'Black', 'WH-BLK-01',
   'https://example.com/product/wireless-bluetooth-headphones-black', 4499.00,
   '2025-05-28 04:55:32', 1, 'admin', '2025-05-28 04:55:32', 1, 'admin',
   NULL, NULL, NULL
 ),
 (
-  2, 'Blue Color - Self Ship Edition', 1,
-  'https://example.com/images/variant-blue.jpg', 'Blue', 'selfship', 'WH-BLU-01',
+  2, 'Blue Color - Self Ship Edition', 1, 'Blue', 'WH-BLU-01',
   'https://example.com/product/wireless-bluetooth-headphones-blue', 4299.00,
   '2025-05-28 04:56:32', 1, 'admin', '2025-05-28 04:56:32', 1, 'admin',
   NULL, NULL, NULL
@@ -445,21 +447,21 @@ INSERT INTO `supplierProductVariant` (
 (2, 3, 1, 2, 1, 89.50, 20, 1, '2025-05-28 05:01:20.000', 3, 'supplier', '2025-05-28 05:01:20.100', NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO `dropshipperProduct` (
-  `id`, `dropshipperId`, `supplierId`, `supplierProductId`, `productId`,
+  `shopifyStoreId`, `dropshipperId`, `supplierId`, `supplierProductId`, `productId`,
   `status`, `createdAt`, `createdBy`, `createdByRole`,
   `updatedAt`, `updatedBy`, `updatedByRole`, `deletedAt`, `deletedBy`, `deletedByRole`
 ) VALUES
 (1, 2, 3, 1, 1, 1, '2025-05-28 05:09:11.534', 2, 'dropshipper', '2025-05-28 05:09:11.536', NULL, NULL, NULL, NULL, NULL),
-(2, 2, 3, 1, 1, 1, '2025-05-28 05:12:22.100', 2, 'dropshipper', '2025-05-28 05:12:22.101', NULL, NULL, NULL, NULL, NULL);
+(1, 2, 3, 1, 1, 1, '2025-05-28 05:12:22.100', 2, 'dropshipper', '2025-05-28 05:12:22.101', NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO `dropshipperProductVariant` (
   `id`, `dropshipperId`, `productId`, `supplierProductId`, `dropshipperProductId`,
-  `supplierProductVariantId`, `price`, `stock`, `status`,
+  `supplierProductVariantId`, `price`, `status`,
   `createdAt`, `createdBy`, `createdByRole`, `updatedAt`, `updatedBy`, `updatedByRole`,
   `deletedAt`, `deletedBy`, `deletedByRole`
 ) VALUES
-(1, 2, 1, 1, 1, 1, 99.99, 10, 1, '2025-05-28 05:09:11.545', 2, 'dropshipper', '2025-05-28 05:09:11.547', NULL, NULL, NULL, NULL, NULL),
-(2, 2, 1, 1, 2, 2, 89.50, 5, 1, '2025-05-28 05:13:13.600', 2, 'dropshipper', '2025-05-28 05:13:13.602', NULL, NULL, NULL, NULL, NULL);
+(1, 2, 1, 1, 1, 1, 99.99, 1, '2025-05-28 05:09:11.545', 2, 'dropshipper', '2025-05-28 05:09:11.547', NULL, NULL, NULL, NULL, NULL),
+(2, 2, 1, 1, 2, 2, 89.50, 1, '2025-05-28 05:13:13.600', 2, 'dropshipper', '2025-05-28 05:13:13.602', NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO `payment` (
   `id`, `transactionId`, `cycle`, `amount`, `status`, `date`,

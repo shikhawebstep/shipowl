@@ -107,6 +107,8 @@ model admin {
   supplierProductVariants    supplierProductVariant[]    @relation("AdminToSupplierProductVariant", map: "admin_supplier_product_variant_fkey")
   dropshipperProductVariants dropshipperProductVariant[] @relation("AdminToDropshipperProductVariant", map: "admin_dropshipper_product_variant_fkey")
   rtoInventories             rtoInventory[]              @relation("AdminToRtoInventory")
+  raiseTickets               raiseTicket[]               @relation("DropshipperToRaiseTicket")
+  respondedTickets           raiseTicket[]               @relation("AdminResponderToRaiseTicket")
 }
 
 model shopifyStore {
@@ -1016,6 +1018,7 @@ model order {
   deletedByRole        String?
   items                orderItem[]
   rtoInventories       rtoInventory[] @relation("OrderToRtoInventory")
+  ticketOrders         ticketOrder[]  @relation("OrderToTicketOrder")
 
   @@index([createdBy])
   @@index([updatedBy])
@@ -1107,4 +1110,59 @@ model supplierOrderPermission {
   billingCountry  Boolean @default(false)
   billingState    Boolean @default(false)
   billingCity     Boolean @default(false)
+}
+
+model raiseTicket {
+  id            Int       @id @default(autoincrement())
+  dropshipperId Int
+  ticketNumber  String    @unique
+  description   String?   @db.LongText
+  gallery       String    @db.LongText
+  status        Boolean?
+  createdAt     DateTime  @default(now())
+  createdBy     Int?
+  createdByRole String?
+  updatedAt     DateTime  @updatedAt
+  updatedBy     Int?
+  updatedByRole String?
+  deletedAt     DateTime?
+  deletedBy     Int?
+  deletedByRole String?
+
+  responseBy     Int? // Foreign key
+  responseAt     DateTime?
+  responseByRole String?
+
+  responder admin? @relation("AdminResponderToRaiseTicket", fields: [responseBy], references: [id], onDelete: SetNull)
+
+  dropshipper  admin         @relation("DropshipperToRaiseTicket", fields: [dropshipperId], references: [id], onDelete: Cascade)
+  ticketOrders ticketOrder[] @relation("RaiseTicketToTicketOrder")
+
+  @@index([dropshipperId])
+  @@index([createdBy])
+  @@index([updatedBy])
+  @@index([deletedAt])
+}
+
+model ticketOrder {
+  id            Int         @id @default(autoincrement())
+  raiseTicketId Int
+  orderId       Int
+  createdAt     DateTime    @default(now())
+  createdBy     Int?
+  createdByRole String?
+  updatedAt     DateTime    @updatedAt
+  updatedBy     Int?
+  updatedByRole String?
+  deletedAt     DateTime?
+  deletedBy     Int?
+  deletedByRole String?
+  raiseTicket   raiseTicket @relation("RaiseTicketToTicketOrder", fields: [raiseTicketId], references: [id], onDelete: Cascade)
+  order         order       @relation("OrderToTicketOrder", fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([raiseTicketId])
+  @@index([orderId])
+  @@index([createdBy])
+  @@index([updatedBy])
+  @@index([deletedAt])
 }
