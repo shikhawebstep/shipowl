@@ -70,11 +70,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ status: false, error: `User Not Found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const apiVersion = process.env.SHOPIFY_API_VERSION?.trim();
+    const apiVersion = process.env.NEXT_PUBLIC_SHOPIFY_API_VERSION?.trim();
     if (!apiVersion) {
       return NextResponse.json({
         error: 'Missing or empty required environment variables.',
-        missing: ['SHOPIFY_API_VERSION'],
+        missing: ['NEXT_PUBLIC_SHOPIFY_API_VERSION'],
       }, { status: 400 });
     }
 

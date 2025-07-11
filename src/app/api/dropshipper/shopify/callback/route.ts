@@ -43,11 +43,11 @@ export async function GET(req: NextRequest) {
 
         // Required environment variables
         const requiredEnvVars = {
-            SHOPIFY_API_KEY: process.env.SHOPIFY_API_KEY,
-            SHOPIFY_API_SECRET: process.env.SHOPIFY_API_SECRET,
-            SHOPIFY_SCOPES: process.env.SHOPIFY_SCOPES,
-            SHOPIFY_REDIRECT_URL: process.env.SHOPIFY_REDIRECT_URL,
-            SHOPIFY_API_VERSION: process.env.SHOPIFY_API_VERSION,
+            NEXT_PUBLIC_SHOPIFY_API_KEY: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY,
+            NEXT_PUBLIC_SHOPIFY_API_SECRET: process.env.NEXT_PUBLIC_SHOPIFY_API_SECRET,
+            NEXT_PUBLIC_SHOPIFY_SCOPES: process.env.NEXT_PUBLIC_SHOPIFY_SCOPES,
+            NEXT_PUBLIC_SHOPIFY_REDIRECT_URL: process.env.NEXT_PUBLIC_SHOPIFY_REDIRECT_URL,
+            NEXT_PUBLIC_SHOPIFY_API_VERSION: process.env.NEXT_PUBLIC_SHOPIFY_API_VERSION,
             APP_HOST: process.env.APP_HOST,
         };
 
@@ -73,14 +73,14 @@ export async function GET(req: NextRequest) {
         }
 
         // Safe to use non-null assertion here because we checked above
-        const redirectUrl = requiredEnvVars.SHOPIFY_REDIRECT_URL!;
-        const apiSecret = requiredEnvVars.SHOPIFY_API_SECRET!;
-        const apiKey = requiredEnvVars.SHOPIFY_API_KEY!;
-        const apiVersion = requiredEnvVars.SHOPIFY_API_VERSION!;
+        const redirectUrl = requiredEnvVars.NEXT_PUBLIC_SHOPIFY_REDIRECT_URL!;
+        const apiSecret = requiredEnvVars.NEXT_PUBLIC_SHOPIFY_API_SECRET!;
+        const apiKey = requiredEnvVars.NEXT_PUBLIC_SHOPIFY_API_KEY!;
+        const apiVersion = requiredEnvVars.NEXT_PUBLIC_SHOPIFY_API_VERSION!;
         const appHost = requiredEnvVars.APP_HOST!;
 
         /*
-        const scopes = requiredEnvVars.SHOPIFY_SCOPES!;
+        const scopes = requiredEnvVars.NEXT_PUBLIC_SHOPIFY_SCOPES!;
         */
 
         // ✅ Validate HMAC

@@ -19,12 +19,12 @@ const tabs = [
   { key: "my", label: "Listed Products" },
 ];
 const ProductDetails = () => {
-  const { fetchImages,getProductDescription } = useImageURL();
-    const [description, setDescription] = useState("");
-        const fetchDescription = (id) => {
-            getProductDescription(id, setDescription);
-    
-        }
+  const { fetchImages, getProductDescription } = useImageURL();
+  const [description, setDescription] = useState("");
+  const fetchDescription = (id) => {
+    getProductDescription(id, setDescription);
+
+  }
 
   const router = useRouter();
   const { hasPermission } = useSupplier();
@@ -61,20 +61,53 @@ const ProductDetails = () => {
   const [openCalculator, setOpenCalculator] = useState(null);
   const [productDetails, setProductDetails] = useState({});
   const [otherSuppliers, setOtherSuppliers] = useState([]);
-  const images = productDetails?.gallery?.split(",") || selectedVariant?.image?.split(",") || [];
+  const [images, setImages] = useState(productDetails?.gallery?.split(",") || selectedVariant?.image?.split(",") || []);
   const [shopifyStores, setShopifyStores] = useState([]);
 
   const [selectedImage, setSelectedImage] = useState("");
 
   // This will update selectedImage when selectedVariant changes
   useEffect(() => {
-    const images =
-      productDetails?.gallery?.split(",") ||
-      selectedVariant?.gallery?.split(",") ||
-      [];
+    let imageSortingIndex = {};
+    try {
+      imageSortingIndex = JSON.parse(productDetails.imageSortingIndex || '{}');
+    } catch (err) {
+      console.error('Failed to parse imageSortingIndex:', err);
+    }
 
-    setSelectedImage(images[0] ?? "");
-  }, [selectedVariant]);
+    const images = (
+      productDetails?.gallery ||
+      selectedVariant?.gallery ||
+      ''
+    ).split(',').map((img) => img.trim()).filter(Boolean);
+
+
+    const sortingList = Array.isArray(imageSortingIndex.gallery)
+      ? [...imageSortingIndex.gallery]
+      : [];
+
+    // Create a map for fast lookup
+    const indexMap = new Map();
+    sortingList.forEach(item => {
+      if (typeof item.index === 'number') {
+        indexMap.set(item.index, parseInt(item.value));
+      }
+    });
+
+    // Sort images according to sorting index
+    const sortedImages = [...images]
+      .map((img, idx) => ({
+        img,
+        sortOrder: indexMap.has(idx) ? indexMap.get(idx) : Number.MAX_SAFE_INTEGER
+      }))
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map(obj => obj.img);
+
+    setImages(sortedImages);
+    setSelectedImage(sortedImages[0] ?? '');
+  }, [selectedVariant, productDetails]);
+
+
   const [categoryId, setCategoryId] = useState('');
   const [variantDetails, setVariantDetails] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -85,6 +118,7 @@ const ProductDetails = () => {
     id: '',
     isVarientExists: '',
   });
+
   const stats = [{ label: "Units Sold", value: "200", icon: <Package className="w-7 h-7 text-orange-500" />, },
   { label: "Delivery Rate", value: "180", icon: <Truck className="w-7 h-7 text-orange-500" />, },
   { label: "Product GST", value: "18%", icon: <Boxes className="w-7 h-7 text-orange-500" />, },
@@ -573,7 +607,7 @@ const ProductDetails = () => {
                                       >
 
                                         <div className="">
-                                         
+
                                           <div className=" text-gray-700 space-y-1 text-left">
                                             <div>Name: <span className="font-medium">{variant.name}</span></div>
                                             <div className="flex items-center gap-1 text-sm text-gray-700">
@@ -671,7 +705,7 @@ const ProductDetails = () => {
                                           }`}
                                       >
                                         <div className="">
-                                          
+
                                           <div className=" text-gray-700 space-y-1 text-left">
                                             <div>Name: <span className="font-medium">{variant.name}</span></div>
                                             <div className="flex items-center gap-1 text-sm text-gray-700">
@@ -867,7 +901,7 @@ const ProductDetails = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
                     {inventoryData.variant?.map((variant, idx) => {
 
-                     
+
                       return (
                         <div
                           key={variant.id || idx}
@@ -875,7 +909,7 @@ const ProductDetails = () => {
                         >
                           <div className='flex gap-2 relative'>
                             {/* Image Preview */}
-                           
+
                             <div className="w-full text-center bg-orange-500 p-2 text-white ">Suggested Price :{variant?.suggested_price || variant?.price}</div>
                           </div>
 
@@ -1040,7 +1074,20 @@ const ProductDetails = () => {
           <div className="grid xl:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-3 productsSection">
             {relatedProducts.map((item, index) => {
               const product = type == "notmy" ? item : item || {};
-              const variants = item.variants || [];
+              let imageSortingIndex = {};
+              try {
+                imageSortingIndex = JSON.parse(product.imageSortingIndex || '{}');
+              } catch (err) {
+                console.error('Failed to parse imageSortingIndex:', err);
+              }
+
+              // Default to [] if no .gallery present
+              const productImageSortingIndex = Array.isArray(imageSortingIndex.gallery)
+                ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value) - parseInt(b.value))
+                : [];
+
+
+              const firstImageIndex = productImageSortingIndex[0]?.index ?? 0;
 
               const getPriceDisplay = (variants) => {
                 if (!variants?.length) return <span>N/A</span>;
@@ -1103,8 +1150,7 @@ const ProductDetails = () => {
                         <Image
                           src={
                             fetchImages(
-                              item?.gallery?.split(',')[0].trim() ||
-                              item?.gallery?.split(',')[0].trim() ||
+                              item?.gallery?.split(',')[firstImageIndex].trim() ||
                               ''
                             )
                           }

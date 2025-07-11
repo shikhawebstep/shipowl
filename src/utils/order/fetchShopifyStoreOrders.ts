@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { logMessage } from '../commonUtils';
 
-const SHOPIFY_API_VERSION = process.env.SHOPIFY_API_VERSION;
+const NEXT_PUBLIC_SHOPIFY_API_VERSION = process.env.NEXT_PUBLIC_SHOPIFY_API_VERSION;
 
 interface Money {
   amount: string;
@@ -145,7 +145,7 @@ export async function fetchShopifyStoreOrders(shop: string, access_token: string
 
   try {
     const response = await axios.post<ShopifyGraphQLResponse>(
-      `https://${shop}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`,
+      `https://${shop}/admin/api/${NEXT_PUBLIC_SHOPIFY_API_VERSION}/graphql.json`,
       { query: gql },
       { headers: { 'X-Shopify-Access-Token': access_token } }
     );

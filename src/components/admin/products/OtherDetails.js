@@ -66,6 +66,7 @@ export default function OtherDetails() {
       const form = new FormData();
 
       const combinedData = { ...formData, ...files };
+      console.log('files(!)_',files)
 
       for (const key in combinedData) {
         let value = combinedData[key];

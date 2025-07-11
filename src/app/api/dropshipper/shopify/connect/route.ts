@@ -91,11 +91,11 @@ export async function POST(req: NextRequest) {
         // Required environment variables
         const requiredEnvVars = {
             APP_HOST: process.env.APP_HOST,
-            SHOPIFY_API_KEY: process.env.SHOPIFY_API_KEY,
-            SHOPIFY_API_SECRET: process.env.SHOPIFY_API_SECRET,
-            SHOPIFY_SCOPES: process.env.SHOPIFY_SCOPES,
-            SHOPIFY_REDIRECT_URL: process.env.SHOPIFY_REDIRECT_URL,
-            SHOPIFY_API_VERSION: process.env.SHOPIFY_API_VERSION,
+            NEXT_PUBLIC_SHOPIFY_API_KEY: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY,
+            NEXT_PUBLIC_SHOPIFY_API_SECRET: process.env.NEXT_PUBLIC_SHOPIFY_API_SECRET,
+            NEXT_PUBLIC_SHOPIFY_SCOPES: process.env.NEXT_PUBLIC_SHOPIFY_SCOPES,
+            NEXT_PUBLIC_SHOPIFY_REDIRECT_URL: process.env.NEXT_PUBLIC_SHOPIFY_REDIRECT_URL,
+            NEXT_PUBLIC_SHOPIFY_API_VERSION: process.env.NEXT_PUBLIC_SHOPIFY_API_VERSION,
         };
 
         // Identify missing or empty env variables
@@ -121,11 +121,11 @@ export async function POST(req: NextRequest) {
 
         // Safe to use non-null assertion here because we checked above
         const appHost = requiredEnvVars.APP_HOST!;
-        const apiKey = requiredEnvVars.SHOPIFY_API_KEY!;
-        const apiSecret = requiredEnvVars.SHOPIFY_API_SECRET!;
-        const scopes = requiredEnvVars.SHOPIFY_SCOPES!;
-        const redirectUrl = requiredEnvVars.SHOPIFY_REDIRECT_URL!;
-        const apiVersion = requiredEnvVars.SHOPIFY_API_VERSION!;
+        const apiKey = requiredEnvVars.NEXT_PUBLIC_SHOPIFY_API_KEY!;
+        const apiSecret = requiredEnvVars.NEXT_PUBLIC_SHOPIFY_API_SECRET!;
+        const scopes = requiredEnvVars.NEXT_PUBLIC_SHOPIFY_SCOPES!;
+        const redirectUrl = requiredEnvVars.NEXT_PUBLIC_SHOPIFY_REDIRECT_URL!;
+        const apiVersion = requiredEnvVars.NEXT_PUBLIC_SHOPIFY_API_VERSION!;
 
         // Check if the Shopify store is already registered and verified
         const isAlreadyUsed = await isShopUsedAndVerified(shop);

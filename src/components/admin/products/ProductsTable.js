@@ -36,7 +36,7 @@ const ProductTable = () => {
         getProductDescription(id, setDescription);
 
     }
-    console.log('description',description)
+    console.log('description', description)
 
     const [selected, setSelected] = useState([]);
     const [selectedMonth, setSelectedMonth] = useState(() => {
@@ -49,6 +49,65 @@ const ProductTable = () => {
         setSelected((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
+    };
+    const handleBulkDelete = async () => {
+        if (selected.length === 0) {
+            Swal.fire("No Product selected", "Please select at least one image.", "info");
+            return;
+        }
+
+        try {
+            Swal.fire({
+                title: "Deleting selected Product...",
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+            });
+
+            const raw = JSON.stringify({
+                ids: selected.join(","),
+            });
+
+            const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+            if (dropshipperData?.project?.active_panel !== "admin") {
+                localStorage.removeItem("shippingData");
+                router.push("/admin/auth/login");
+                return;
+            }
+
+            const token = dropshipperData?.security?.token;
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/product/bulk`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`, // insert token here
+                    },
+                    body: raw,
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.close();
+                Swal.fire({
+                    icon: "error",
+                    title: "Delete Failed",
+                    text: errorMessage.message || "An error occurred",
+                });
+                return;
+            }
+
+            Swal.close();
+            Swal.fire("Deleted!", "Selected Product deleted.", "success");
+
+            fetchAll(setProducts, setLoading);
+            setSelected([]);
+
+        } catch (error) {
+            Swal.close();
+            Swal.fire("Error", error.message || "Something went wrong.", "error");
+        }
     };
 
     const handleToggleTrash = async () => {
@@ -292,6 +351,9 @@ const ProductTable = () => {
                                     </span>
                                 </h5>
                             )}
+                            {selected.length > 0 && (
+                                <button className='bg-red-500 text-white p-2 rounded-md' onClick={handleBulkDelete}>Delete Selected</button>
+                            )}
 
                             <button className="bg-[#F4F7FE] w-9/12 md:w-auto rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
                                 {/* Month Input */}
@@ -473,14 +535,14 @@ const ProductTable = () => {
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                             {selectedProduct?.variants?.map((variant, idx) => {
-                                               
+
 
                                                 const varinatExists = selectedProduct?.isVarientExists ? 'yes' : 'no';
                                                 const isExists = varinatExists === 'yes';
 
                                                 return (
                                                     <div key={variant.id || idx} className="border rounded-lg shadow-sm p-4 bg-white">
-                                                      
+
 
                                                         {/* Details */}
                                                         <div className="space-y-2 text-sm text-gray-700">

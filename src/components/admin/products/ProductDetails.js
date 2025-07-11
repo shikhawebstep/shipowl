@@ -46,8 +46,16 @@ export default function ProductDetails() {
 
     setErrors((prev) => ({ ...prev, gallery: '' }));
   };
+  const [checkedIndexes, setCheckedIndexes] = useState([]);
+  const handleCheckboxChange = (index) => {
+    setCheckedIndexes((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
+  };
 
- const handleGalleryImageDelete = (index) => {
+
+
+  const handleGalleryImageDelete = (index) => {
     const updatedPreviews = [...galleryPreviews];
     const updatedFiles = [...formData.gallery];
 
@@ -60,6 +68,83 @@ export default function ProductDetails() {
       gallery: updatedFiles,
     }));
   };
+  const handleBulkDelete = async (type) => {
+
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    if (dropshipperData?.project?.active_panel !== "admin") {
+      localStorage.removeItem("shippingData");
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    const token = dropshipperData?.security?.token;
+    if (checkedIndexes.length === 0) {
+      Swal.fire("No images selected", "Please select at least one image.", "info");
+      return;
+    }
+
+
+    try {
+      Swal.fire({
+        title: "Deleting selected images...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", `Bearer ${token}`);
+
+      const raw = JSON.stringify({
+        "type": type,
+        "indexes": checkedIndexes.join(","),
+      });
+
+      const requestOptions = {
+        method: "DELETE",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+      };
+
+
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/product/${id}/image/bulk`, requestOptions
+
+      );
+
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        Swal.close();
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: errorMessage.message || "An error occurred",
+        });
+        return;
+      }
+
+      Swal.close();
+      Swal.fire("Deleted!", "Selected images deleted.", "success");
+
+      // Remove from formData.gallery
+      const updatedImages = (formData.gallery || '')
+        .split(",")
+        .map((img) => img.trim())
+        .filter((_, idx) => !checkedIndexes.includes(idx));
+
+      setFormData((prev) => ({
+        ...prev,
+        gallery: updatedImages.join(","),
+      }));
+
+      setCheckedIndexes([]);
+    } catch (error) {
+      Swal.close();
+      Swal.fire("Error", error.message || "Something went wrong.", "error");
+    }
+  };
 
   const searchParams = useSearchParams();
 
@@ -67,8 +152,6 @@ export default function ProductDetails() {
   const id = searchParams.get("id");
 
   const handleImageDelete = async (index, type) => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const id = searchParams.get("id");
 
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
     if (dropshipperData?.project?.active_panel !== "admin") {
@@ -286,7 +369,9 @@ export default function ProductDetails() {
       </div>
       <div>
         <label className="block mt-3 text-[#232323] font-semibold">
-          Image Gallery <span className="text-red-500">*</span>
+          Image Gallery <span className="text-red-500">*</span> {
+            checkedIndexes.length > 0 && <button className='bg-red-500 p-2 rounded-md ' onClick={() => handleBulkDelete('gallery')}>Delete All</button>
+          }
         </label>
 
         <div className="mt-2 grid grid-cols-4 gap-4">
@@ -326,6 +411,9 @@ export default function ProductDetails() {
                           if (result.isConfirmed) {
                             if (isFile) {
                               handleGalleryImageDelete(fileIndex);
+
+                              // ✅ If any checkboxes selected, run bulk delete
+
                             } else {
                               handleImageDelete(index, 'gallery');
                             }
@@ -336,6 +424,7 @@ export default function ProductDetails() {
                       ✕
                     </button>
 
+
                     <img
                       src={imageUrl}
                       alt={`Gallery ${index}`}
@@ -343,24 +432,34 @@ export default function ProductDetails() {
                     />
 
                   </div>
-                  {
-                    !isFile && <input
-                      className='border w-full border-gray-200 rounded-md p-2 mt-1'
-                      type='number'
-                      name="sorting_index"
-                      placeholder='Sorting Index'
-                      value={
-                        formData.imageSortingIndex?.gallery?.find(item => item.index === index)?.value || ''
-                      }
-                      onChange={(e) => handleSortingIndexChange(index, 'gallery', e.target.value)}
-                    />
-                  }
+                  {!isFile && (
+                    <>
+                      <input
+                        className="border w-full border-gray-200 rounded-md p-2 mt-1"
+                        type="number"
+                        name="sorting_index"
+                        placeholder="Sorting Index"
+                        value={
+                          formData.imageSortingIndex?.gallery?.find((item) => item.index === index)?.value || ""
+                        }
+                        onChange={(e) => handleSortingIndexChange(index, "gallery", e.target.value)}
+                      />
+                      <label className="flex items-center gap-2 mt-1">
+                        <input
+                          type="checkbox"
+                          checked={checkedIndexes.includes(index)}
+                          onChange={() => handleCheckboxChange(index)}
+                        />
+                        Select for bulk delete
+                      </label>
+                    </>
+                  )}
                 </div>
               );
             });
           })()}
 
-            {galleryPreviews.length > 0 &&
+          {galleryPreviews.length > 0 &&
             galleryPreviews.map((src, index) => (
               <div key={index} className="relative w-full p-4 h-[300px] rounded overflow-hidden border border-gray-300">
                 <button

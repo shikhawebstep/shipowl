@@ -287,7 +287,7 @@ export async function POST(req: NextRequest) {
     // if (productCreateResult?.status) {
     const shopDomain = shopifyStore.shop;
     const accessToken = shopifyStore.accessToken;
-    const SHOPIFY_API_VERSION = process.env.SHOPIFY_API_VERSION;
+    const NEXT_PUBLIC_SHOPIFY_API_VERSION = process.env.NEXT_PUBLIC_SHOPIFY_API_VERSION;
     const APP_HOST = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
     try {
@@ -317,7 +317,7 @@ export async function POST(req: NextRequest) {
       console.log('shopifyProductPayload.product.images - ', shopifyProductPayload.product.images);
       console.log('shopifyProductPayload.product.variants - ', shopifyProductPayload.product.variants);
 
-      const graphqlEndpoint = `https://${shopDomain}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`;
+      const graphqlEndpoint = `https://${shopDomain}/admin/api/${NEXT_PUBLIC_SHOPIFY_API_VERSION}/graphql.json`;
 
       // Step 1: Create Product
       const productCreateMutation = `

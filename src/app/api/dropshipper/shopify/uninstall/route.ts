@@ -50,14 +50,14 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const apiSecret = process.env.SHOPIFY_API_SECRET;
+        const apiSecret = process.env.NEXT_PUBLIC_SHOPIFY_API_SECRET;
         if (!apiSecret || apiSecret.trim() === '') {
-            logMessage('error', 'Missing SHOPIFY_API_SECRET environment variable.');
+            logMessage('error', 'Missing NEXT_PUBLIC_SHOPIFY_API_SECRET environment variable.');
             return NextResponse.json(
                 {
                     status: false,
                     message: 'Configuration error: Missing required Shopify API secret.',
-                    missing: ['SHOPIFY_API_SECRET'],
+                    missing: ['NEXT_PUBLIC_SHOPIFY_API_SECRET'],
                 },
                 { status: 500 }
             );

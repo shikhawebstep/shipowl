@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
 
     // Required environment variables
     const requiredEnvVars = {
-        SHOPIFY_API_SECRET: process.env.SHOPIFY_API_SECRET
+        NEXT_PUBLIC_SHOPIFY_API_SECRET: process.env.NEXT_PUBLIC_SHOPIFY_API_SECRET
     };
 
     // Identify missing or empty env variables
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Safe to use non-null assertion here because we checked above
-    const apiSecret = requiredEnvVars.SHOPIFY_API_SECRET!;
+    const apiSecret = requiredEnvVars.NEXT_PUBLIC_SHOPIFY_API_SECRET!;
 
     const rawBody = await req.text(); // get raw body
     const hmacHeader = req.headers.get('x-shopify-hmac-sha256') || '';
