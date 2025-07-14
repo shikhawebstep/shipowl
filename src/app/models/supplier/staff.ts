@@ -6,13 +6,15 @@ import { logMessage } from "@/utils/commonUtils";
 interface SupplierStaff {
     admin: {
         connect: { id: number }
-    }
+    },
+    role?: {
+        connect: { id: number }
+    },
     id?: bigint; // Optional: ID of the supplierStaff (if exists)
     name: string; // Name of the supplierStaff
     profilePicture: string,
     email: string; // Email address of the supplierStaff
     phoneNumber: string;
-    permissions: string;
     password: string; // Password for the supplierStaff account
     permanentAddress: string; // Permanent address of the supplierStaff
     permanentPostalCode: string; // Postal code of the permanent address
@@ -65,11 +67,11 @@ export async function checkEmailAvailability(email: string) {
         // Query to find if an email already exists with role 'supplierStaff'
         const existingSupplierStaff = await prisma.adminStaff.findFirst({
             where: { email },
-            select: { email: true, role: true },
+            select: { email: true, role: true, panel: true },
         });
 
         // If the email is already in use by a supplierStaff
-        if (existingSupplierStaff && existingSupplierStaff.role === 'supplier') {
+        if (existingSupplierStaff && existingSupplierStaff.panel === 'supplier') {
             return {
                 status: false,
                 message: `Email "${email}" is already in use by a supplierStaff.`,
@@ -101,11 +103,11 @@ export async function checkEmailAvailabilityForUpdate(email: string, supplierSta
                     id: supplierStaffId,  // Exclude the current product being updated
                 },
             },
-            select: { email: true, role: true },
+            select: { email: true, role: true, panel: true },
         });
 
         // If the email is already in use by a supplierStaff
-        if (existingSupplierStaff && existingSupplierStaff.role === 'supplier') {
+        if (existingSupplierStaff && existingSupplierStaff.panel === 'supplier') {
             return {
                 status: false,
                 message: `Email "${email}" is already in use by a supplierStaff.`,
@@ -129,12 +131,27 @@ export async function checkEmailAvailabilityForUpdate(email: string, supplierSta
 
 export async function createSupplierStaff(supplierId: number, supplierRole: string, supplierStaff: SupplierStaff) {
     try {
-        const { admin, name, profilePicture, email, phoneNumber, permissions, password, permanentAddress, permanentPostalCode, permanentCity, permanentState, permanentCountry, status: statusRaw, createdAt, createdBy, createdByRole } = supplierStaff;
+        const {
+            admin,
+            name,
+            profilePicture,
+            email,
+            role,
+            phoneNumber,
+            password,
+            permanentAddress,
+            permanentPostalCode,
+            permanentCity,
+            permanentState,
+            permanentCountry,
+            status: statusRaw,
+            createdAt,
+            createdBy,
+            createdByRole
+        } = supplierStaff;
 
-        // Convert statusRaw to a boolean using the includes check
+        // Convert statusRaw to a boolean
         const status = ['true', '1', true, 1, 'active', 'yes'].includes(statusRaw as string | number | boolean);
-
-        // Convert boolean status to string ('active' or 'inactive')
         const statusString = status ? 'active' : 'inactive';
 
         const newSupplierStaff = await prisma.adminStaff.create({
@@ -145,7 +162,8 @@ export async function createSupplierStaff(supplierId: number, supplierRole: stri
                 email,
                 phoneNumber,
                 password,
-                role: 'supplier',
+                role,
+                panel: 'supplier_staff',
                 permanentAddress,
                 permanentPostalCode,
                 permanentCity,
@@ -158,32 +176,10 @@ export async function createSupplierStaff(supplierId: number, supplierRole: stri
             },
         });
 
-        if (permissions && permissions.trim() !== '') {
-            const permissionsArray = permissions.split(',').map(p => p.trim());
-
-            for (const [index, permission] of permissionsArray.entries()) {
-                if (!permission) {
-                    throw new Error(`Invalid permission at index ${index}: ${permission}`);
-                }
-
-                const permissionExists = await prisma.adminStaffPermission.findFirst({
-                    where: { id: Number(permission), panel: 'supplier_staff' }
-                });
-
-                if (permissionExists) {
-                    await prisma.adminStaffHasPermission.create({
-                        data: {
-                            adminStaffPermissionId: permissionExists.id,
-                            adminStaffId: newSupplierStaff.id
-                        },
-                    });
-                }
-            }
-        }
-
         return { status: true, supplierStaff: serializeBigInt(newSupplierStaff) };
+
     } catch (error) {
-        console.error(`Error creating city:`, error);
+        console.error(`Error creating supplier staff:`, error);
         return { status: false, message: "Internal Server Error" };
     }
 }
@@ -208,7 +204,7 @@ export const getSupplierStaffsByStatus = async (
 
         const supplierStaffs = await prisma.adminStaff.findMany({
             where: whereCondition,
-            orderBy: { name: "asc" }
+            orderBy: { name: "asc" },
         });
 
         logMessage(`debug`, `withPassword:`, withPassword);
@@ -224,9 +220,13 @@ export const getSupplierStaffsByStatus = async (
 export const getSupplierStaffById = async (id: number, withPassword: boolean | string | number = false) => {
     try {
         const supplierStaff = await prisma.adminStaff.findUnique({
-            where: { id, role: 'supplier' },
+            where: { id, panel: 'supplier_staff' },
             include: {
-                adminStaffPermissions: true,
+                role: {
+                    include: {
+                        rolePermissions: true
+                    }
+                }
             }
         });
 
@@ -253,9 +253,9 @@ export const updateSupplierStaff = async (
             name,
             profilePicture,
             email,
+            role,
             password,
             phoneNumber,
-            permissions,
             permanentAddress,
             permanentPostalCode,
             permanentCity,
@@ -267,29 +267,27 @@ export const updateSupplierStaff = async (
             updatedByRole
         } = supplierStaff;
 
-        // Convert statusRaw to a boolean using the includes check
         const status = ['true', '1', true, 1, 'active', 'yes'].includes(statusRaw as string | number | boolean);
-
-        // Convert boolean status to string ('active' or 'inactive')
         const statusString = status ? 'active' : 'inactive';
 
-        // Fetch current supplierStaff details, including password based on withPassword flag
-        const { status: supplierStaffStatus, supplierStaff: currentSupplierStaff, message } = await getSupplierStaffById(supplierStaffId, withPassword);
+        const { status: supplierStaffStatus, supplierStaff: currentSupplierStaff, message } =
+            await getSupplierStaffById(supplierStaffId, withPassword);
 
         if (!supplierStaffStatus || !currentSupplierStaff) {
-            return { status: false, message: message || "SupplierStaff not found." };
+            return { status: false, message: message || "Supplier staff not found." };
         }
 
-        // Check if currentSupplier has a password (it should if the supplier is valid)
-        const finalPassword = (withPassword && currentSupplierStaff.password) ? password : currentSupplierStaff.password; // Default password
+        const finalPassword = (withPassword && currentSupplierStaff.password)
+            ? password
+            : currentSupplierStaff.password; // Default password fallback
 
+        // Delete old profile picture if new one is provided
         if (profilePicture && profilePicture.trim() !== '' && currentSupplierStaff?.profilePicture?.trim()) {
             try {
                 const imageFileName = path.basename(currentSupplierStaff.profilePicture.trim());
-                const filePath = path.join(process.cwd(), 'tmp', 'uploads', 'supplierStaff');
+                const filePath = path.join(process.cwd(), 'tmp', 'uploads', 'supplierStaff', imageFileName);
 
                 const fileDeleted = await deleteFile(filePath);
-
                 if (!fileDeleted) {
                     console.warn(`Failed to delete old profile picture: ${imageFileName}`);
                 }
@@ -298,86 +296,62 @@ export const updateSupplierStaff = async (
             }
         }
 
-        const updateData = {
-            admin,
-            name,
-            email,
-            phoneNumber,
-            password: finalPassword,
-            role: 'supplier',
-            permanentAddress,
-            permanentPostalCode,
-            permanentCity,
-            permanentState,
-            permanentCountry,
-            status: statusString,
-            updatedBy,
-            updatedByRole,
-            updatedAt,
-            ...(profilePicture && profilePicture.trim() !== '' ? { profilePicture: profilePicture.trim() } : {})
-        };
+        let updateData;
+        if (withPassword) {
+            updateData = {
+                admin,
+                name,
+                email,
+                phoneNumber,
+                password: finalPassword,
+                role,
+                panel: 'supplier_staff',
+                permanentAddress,
+                permanentPostalCode,
+                permanentCity,
+                permanentState,
+                permanentCountry,
+                status: statusString,
+                updatedBy,
+                updatedByRole,
+                updatedAt,
+                ...(profilePicture?.trim() ? { profilePicture: profilePicture.trim() } : {})
+            };
+
+        } else {
+            updateData = {
+                admin,
+                name,
+                email,
+                phoneNumber,
+                role,
+                panel: 'supplier_staff',
+                permanentAddress,
+                permanentPostalCode,
+                permanentCity,
+                permanentState,
+                permanentCountry,
+                status: statusString,
+                updatedBy,
+                updatedByRole,
+                updatedAt,
+                ...(profilePicture?.trim() ? { profilePicture: profilePicture.trim() } : {})
+            };
+
+        }
 
         const updatedSupplierStaff = await prisma.adminStaff.update({
             where: { id: supplierStaffId },
             data: updateData,
         });
 
-        // Assign new permissions if provided
-        if (permissions && permissions.trim() !== '') {
-            const permissionsArray = permissions
-                .split(',')
-                .map(p => p.trim())
-                .filter(p => p !== '');
+        return {
+            status: true,
+            supplierStaff: serializeBigInt(updatedSupplierStaff)
+        };
 
-            const validPermissionIds: number[] = [];
-
-            for (const [index, permission] of permissionsArray.entries()) {
-                const permissionId = Number(permission);
-                if (isNaN(permissionId)) {
-                    throw new Error(`Permission ID must be a number. Invalid at index ${index}: ${permission}`);
-                }
-
-                const permissionExists = await prisma.adminStaffPermission.findFirst({
-                    where: { id: permissionId, panel: 'supplier_staff' },
-                });
-
-                if (!permissionExists) {
-                    throw new Error(`Invalid permission at index ${index}: ${permission}`);
-                }
-
-                validPermissionIds.push(permissionId);
-
-                const alreadyGivenPermission = await prisma.adminStaffHasPermission.findFirst({
-                    where: {
-                        adminStaffId: updatedSupplierStaff.id,
-                        adminStaffPermissionId: permissionId,
-                    },
-                });
-
-                if (!alreadyGivenPermission) {
-                    await prisma.adminStaffHasPermission.create({
-                        data: {
-                            adminStaffPermissionId: permissionId,
-                            adminStaffId: updatedSupplierStaff.id,
-                        },
-                    });
-                }
-            }
-
-            // Now delete permissions that are not in the new list
-            await prisma.adminStaffHasPermission.deleteMany({
-                where: {
-                    adminStaffId: updatedSupplierStaff.id,
-                    adminStaffPermissionId: {
-                        notIn: validPermissionIds,
-                    },
-                },
-            });
-        }
-
-        return { status: true, supplierStaff: serializeBigInt(updatedSupplierStaff) };
     } catch (error) {
-        console.error(`Error updating supplierStaff:`, error);
+        console.error(`Error updating supplier staff:`, error);
         return { status: false, message: "Internal Server Error" };
     }
 };
@@ -387,7 +361,7 @@ export const softDeleteSupplierStaff = async (supplierId: number, supplierStaffR
     try {
         // Soft delete the supplierStaff
         const updatedSupplierStaff = await prisma.adminStaff.update({
-            where: { id, role: 'supplier' },
+            where: { id, panel: 'supplier_staff' },
             data: {
                 deletedBy: supplierId,
                 deletedAt: new Date(),
@@ -438,7 +412,7 @@ export const restoreSupplierStaff = async (supplierId: number, supplierStaffRole
 export const deleteSupplierStaff = async (id: number) => {
     try {
         console.log(`id - `, id);
-        await prisma.adminStaff.delete({ where: { id, role: 'supplier' } });
+        await prisma.adminStaff.delete({ where: { id, panel: 'supplier_staff' } });
         return { status: true, message: "SupplierStaff deleted successfully" };
     } catch (error) {
         console.error("❌ deleteSupplierStaff Error:", error);
