@@ -291,7 +291,7 @@ export async function POST(req: NextRequest) {
       pickupAddress: extractString('pickup_address') || '',
       description: extractString('description'),
       gallery: uploadedFiles['gallery'],
-      imageSortingIndex,
+      imageSortingIndex: imageSortingIndex ? JSON.stringify(imageSortingIndex) : '',
       tags: extractString('tags') || '',
       brandId: extractNumber('brand') || 0,
       originCountryId,
