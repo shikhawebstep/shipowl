@@ -991,6 +991,21 @@ exports.Prisma.TicketOrderScalarFieldEnum = {
   deletedByRole: 'deletedByRole'
 };
 
+exports.Prisma.SupplierBannerScalarFieldEnum = {
+  id: 'id',
+  image: 'image',
+  status: 'status',
+  createdAt: 'createdAt',
+  createdBy: 'createdBy',
+  createdByRole: 'createdByRole',
+  updatedAt: 'updatedAt',
+  updatedBy: 'updatedBy',
+  updatedByRole: 'updatedByRole',
+  deletedAt: 'deletedAt',
+  deletedBy: 'deletedBy',
+  deletedByRole: 'deletedByRole'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1446,6 +1461,13 @@ exports.Prisma.ticketOrderOrderByRelevanceFieldEnum = {
   deletedByRole: 'deletedByRole'
 };
 
+exports.Prisma.supplierBannerOrderByRelevanceFieldEnum = {
+  image: 'image',
+  createdByRole: 'createdByRole',
+  updatedByRole: 'updatedByRole',
+  deletedByRole: 'deletedByRole'
+};
+
 
 exports.Prisma.ModelName = {
   appConfig: 'appConfig',
@@ -1486,7 +1508,8 @@ exports.Prisma.ModelName = {
   rtoInventory: 'rtoInventory',
   supplierOrderPermission: 'supplierOrderPermission',
   raiseTicket: 'raiseTicket',
-  ticketOrder: 'ticketOrder'
+  ticketOrder: 'ticketOrder',
+  supplierBanner: 'supplierBanner'
 };
 
 /**
