@@ -55,13 +55,12 @@ export async function isUserExist(adminId: number, adminRole: string) {
             });
         } else {
             admin = await prisma.adminStaff.findUnique({
-                where: { id: adminId, role: adminRoleStr },
+                where: { id: adminId },
                 select: {
                     id: true,
                     name: true,
                     email: true,
-                    password: true, // Hashed password stored in DB
-                    role: true,
+                    password: true,
                     admin: true
                 }
             });

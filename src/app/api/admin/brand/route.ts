@@ -19,19 +19,19 @@ interface MainAdmin {
   // other optional properties if needed
 }
 
-interface SupplierStaff {
+interface AdminStaff {
   id: number;
   name: string;
   email: string;
   password: string;
-  role: string;
+  role?: string;
   admin?: MainAdmin;
 }
 
 interface UserCheckResult {
   status: boolean;
   message?: string;
-  admin?: SupplierStaff;
+  admin?: AdminStaff;
 }
 
 type UploadedFileInfo = {
@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
     // Check if admin exists
     //  let mainAdminId = adminId;
     const userCheck: UserCheckResult = await isUserExist(adminId, String(adminRole));
+
     if (!userCheck.status) {
       return NextResponse.json(
         { status: false, error: `User Not Found: ${userCheck.message}` },
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'dropshipper', 'admin'].includes(String(adminRole));
 
     if (isStaff) {
       //  mainAdminId = userCheck.admin?.admin?.id ?? adminId;

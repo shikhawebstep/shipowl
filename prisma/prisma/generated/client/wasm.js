@@ -313,9 +313,27 @@ exports.Prisma.BankAccountChangeRequestScalarFieldEnum = {
   deletedByRole: 'deletedByRole'
 };
 
+exports.Prisma.RoleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  adminId: 'adminId',
+  status: 'status',
+  createdAt: 'createdAt',
+  createdBy: 'createdBy',
+  createdByRole: 'createdByRole',
+  updatedAt: 'updatedAt',
+  updatedBy: 'updatedBy',
+  updatedByRole: 'updatedByRole',
+  deletedAt: 'deletedAt',
+  deletedBy: 'deletedBy',
+  deletedByRole: 'deletedByRole'
+};
+
 exports.Prisma.AdminStaffScalarFieldEnum = {
   id: 'id',
   admin_id: 'admin_id',
+  roleId: 'roleId',
   profilePicture: 'profilePicture',
   name: 'name',
   email: 'email',
@@ -327,7 +345,6 @@ exports.Prisma.AdminStaffScalarFieldEnum = {
   permanentStateId: 'permanentStateId',
   permanentCountryId: 'permanentCountryId',
   password: 'password',
-  role: 'role',
   status: 'status',
   pr_token: 'pr_token',
   pr_expires_at: 'pr_expires_at',
@@ -343,7 +360,7 @@ exports.Prisma.AdminStaffScalarFieldEnum = {
   deletedByRole: 'deletedByRole'
 };
 
-exports.Prisma.AdminStaffPermissionScalarFieldEnum = {
+exports.Prisma.RolePermissionScalarFieldEnum = {
   id: 'id',
   panel: 'panel',
   module: 'module',
@@ -360,10 +377,10 @@ exports.Prisma.AdminStaffPermissionScalarFieldEnum = {
   deletedByRole: 'deletedByRole'
 };
 
-exports.Prisma.AdminStaffHasPermissionScalarFieldEnum = {
+exports.Prisma.RoleHasPermissionScalarFieldEnum = {
   id: 'id',
-  adminStaffId: 'adminStaffId',
-  adminStaffPermissionId: 'adminStaffPermissionId',
+  roleId: 'roleId',
+  rolePermissionId: 'rolePermissionId',
   createdAt: 'createdAt',
   createdBy: 'createdBy',
   createdByRole: 'createdByRole',
@@ -1117,6 +1134,14 @@ exports.Prisma.bankAccountChangeRequestOrderByRelevanceFieldEnum = {
   deletedByRole: 'deletedByRole'
 };
 
+exports.Prisma.roleOrderByRelevanceFieldEnum = {
+  name: 'name',
+  description: 'description',
+  createdByRole: 'createdByRole',
+  updatedByRole: 'updatedByRole',
+  deletedByRole: 'deletedByRole'
+};
+
 exports.Prisma.adminStaffOrderByRelevanceFieldEnum = {
   profilePicture: 'profilePicture',
   name: 'name',
@@ -1126,7 +1151,6 @@ exports.Prisma.adminStaffOrderByRelevanceFieldEnum = {
   permanentAddress: 'permanentAddress',
   permanentPostalCode: 'permanentPostalCode',
   password: 'password',
-  role: 'role',
   status: 'status',
   pr_token: 'pr_token',
   createdByRole: 'createdByRole',
@@ -1134,7 +1158,7 @@ exports.Prisma.adminStaffOrderByRelevanceFieldEnum = {
   deletedByRole: 'deletedByRole'
 };
 
-exports.Prisma.adminStaffPermissionOrderByRelevanceFieldEnum = {
+exports.Prisma.rolePermissionOrderByRelevanceFieldEnum = {
   panel: 'panel',
   module: 'module',
   action: 'action',
@@ -1143,7 +1167,7 @@ exports.Prisma.adminStaffPermissionOrderByRelevanceFieldEnum = {
   deletedByRole: 'deletedByRole'
 };
 
-exports.Prisma.adminStaffHasPermissionOrderByRelevanceFieldEnum = {
+exports.Prisma.roleHasPermissionOrderByRelevanceFieldEnum = {
   createdByRole: 'createdByRole',
   updatedByRole: 'updatedByRole',
   deletedByRole: 'deletedByRole'
@@ -1429,9 +1453,10 @@ exports.Prisma.ModelName = {
   companyDetail: 'companyDetail',
   bankAccount: 'bankAccount',
   bankAccountChangeRequest: 'bankAccountChangeRequest',
+  role: 'role',
   adminStaff: 'adminStaff',
-  adminStaffPermission: 'adminStaffPermission',
-  adminStaffHasPermission: 'adminStaffHasPermission',
+  rolePermission: 'rolePermission',
+  roleHasPermission: 'roleHasPermission',
   globalPermission: 'globalPermission',
   loginLog: 'loginLog',
   activityLog: 'activityLog',

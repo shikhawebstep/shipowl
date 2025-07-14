@@ -227,9 +227,34 @@ CREATE TABLE `bankAccountChangeRequest` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `role` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `description` LONGTEXT NULL,
+    `adminId` INTEGER NULL,
+    `status` BOOLEAN NOT NULL DEFAULT true,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `createdBy` INTEGER NULL,
+    `createdByRole` VARCHAR(191) NULL,
+    `updatedAt` DATETIME(3) NOT NULL,
+    `updatedBy` INTEGER NULL,
+    `updatedByRole` VARCHAR(191) NULL,
+    `deletedAt` DATETIME(3) NULL,
+    `deletedBy` INTEGER NULL,
+    `deletedByRole` VARCHAR(191) NULL,
+
+    UNIQUE INDEX `role_name_key`(`name`),
+    INDEX `role_createdBy_idx`(`createdBy`),
+    INDEX `role_updatedBy_idx`(`updatedBy`),
+    INDEX `role_deletedAt_idx`(`deletedAt`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `adminStaff` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `admin_id` INTEGER NOT NULL,
+    `roleId` INTEGER NOT NULL,
     `profilePicture` LONGTEXT NULL,
     `name` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
@@ -241,7 +266,6 @@ CREATE TABLE `adminStaff` (
     `permanentStateId` BIGINT NULL,
     `permanentCountryId` BIGINT NULL,
     `password` VARCHAR(191) NOT NULL,
-    `role` VARCHAR(191) NOT NULL DEFAULT 'admin',
     `status` VARCHAR(191) NOT NULL DEFAULT 'active',
     `pr_token` VARCHAR(191) NULL,
     `pr_expires_at` DATETIME(3) NULL,
@@ -257,11 +281,13 @@ CREATE TABLE `adminStaff` (
     `deletedByRole` VARCHAR(191) NULL,
 
     UNIQUE INDEX `adminStaff_email_key`(`email`),
+    INDEX `adminStaff_admin_id_idx`(`admin_id`),
+    INDEX `adminStaff_roleId_idx`(`roleId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `adminStaffPermission` (
+CREATE TABLE `rolePermission` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `panel` VARCHAR(191) NOT NULL,
     `module` VARCHAR(191) NOT NULL,
@@ -277,17 +303,17 @@ CREATE TABLE `adminStaffPermission` (
     `deletedBy` INTEGER NULL,
     `deletedByRole` VARCHAR(191) NULL,
 
-    INDEX `adminStaffPermission_createdBy_idx`(`createdBy`),
-    INDEX `adminStaffPermission_updatedBy_idx`(`updatedBy`),
-    INDEX `adminStaffPermission_deletedAt_idx`(`deletedAt`),
+    INDEX `rolePermission_createdBy_idx`(`createdBy`),
+    INDEX `rolePermission_updatedBy_idx`(`updatedBy`),
+    INDEX `rolePermission_deletedAt_idx`(`deletedAt`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `adminStaffHasPermission` (
+CREATE TABLE `roleHasPermission` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `adminStaffId` INTEGER NOT NULL,
-    `adminStaffPermissionId` INTEGER NOT NULL,
+    `roleId` INTEGER NOT NULL,
+    `rolePermissionId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `createdBy` INTEGER NULL,
     `createdByRole` VARCHAR(191) NULL,
@@ -298,11 +324,11 @@ CREATE TABLE `adminStaffHasPermission` (
     `deletedBy` INTEGER NULL,
     `deletedByRole` VARCHAR(191) NULL,
 
-    INDEX `adminStaffHasPermission_adminStaffId_idx`(`adminStaffId`),
-    INDEX `adminStaffHasPermission_adminStaffPermissionId_idx`(`adminStaffPermissionId`),
-    INDEX `adminStaffHasPermission_createdBy_idx`(`createdBy`),
-    INDEX `adminStaffHasPermission_updatedBy_idx`(`updatedBy`),
-    INDEX `adminStaffHasPermission_deletedAt_idx`(`deletedAt`),
+    INDEX `roleHasPermission_roleId_idx`(`roleId`),
+    INDEX `roleHasPermission_rolePermissionId_idx`(`rolePermissionId`),
+    INDEX `roleHasPermission_createdBy_idx`(`createdBy`),
+    INDEX `roleHasPermission_updatedBy_idx`(`updatedBy`),
+    INDEX `roleHasPermission_deletedAt_idx`(`deletedAt`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -1138,6 +1164,9 @@ ALTER TABLE `bankAccountChangeRequest` ADD CONSTRAINT `admin_bank_account_change
 ALTER TABLE `bankAccountChangeRequest` ADD CONSTRAINT `bankAccountChangeRequest_bankAccountId_fkey` FOREIGN KEY (`bankAccountId`) REFERENCES `bankAccount`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `role` ADD CONSTRAINT `role_adminId_fkey` FOREIGN KEY (`adminId`) REFERENCES `admin`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `adminStaff` ADD CONSTRAINT `adminStaff_permanentCityId_fkey` FOREIGN KEY (`permanentCityId`) REFERENCES `city`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -1150,10 +1179,13 @@ ALTER TABLE `adminStaff` ADD CONSTRAINT `adminStaff_permanentCountryId_fkey` FOR
 ALTER TABLE `adminStaff` ADD CONSTRAINT `adminStaff_admin_id_fkey` FOREIGN KEY (`admin_id`) REFERENCES `admin`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `adminStaffHasPermission` ADD CONSTRAINT `adminStaffHasPermission_adminStaffId_fkey` FOREIGN KEY (`adminStaffId`) REFERENCES `adminStaff`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `adminStaff` ADD CONSTRAINT `adminStaff_roleId_fkey` FOREIGN KEY (`roleId`) REFERENCES `role`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `adminStaffHasPermission` ADD CONSTRAINT `adminStaffHasPermission_adminStaffPermissionId_fkey` FOREIGN KEY (`adminStaffPermissionId`) REFERENCES `adminStaffPermission`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `roleHasPermission` ADD CONSTRAINT `roleHasPermission_roleId_fkey` FOREIGN KEY (`roleId`) REFERENCES `role`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `roleHasPermission` ADD CONSTRAINT `roleHasPermission_rolePermissionId_fkey` FOREIGN KEY (`rolePermissionId`) REFERENCES `rolePermission`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `state` ADD CONSTRAINT `state_countryId_fkey` FOREIGN KEY (`countryId`) REFERENCES `country`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

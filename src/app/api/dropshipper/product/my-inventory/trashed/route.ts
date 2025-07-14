@@ -16,7 +16,7 @@ interface SupplierStaff {
   name: string;
   email: string;
   password: string;
-  role: string;
+  role?: string;
   admin?: MainAdmin;
 }
 
