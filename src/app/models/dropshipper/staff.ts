@@ -6,13 +6,15 @@ import { logMessage } from "@/utils/commonUtils";
 interface DropshipperStaff {
     admin: {
         connect: { id: number }
-    }
+    },
+    role?: {
+        connect: { id: number }
+    },
     id?: bigint; // Optional: ID of the dropshipperStaff (if exists)
     name: string; // Name of the dropshipperStaff
     profilePicture: string,
     email: string; // Email address of the dropshipperStaff
     phoneNumber: string;
-    permissions: string;
     password: string; // Password for the dropshipperStaff account
     permanentAddress: string; // Permanent address of the dropshipperStaff
     permanentPostalCode: string; // Postal code of the permanent address
@@ -65,11 +67,11 @@ export async function checkEmailAvailability(email: string) {
         // Query to find if an email already exists with role 'dropshipperStaff'
         const existingDropshipperStaff = await prisma.adminStaff.findFirst({
             where: { email },
-            select: { email: true, role: true },
+            select: { email: true, role: true, panel: true },
         });
 
         // If the email is already in use by a dropshipperStaff
-        if (existingDropshipperStaff && existingDropshipperStaff.role === 'dropshipper') {
+        if (existingDropshipperStaff && existingDropshipperStaff.panel === 'dropshipper') {
             return {
                 status: false,
                 message: `Email "${email}" is already in use by a dropshipperStaff.`,
@@ -101,11 +103,11 @@ export async function checkEmailAvailabilityForUpdate(email: string, dropshipper
                     id: dropshipperStaffId,  // Exclude the current product being updated
                 },
             },
-            select: { email: true, role: true },
+            select: { email: true, role: true, panel: true },
         });
 
         // If the email is already in use by a dropshipperStaff
-        if (existingDropshipperStaff && existingDropshipperStaff.role === 'dropshipper') {
+        if (existingDropshipperStaff && existingDropshipperStaff.panel === 'dropshipper') {
             return {
                 status: false,
                 message: `Email "${email}" is already in use by a dropshipperStaff.`,
@@ -129,12 +131,27 @@ export async function checkEmailAvailabilityForUpdate(email: string, dropshipper
 
 export async function createDropshipperStaff(dropshipperId: number, dropshipperRole: string, dropshipperStaff: DropshipperStaff) {
     try {
-        const { admin, name, profilePicture, email, phoneNumber, permissions, password, permanentAddress, permanentPostalCode, permanentCity, permanentState, permanentCountry, status: statusRaw, createdAt, createdBy, createdByRole } = dropshipperStaff;
+        const {
+            admin,
+            name,
+            profilePicture,
+            email,
+            role,
+            phoneNumber,
+            password,
+            permanentAddress,
+            permanentPostalCode,
+            permanentCity,
+            permanentState,
+            permanentCountry,
+            status: statusRaw,
+            createdAt,
+            createdBy,
+            createdByRole
+        } = dropshipperStaff;
 
-        // Convert statusRaw to a boolean using the includes check
+        // Convert statusRaw to a boolean
         const status = ['true', '1', true, 1, 'active', 'yes'].includes(statusRaw as string | number | boolean);
-
-        // Convert boolean status to string ('active' or 'inactive')
         const statusString = status ? 'active' : 'inactive';
 
         const newDropshipperStaff = await prisma.adminStaff.create({
@@ -145,7 +162,8 @@ export async function createDropshipperStaff(dropshipperId: number, dropshipperR
                 email,
                 phoneNumber,
                 password,
-                role: 'dropshipper',
+                role,
+                panel: 'dropshipper_staff',
                 permanentAddress,
                 permanentPostalCode,
                 permanentCity,
@@ -158,32 +176,10 @@ export async function createDropshipperStaff(dropshipperId: number, dropshipperR
             },
         });
 
-        if (permissions && permissions.trim() !== '') {
-            const permissionsArray = permissions.split(',').map(p => p.trim());
-
-            for (const [index, permission] of permissionsArray.entries()) {
-                if (!permission) {
-                    throw new Error(`Invalid permission at index ${index}: ${permission}`);
-                }
-
-                const permissionExists = await prisma.adminStaffPermission.findFirst({
-                    where: { id: Number(permission), panel: 'dropshipper_staff' }
-                });
-
-                if (permissionExists) {
-                    await prisma.adminStaffHasPermission.create({
-                        data: {
-                            adminStaffPermissionId: permissionExists.id,
-                            adminStaffId: newDropshipperStaff.id
-                        },
-                    });
-                }
-            }
-        }
-
         return { status: true, dropshipperStaff: serializeBigInt(newDropshipperStaff) };
+
     } catch (error) {
-        console.error(`Error creating city:`, error);
+        console.error(`Error creating dropshipper staff:`, error);
         return { status: false, message: "Internal Server Error" };
     }
 }
@@ -224,9 +220,13 @@ export const getDropshipperStaffsByStatus = async (
 export const getDropshipperStaffById = async (id: number, withPassword: boolean | string | number = false) => {
     try {
         const dropshipperStaff = await prisma.adminStaff.findUnique({
-            where: { id, role: 'dropshipper' },
+            where: { id, panel: 'dropshipper_staff' },
             include: {
-                adminStaffPermissions: true,
+                role: {
+                    include: {
+                        rolePermissions: true
+                    }
+                }
             }
         });
 
@@ -253,9 +253,9 @@ export const updateDropshipperStaff = async (
             name,
             profilePicture,
             email,
+            role,
             password,
             phoneNumber,
-            permissions,
             permanentAddress,
             permanentPostalCode,
             permanentCity,
@@ -267,29 +267,27 @@ export const updateDropshipperStaff = async (
             updatedByRole
         } = dropshipperStaff;
 
-        // Convert statusRaw to a boolean using the includes check
         const status = ['true', '1', true, 1, 'active', 'yes'].includes(statusRaw as string | number | boolean);
-
-        // Convert boolean status to string ('active' or 'inactive')
         const statusString = status ? 'active' : 'inactive';
 
-        // Fetch current dropshipperStaff details, including password based on withPassword flag
-        const { status: dropshipperStaffStatus, dropshipperStaff: currentDropshipperStaff, message } = await getDropshipperStaffById(dropshipperStaffId, withPassword);
+        const { status: dropshipperStaffStatus, dropshipperStaff: currentDropshipperStaff, message } =
+            await getDropshipperStaffById(dropshipperStaffId, withPassword);
 
         if (!dropshipperStaffStatus || !currentDropshipperStaff) {
-            return { status: false, message: message || "DropshipperStaff not found." };
+            return { status: false, message: message || "Dropshipper staff not found." };
         }
 
-        // Check if currentDropshipper has a password (it should if the dropshipper is valid)
-        const finalPassword = (withPassword && currentDropshipperStaff.password) ? password : currentDropshipperStaff.password; // Default password
+        const finalPassword = (withPassword && currentDropshipperStaff.password)
+            ? password
+            : currentDropshipperStaff.password; // Default password fallback
 
+        // Delete old profile picture if new one is provided
         if (profilePicture && profilePicture.trim() !== '' && currentDropshipperStaff?.profilePicture?.trim()) {
             try {
                 const imageFileName = path.basename(currentDropshipperStaff.profilePicture.trim());
-                const filePath = path.join(process.cwd(), 'tmp', 'uploads', 'dropshipperStaff');
+                const filePath = path.join(process.cwd(), 'tmp', 'uploads', 'dropshipperStaff', imageFileName);
 
                 const fileDeleted = await deleteFile(filePath);
-
                 if (!fileDeleted) {
                     console.warn(`Failed to delete old profile picture: ${imageFileName}`);
                 }
@@ -298,86 +296,62 @@ export const updateDropshipperStaff = async (
             }
         }
 
-        const updateData = {
-            admin,
-            name,
-            email,
-            phoneNumber,
-            password: finalPassword,
-            role: 'dropshipper',
-            permanentAddress,
-            permanentPostalCode,
-            permanentCity,
-            permanentState,
-            permanentCountry,
-            status: statusString,
-            updatedBy,
-            updatedByRole,
-            updatedAt,
-            ...(profilePicture && profilePicture.trim() !== '' ? { profilePicture: profilePicture.trim() } : {})
-        };
+        let updateData;
+        if (withPassword) {
+            updateData = {
+                admin,
+                name,
+                email,
+                phoneNumber,
+                password: finalPassword,
+                role,
+                panel: 'dropshipper_staff',
+                permanentAddress,
+                permanentPostalCode,
+                permanentCity,
+                permanentState,
+                permanentCountry,
+                status: statusString,
+                updatedBy,
+                updatedByRole,
+                updatedAt,
+                ...(profilePicture?.trim() ? { profilePicture: profilePicture.trim() } : {})
+            };
+
+        } else {
+            updateData = {
+                admin,
+                name,
+                email,
+                phoneNumber,
+                role,
+                panel: 'dropshipper_staff',
+                permanentAddress,
+                permanentPostalCode,
+                permanentCity,
+                permanentState,
+                permanentCountry,
+                status: statusString,
+                updatedBy,
+                updatedByRole,
+                updatedAt,
+                ...(profilePicture?.trim() ? { profilePicture: profilePicture.trim() } : {})
+            };
+
+        }
 
         const updatedDropshipperStaff = await prisma.adminStaff.update({
             where: { id: dropshipperStaffId },
             data: updateData,
         });
 
-        // Assign new permissions if provided
-        if (permissions && permissions.trim() !== '') {
-            const permissionsArray = permissions
-                .split(',')
-                .map(p => p.trim())
-                .filter(p => p !== '');
+        return {
+            status: true,
+            dropshipperStaff: serializeBigInt(updatedDropshipperStaff)
+        };
 
-            const validPermissionIds: number[] = [];
-
-            for (const [index, permission] of permissionsArray.entries()) {
-                const permissionId = Number(permission);
-                if (isNaN(permissionId)) {
-                    throw new Error(`Permission ID must be a number. Invalid at index ${index}: ${permission}`);
-                }
-
-                const permissionExists = await prisma.adminStaffPermission.findFirst({
-                    where: { id: permissionId, panel: 'dropshipper_staff' },
-                });
-
-                if (!permissionExists) {
-                    throw new Error(`Invalid permission at index ${index}: ${permission}`);
-                }
-
-                validPermissionIds.push(permissionId);
-
-                const alreadyGivenPermission = await prisma.adminStaffHasPermission.findFirst({
-                    where: {
-                        adminStaffId: updatedDropshipperStaff.id,
-                        adminStaffPermissionId: permissionId,
-                    },
-                });
-
-                if (!alreadyGivenPermission) {
-                    await prisma.adminStaffHasPermission.create({
-                        data: {
-                            adminStaffPermissionId: permissionId,
-                            adminStaffId: updatedDropshipperStaff.id,
-                        },
-                    });
-                }
-            }
-
-            // Now delete permissions that are not in the new list
-            await prisma.adminStaffHasPermission.deleteMany({
-                where: {
-                    adminStaffId: updatedDropshipperStaff.id,
-                    adminStaffPermissionId: {
-                        notIn: validPermissionIds,
-                    },
-                },
-            });
-        }
-
-        return { status: true, dropshipperStaff: serializeBigInt(updatedDropshipperStaff) };
     } catch (error) {
-        console.error(`Error updating dropshipperStaff:`, error);
+        console.error(`Error updating dropshipper staff:`, error);
         return { status: false, message: "Internal Server Error" };
     }
 };
@@ -387,7 +361,7 @@ export const softDeleteDropshipperStaff = async (dropshipperId: number, dropship
     try {
         // Soft delete the dropshipperStaff
         const updatedDropshipperStaff = await prisma.adminStaff.update({
-            where: { id, role: 'dropshipper' },
+            where: { id, panel: 'dropshipper_staff' },
             data: {
                 deletedBy: dropshipperId,
                 deletedAt: new Date(),
@@ -438,7 +412,7 @@ export const restoreDropshipperStaff = async (dropshipperId: number, dropshipper
 export const deleteDropshipperStaff = async (id: number) => {
     try {
         console.log(`id - `, id);
-        await prisma.adminStaff.delete({ where: { id, role: 'dropshipper' } });
+        await prisma.adminStaff.delete({ where: { id, panel: 'dropshipper_staff' } });
         return { status: true, message: "DropshipperStaff deleted successfully" };
     } catch (error) {
         console.error("❌ deleteDropshipperStaff Error:", error);
