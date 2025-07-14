@@ -276,7 +276,8 @@ model role {
 model adminStaff {
   id                  Int       @id @default(autoincrement())
   admin_id            Int
-  roleId              Int
+  roleId              Int?
+  panel               String
   profilePicture      String?   @db.LongText
   name                String
   email               String    @unique
@@ -305,7 +306,7 @@ model adminStaff {
   permanentState      state?    @relation(fields: [permanentStateId], references: [id], onDelete: SetNull)
   permanentCountry    country?  @relation(fields: [permanentCountryId], references: [id], onDelete: SetNull)
   admin               admin     @relation(fields: [admin_id], references: [id], onDelete: Cascade, name: "AdminToStaff")
-  role                role      @relation(fields: [roleId], references: [id], onDelete: Cascade, name: "RoleToAdminStaff")
+  role                role?     @relation(fields: [roleId], references: [id], onDelete: Cascade, name: "RoleToAdminStaff")
 
   @@index([admin_id])
   @@index([roleId])

@@ -334,6 +334,7 @@ exports.Prisma.AdminStaffScalarFieldEnum = {
   id: 'id',
   admin_id: 'admin_id',
   roleId: 'roleId',
+  panel: 'panel',
   profilePicture: 'profilePicture',
   name: 'name',
   email: 'email',
@@ -1143,6 +1144,7 @@ exports.Prisma.roleOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.adminStaffOrderByRelevanceFieldEnum = {
+  panel: 'panel',
   profilePicture: 'profilePicture',
   name: 'name',
   email: 'email',

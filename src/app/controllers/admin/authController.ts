@@ -7,7 +7,7 @@ import { getEmailConfig } from '@/app/models/admin/emailConfig';
 import { sendEmail } from "@/utils/email/sendEmail";
 import bcrypt from 'bcryptjs';
 import { logMessage } from '@/utils/commonUtils';
-import { getStaffPermissionsByStaffId } from '@/app/models/staffPermission';
+import { getRolePermissionsByStaffId } from '@/app/models/staffPermission';
 
 interface Admin {
     id: number;
@@ -29,12 +29,16 @@ export async function handleLogin(req: NextRequest, adminRole: string, adminStaf
 
         // Fetch admin by email and role
         let type = 'main';
+        logMessage(`log`, `adminRole - `, adminRole);
         let adminResponse = await adminByUsernameRole(email, adminRole);
         if (!adminResponse.status || !adminResponse.admin) {
             adminResponse = await adminByUsernameRole(email, adminStaffRole);
             type = 'sub';
             if (!adminResponse.status || !adminResponse.admin) {
-                return NextResponse.json({ message: adminResponse.message || "Invalid email or password", type, status: false }, { status: 401 });
+                return NextResponse.json(
+                    { message: adminResponse.message || "Invalid email or password", type, status: false },
+                    { status: 401 }
+                );
             }
         }
 
@@ -44,7 +48,9 @@ export async function handleLogin(req: NextRequest, adminRole: string, adminStaf
             id: admin.id,
             name: admin.name,
             email: admin.email,
-            role: admin.role,
+            role: type === 'main'
+                ? (admin as { role: string }).role
+                : (admin as { panel: string }).panel
         };
 
         console.log(`admin - `, admin);
@@ -64,7 +70,7 @@ export async function handleLogin(req: NextRequest, adminRole: string, adminStaf
         }
 
         // Email & account verification checks for supplier
-        if (type === 'main' && admin.role === 'supplier') {
+        if (type === 'main' && adminData.role === 'supplier') {
             if ('isEmailVerified' in admin && !admin?.isEmailVerified) {
                 return NextResponse.json(
                     { status: false, message: "Email is not verified yet" },
@@ -85,28 +91,40 @@ export async function handleLogin(req: NextRequest, adminRole: string, adminStaf
             }
         }
 
-        if (type === 'sub' && 'admin' in admin && admin.admin?.role === 'supplier') {
-            if ('admin' in admin && !admin.admin.isEmailVerified) {
-                return NextResponse.json({ status: false, message: "Main account's email is not verified yet" }, { status: 403 });
+        if (type === 'sub' && 'admin' in admin && adminData?.role === 'supplier') {
+            const mainAdmin = admin.admin as {
+                isEmailVerified: boolean;
+                isVerified: boolean;
+            };
+
+            if (!mainAdmin.isEmailVerified) {
+                return NextResponse.json(
+                    { status: false, message: "Main account's email is not verified yet" },
+                    { status: 403 }
+                );
             }
-            if ('admin' in admin && !admin.admin.isVerified) {
-                return NextResponse.json({ status: false, message: "Main account is not yet verified by admin" }, { status: 403 });
+
+            if (!mainAdmin.isVerified) {
+                return NextResponse.json(
+                    { status: false, message: "Main account is not yet verified by admin" },
+                    { status: 403 }
+                );
             }
         }
 
         // Generate authentication token
-        const token = generateToken(admin.id, admin.role);
-        const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(admin.role));
+        const token = generateToken(admin.id, adminData.role);
+        const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(adminData.role));
 
         let assignedPermissions;
         if (isStaffUser && 'admin' in admin) {
-            const role = String(admin.admin.role);
+            const role = String(adminData.role);
             const formattedRole = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
             const options = {
                 panel: formattedRole
             };
 
-            const assignedPermissionsResult = await getStaffPermissionsByStaffId(options, admin.id);
+            const assignedPermissionsResult = await getRolePermissionsByStaffId(options, admin.id);
             assignedPermissions = assignedPermissionsResult.assignedPermissions;
         }
 
@@ -160,23 +178,32 @@ export async function handleForgetPassword(
             );
         }
 
-        // Attempt to fetch admin or adminStaff by email
-        let userResponse = await adminByUsernameRole(email, adminRole);
-        if (!userResponse.status || !userResponse.admin) {
-            userResponse = await adminByUsernameRole(email, adminStaffRole);
-            if (!userResponse.status || !userResponse.admin) {
+        // Fetch admin by email and role
+        let type = 'main';
+        let adminResponse = await adminByUsernameRole(email, adminRole);
+        if (!adminResponse.status || !adminResponse.admin) {
+            adminResponse = await adminByUsernameRole(email, adminStaffRole);
+            type = 'sub';
+            if (!adminResponse.status || !adminResponse.admin) {
                 return NextResponse.json(
-                    {
-                        message: "No account found with this email.",
-                        status: false,
-                    },
-                    { status: 404 }
+                    { message: adminResponse.message || "No account found with this email.", type, status: false },
+                    { status: 401 }
                 );
             }
         }
 
-        const admin = userResponse.admin;
-        const token = generatePasswordResetToken(admin.id, admin.role);
+        const admin = adminResponse.admin;
+
+        let adminData = {
+            id: admin.id,
+            name: admin.name,
+            email: admin.email,
+            role: type === 'main'
+                ? (admin as { role: string }).role
+                : (admin as { panel: string }).panel
+        };
+
+        const token = generatePasswordResetToken(admin.id, adminData.role);
         const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
         // Update token and expiry in database
@@ -185,7 +212,7 @@ export async function handleForgetPassword(
             pr_expires_at: expiry,
         };
 
-        if (admin.role === adminRole) {
+        if (adminData.role === adminRole) {
             await prisma.admin.update({ where: { id: admin.id }, data: updateData });
         } else {
             await prisma.adminStaff.update({ where: { id: admin.id }, data: updateData });
@@ -663,18 +690,22 @@ export async function handleVerifyStatus(
     }
 }
 
-export async function adminByUsernameRole(username: string, role: string) {
+export async function adminByUsernameRole(username: string, panel: string) {
     try {
+        console.log("Function called: adminByUsernameRole");
+        console.log("Input username:", username);
+        console.log("Input panel:", panel);
 
-        const adminRoleStr = String(role); // Ensure it's a string
+        const adminRoleStr = String(panel); // Ensure it's a string
         const adminModel = ["admin", "dropshipper", "supplier"].includes(adminRoleStr) ? "admin" : "adminStaff";
-        console.log(`adminRoleStr - `, adminRoleStr);
+        console.log("Resolved adminModel:", adminModel);
 
-        // Fetch admin details from database
-        let admin
+        let admin;
+
         if (adminModel === "admin") {
+            console.log("Fetching from: prisma.admin");
             admin = await prisma.admin.findFirst({
-                where: { email: username, role },
+                where: { email: username, role: panel },
                 select: {
                     id: true,
                     name: true,
@@ -691,29 +722,34 @@ export async function adminByUsernameRole(username: string, role: string) {
                     }
                 },
             });
+            console.log("Admin result from prisma.admin:", admin);
         } else {
+            console.log("Fetching from: prisma.adminStaff");
             admin = await prisma.adminStaff.findFirst({
-                where: { email: username, role },
+                where: { email: username, panel: panel },
                 select: {
                     id: true,
                     name: true,
                     email: true,
                     password: true,
                     role: true,
+                    panel: true,
                     status: true,
                     admin: true
                 },
             });
+            console.log("Admin result from prisma.adminStaff:", admin);
         }
 
-        // If admin doesn't exist, return false with a message
         if (!admin) {
+            console.warn("No admin found for provided credentials.");
             return { status: false, message: "User with the provided ID does not exist" };
         }
 
+        console.log("Admin fetched successfully.");
         return { status: true, admin };
     } catch (error) {
-        console.error(`Error fetching admin:`, error);
+        console.error("Error fetching admin:", error);
         return { status: false, message: "Internal Server Error" };
     }
 }
@@ -722,60 +758,88 @@ export async function adminByToken(
     token: string,
     adminRole: string,
     adminStaffRole: string
-): Promise<{ status: boolean, message: string, admin?: Admin }> {
+) {
     try {
         // Verify token and extract admin details
         const { payload, status, message } = await verifyToken(token);
+
         if (!status || !payload || typeof payload.adminId !== 'number') {
-            return { status: false, message: message || "Unauthorized access. Invalid token." };
+            return {
+                status: false,
+                message: message || "Unauthorized access. Invalid token."
+            };
         }
 
-        // Determine the admin model based on role
-        const payloadAdminRole = String(payload.adminRole); // Ensure it's a string
+        // Ensure adminRole is a string
+        const payloadAdminRole = String(payload.adminRole);
 
         if (![adminRole, adminStaffRole].includes(payloadAdminRole)) {
-            return { status: false, message: "Access denied. Invalid role." };
+            return {
+                status: false,
+                message: "Access denied. Invalid panel."
+            };
         }
 
-        // Set the correct admin model
-        const adminModel = ["admin", "dropshipper", "supplier"].includes(payloadAdminRole) ? "admin" : "adminStaff";
+        // Determine model based on role
+        const isMainAdmin = ["admin", "dropshipper", "supplier"].includes(payloadAdminRole);
+        const adminModel = isMainAdmin ? "admin" : "adminStaff";
 
-        // Fetch the admin from the database
-        let admin: Admin | null;
+        let rawAdmin: any;
+
         if (adminModel === "admin") {
-            admin = await prisma.admin.findUnique({
+            rawAdmin = await prisma.admin.findUnique({
                 where: { id: payload.adminId },
                 select: {
                     id: true,
                     name: true,
                     email: true,
-                    role: true,
                     createdAt: true,
-                },
+                    role: true
+                }
             });
         } else {
-            admin = await prisma.adminStaff.findUnique({
+            rawAdmin = await prisma.adminStaff.findUnique({
                 where: { id: payload.adminId },
                 select: {
                     id: true,
                     name: true,
                     email: true,
-                    role: true,
                     createdAt: true,
-                },
+                    role: {
+                        select: {
+                            name: true
+                        }
+                    }
+                }
             });
         }
 
-        // If admin not found, return error
-        if (!admin) {
-            return { status: false, message: "Invalid admin credentials or account not found." };
+        if (!rawAdmin) {
+            return {
+                status: false,
+                message: "Invalid admin credentials or account not found."
+            };
         }
 
-        // Return success with admin details
-        return { status: true, message: "Token is valid", admin };
+        // Map to match Admin type
+        const admin: Admin = {
+            id: rawAdmin.id,
+            name: rawAdmin.name,
+            email: rawAdmin.email,
+            createdAt: rawAdmin.createdAt,
+            role: rawAdmin.role?.name || ''
+        };
+
+        return {
+            status: true,
+            message: "Token is valid",
+            admin
+        };
     } catch (error) {
         console.error("Error fetching admin:", error);
-        return { status: false, message: "Internal Server Error" };
+        return {
+            status: false,
+            message: "Internal Server Error"
+        };
     }
 }
-

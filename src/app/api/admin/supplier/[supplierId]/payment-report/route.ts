@@ -5,7 +5,7 @@ import { isUserExist } from '@/utils/auth/authUtils';
 import { getOrdersByStatusForSupplierReporting } from '@/app/models/order/order';
 import { getAppConfig } from '@/app/models/app/appConfig';
 import { getSupplierById } from '@/app/models/supplier/supplier';
-import { checkStaffPermissionStatus, getStaffPermissionsByStaffId } from '@/app/models/staffPermission';
+import { checkStaffPermissionStatus, getRolePermissionsByStaffId } from '@/app/models/staffPermission';
 
 type Permission = {
   permission: {
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
         }, { status: 403 });
       }
 
-      const orderVariablePermissionCheck = await getStaffPermissionsByStaffId({
+      const orderVariablePermissionCheck = await getRolePermissionsByStaffId({
         panel: 'Admin',
         module: 'Order Variables'
       }, adminId);

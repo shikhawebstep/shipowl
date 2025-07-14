@@ -98,7 +98,7 @@ export function middleware(req: NextRequest) {
             ],
             routes: [
                 "/api/admin",
-                "/api/admin/:path*",
+                "/api/admin/",
                 "/api/product",
                 "/api/category",
                 "/api/brand",
@@ -109,6 +109,7 @@ export function middleware(req: NextRequest) {
         {
             routes: [
                 "/api/dropshipper",
+                "/api/dropshipper/",
                 "/api/dropshipper/list",
                 "/api/dropshipper/auth/verify",
                 "/api/dropshipper/profile",

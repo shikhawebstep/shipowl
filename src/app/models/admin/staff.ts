@@ -6,13 +6,15 @@ import { logMessage } from "@/utils/commonUtils";
 interface AdminStaff {
     admin: {
         connect: { id: number }
-    }
+    },
+    role?: {
+        connect: { id: number }
+    },
     id?: bigint; // Optional: ID of the adminStaff (if exists)
     name: string; // Name of the adminStaff
     profilePicture: string,
     email: string; // Email address of the adminStaff
     phoneNumber: string;
-    permissions: string;
     password: string; // Password for the adminStaff account
     permanentAddress: string; // Permanent address of the adminStaff
     permanentPostalCode: string; // Postal code of the permanent address
@@ -65,11 +67,11 @@ export async function checkEmailAvailability(email: string) {
         // Query to find if an email already exists with role 'adminStaff'
         const existingAdminStaff = await prisma.adminStaff.findFirst({
             where: { email },
-            select: { email: true, role: true },
+            select: { email: true, role: true, panel: true },
         });
 
         // If the email is already in use by a adminStaff
-        if (existingAdminStaff && existingAdminStaff.role === 'admin_staff') {
+        if (existingAdminStaff && existingAdminStaff.panel === 'admin') {
             return {
                 status: false,
                 message: `Email "${email}" is already in use by a adminStaff.`,
@@ -101,11 +103,11 @@ export async function checkEmailAvailabilityForUpdate(email: string, adminStaffI
                     id: adminStaffId,  // Exclude the current product being updated
                 },
             },
-            select: { email: true, role: true },
+            select: { email: true, role: true, panel: true },
         });
 
         // If the email is already in use by a adminStaff
-        if (existingAdminStaff && existingAdminStaff.role === 'admin_staff') {
+        if (existingAdminStaff && existingAdminStaff.panel === 'admin') {
             return {
                 status: false,
                 message: `Email "${email}" is already in use by a adminStaff.`,
@@ -134,8 +136,8 @@ export async function createAdminStaff(adminId: number, adminRole: string, admin
             name,
             profilePicture,
             email,
+            role,
             phoneNumber,
-            permissions,
             password,
             permanentAddress,
             permanentPostalCode,
@@ -160,7 +162,8 @@ export async function createAdminStaff(adminId: number, adminRole: string, admin
                 email,
                 phoneNumber,
                 password,
-                role: 'admin_staff',
+                role,
+                panel: 'admin_staff',
                 permanentAddress,
                 permanentPostalCode,
                 permanentCity,
@@ -172,29 +175,6 @@ export async function createAdminStaff(adminId: number, adminRole: string, admin
                 createdByRole
             },
         });
-
-        if (permissions && permissions.trim() !== '') {
-            const permissionsArray = permissions.split(',').map(p => p.trim());
-
-            for (const [index, permission] of permissionsArray.entries()) {
-                if (!permission) {
-                    throw new Error(`Invalid permission at index ${index}: ${permission}`);
-                }
-
-                const permissionExists = await prisma.adminStaffPermission.findFirst({
-                    where: { id: Number(permission), panel: 'admin' }
-                });
-
-                if (permissionExists) {
-                    await prisma.adminStaffHasPermission.create({
-                        data: {
-                            adminStaffPermissionId: permissionExists.id,
-                            adminStaffId: newAdminStaff.id
-                        },
-                    });
-                }
-            }
-        }
 
         return { status: true, adminStaff: serializeBigInt(newAdminStaff) };
 
@@ -213,10 +193,10 @@ export const getAdminStaffsByStatus = async (
 
         switch (status) {
             case "notDeleted":
-                whereCondition = { role: 'admin_staff', deletedAt: null };
+                whereCondition = { role: 'admin', deletedAt: null };
                 break;
             case "deleted":
-                whereCondition = { role: 'admin_staff', deletedAt: { not: null } };
+                whereCondition = { role: 'admin', deletedAt: { not: null } };
                 break;
             default:
                 throw new Error("Invalid status");
@@ -240,9 +220,13 @@ export const getAdminStaffsByStatus = async (
 export const getAdminStaffById = async (id: number, withPassword: boolean | string | number = false) => {
     try {
         const adminStaff = await prisma.adminStaff.findUnique({
-            where: { id, role: 'admin_staff' },
+            where: { id, panel: 'admin_staff' },
             include: {
-                adminStaffPermissions: true,
+                role: {
+                    include: {
+                        rolePermissions: true
+                    }
+                }
             }
         });
 
@@ -269,9 +253,9 @@ export const updateAdminStaff = async (
             name,
             profilePicture,
             email,
+            role,
             password,
             phoneNumber,
-            permissions,
             permanentAddress,
             permanentPostalCode,
             permanentCity,
@@ -320,7 +304,8 @@ export const updateAdminStaff = async (
                 email,
                 phoneNumber,
                 password: finalPassword,
-                role: 'admin_staff',
+                role,
+                panel: 'admin_staff',
                 permanentAddress,
                 permanentPostalCode,
                 permanentCity,
@@ -339,7 +324,8 @@ export const updateAdminStaff = async (
                 name,
                 email,
                 phoneNumber,
-                role: 'admin_staff',
+                role,
+                panel: 'admin_staff',
                 permanentAddress,
                 permanentPostalCode,
                 permanentCity,
@@ -359,59 +345,6 @@ export const updateAdminStaff = async (
             data: updateData,
         });
 
-        // Assign new permissions if provided
-        if (permissions && permissions.trim() !== '') {
-            const permissionsArray = permissions
-                .split(',')
-                .map(p => p.trim())
-                .filter(p => p !== '');
-
-            const validPermissionIds: number[] = [];
-
-            for (const [index, permission] of permissionsArray.entries()) {
-                const permissionId = Number(permission);
-                if (isNaN(permissionId)) {
-                    throw new Error(`Permission ID must be a number. Invalid at index ${index}: ${permission}`);
-                }
-
-                const permissionExists = await prisma.adminStaffPermission.findFirst({
-                    where: { id: permissionId, panel: 'admin' },
-                });
-
-                if (!permissionExists) {
-                    throw new Error(`Invalid permission at index ${index}: ${permission}`);
-                }
-
-                validPermissionIds.push(permissionId);
-
-                const alreadyGivenPermission = await prisma.adminStaffHasPermission.findFirst({
-                    where: {
-                        adminStaffId: updatedAdminStaff.id,
-                        adminStaffPermissionId: permissionId,
-                    },
-                });
-
-                if (!alreadyGivenPermission) {
-                    await prisma.adminStaffHasPermission.create({
-                        data: {
-                            adminStaffPermissionId: permissionId,
-                            adminStaffId: updatedAdminStaff.id,
-                        },
-                    });
-                }
-            }
-
-            // Now delete permissions that are not in the new list
-            await prisma.adminStaffHasPermission.deleteMany({
-                where: {
-                    adminStaffId: updatedAdminStaff.id,
-                    adminStaffPermissionId: {
-                        notIn: validPermissionIds,
-                    },
-                },
-            });
-        }
-
         return {
             status: true,
             adminStaff: serializeBigInt(updatedAdminStaff)
@@ -428,7 +361,7 @@ export const softDeleteAdminStaff = async (adminId: number, adminStaffRole: stri
     try {
         // Soft delete the adminStaff
         const updatedAdminStaff = await prisma.adminStaff.update({
-            where: { id, role: 'admin_staff' },
+            where: { id, panel: 'admin_staff' },
             data: {
                 deletedBy: adminId,
                 deletedAt: new Date(),
@@ -479,7 +412,7 @@ export const restoreAdminStaff = async (adminId: number, adminStaffRole: string,
 export const deleteAdminStaff = async (id: number) => {
     try {
         console.log(`id - `, id);
-        await prisma.adminStaff.delete({ where: { id, role: 'admin_staff' } });
+        await prisma.adminStaff.delete({ where: { id, panel: 'admin_staff' } });
         return { status: true, message: "AdminStaff deleted successfully" };
     } catch (error) {
         console.error("❌ deleteAdminStaff Error:", error);

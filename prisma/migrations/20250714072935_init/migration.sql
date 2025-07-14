@@ -254,7 +254,8 @@ CREATE TABLE `role` (
 CREATE TABLE `adminStaff` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `admin_id` INTEGER NOT NULL,
-    `roleId` INTEGER NOT NULL,
+    `roleId` INTEGER NULL,
+    `panel` VARCHAR(191) NOT NULL,
     `profilePicture` LONGTEXT NULL,
     `name` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,

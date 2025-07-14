@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
-import { getStaffPermissions } from '@/app/models/staffPermission';
+import { getRolePermissions } from '@/app/models/staffPermission';
 
 interface MainAdmin {
   id: number;
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       panel: 'Admin',
     };
 
-    const staffPermissionsResult = await getStaffPermissions(options);
+    const staffPermissionsResult = await getRolePermissions(options);
     logMessage('info', 'Fetched staff permissions:', staffPermissionsResult);
 
     if (!staffPermissionsResult.status) {

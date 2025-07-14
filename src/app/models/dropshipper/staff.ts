@@ -69,7 +69,7 @@ export async function checkEmailAvailability(email: string) {
         });
 
         // If the email is already in use by a dropshipperStaff
-        if (existingDropshipperStaff && existingDropshipperStaff.role === 'dropshipper_staff') {
+        if (existingDropshipperStaff && existingDropshipperStaff.role === 'dropshipper') {
             return {
                 status: false,
                 message: `Email "${email}" is already in use by a dropshipperStaff.`,
@@ -105,7 +105,7 @@ export async function checkEmailAvailabilityForUpdate(email: string, dropshipper
         });
 
         // If the email is already in use by a dropshipperStaff
-        if (existingDropshipperStaff && existingDropshipperStaff.role === 'dropshipper_staff') {
+        if (existingDropshipperStaff && existingDropshipperStaff.role === 'dropshipper') {
             return {
                 status: false,
                 message: `Email "${email}" is already in use by a dropshipperStaff.`,
@@ -145,7 +145,7 @@ export async function createDropshipperStaff(dropshipperId: number, dropshipperR
                 email,
                 phoneNumber,
                 password,
-                role: 'dropshipper_staff',
+                role: 'dropshipper',
                 permanentAddress,
                 permanentPostalCode,
                 permanentCity,
@@ -167,7 +167,7 @@ export async function createDropshipperStaff(dropshipperId: number, dropshipperR
                 }
 
                 const permissionExists = await prisma.adminStaffPermission.findFirst({
-                    where: { id: Number(permission), panel: 'dropshipper' }
+                    where: { id: Number(permission), panel: 'dropshipper_staff' }
                 });
 
                 if (permissionExists) {
@@ -197,10 +197,10 @@ export const getDropshipperStaffsByStatus = async (
 
         switch (status) {
             case "notDeleted":
-                whereCondition = { role: 'dropshipper_staff', deletedAt: null };
+                whereCondition = { role: 'dropshipper', deletedAt: null };
                 break;
             case "deleted":
-                whereCondition = { role: 'dropshipper_staff', deletedAt: { not: null } };
+                whereCondition = { role: 'dropshipper', deletedAt: { not: null } };
                 break;
             default:
                 throw new Error("Invalid status");
@@ -224,7 +224,7 @@ export const getDropshipperStaffsByStatus = async (
 export const getDropshipperStaffById = async (id: number, withPassword: boolean | string | number = false) => {
     try {
         const dropshipperStaff = await prisma.adminStaff.findUnique({
-            where: { id, role: 'dropshipper_staff' },
+            where: { id, role: 'dropshipper' },
             include: {
                 adminStaffPermissions: true,
             }
@@ -304,7 +304,7 @@ export const updateDropshipperStaff = async (
             email,
             phoneNumber,
             password: finalPassword,
-            role: 'dropshipper_staff',
+            role: 'dropshipper',
             permanentAddress,
             permanentPostalCode,
             permanentCity,
@@ -338,7 +338,7 @@ export const updateDropshipperStaff = async (
                 }
 
                 const permissionExists = await prisma.adminStaffPermission.findFirst({
-                    where: { id: permissionId, panel: 'dropshipper' },
+                    where: { id: permissionId, panel: 'dropshipper_staff' },
                 });
 
                 if (!permissionExists) {
@@ -387,7 +387,7 @@ export const softDeleteDropshipperStaff = async (dropshipperId: number, dropship
     try {
         // Soft delete the dropshipperStaff
         const updatedDropshipperStaff = await prisma.adminStaff.update({
-            where: { id, role: 'dropshipper_staff' },
+            where: { id, role: 'dropshipper' },
             data: {
                 deletedBy: dropshipperId,
                 deletedAt: new Date(),
@@ -438,7 +438,7 @@ export const restoreDropshipperStaff = async (dropshipperId: number, dropshipper
 export const deleteDropshipperStaff = async (id: number) => {
     try {
         console.log(`id - `, id);
-        await prisma.adminStaff.delete({ where: { id, role: 'dropshipper_staff' } });
+        await prisma.adminStaff.delete({ where: { id, role: 'dropshipper' } });
         return { status: true, message: "DropshipperStaff deleted successfully" };
     } catch (error) {
         console.error("❌ deleteDropshipperStaff Error:", error);

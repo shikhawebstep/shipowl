@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 
+// Serialize BigInt to string to avoid JSON issues
 const serializeBigInt = <T>(obj: T): T => {
     if (typeof obj === "bigint") return obj.toString() as unknown as T;
     if (obj instanceof Date) return obj;
@@ -18,10 +19,39 @@ interface StaffPermissionFilter {
     action?: string;
 }
 
-// 🔍 Professional: Filter by panel, module, action (any or all)
-export const getStaffPermissions = async (filter: StaffPermissionFilter = {}) => {
+// ✅ VALID PANELS
+const VALID_PANELS = ["Admin", "Supplier", "Dropshipper"];
+
+// ✅ COMMON: Validate filter
+const validateFilter = (filter: any, requiredFields = ["panel", "module", "action"]) => {
+    for (const field of requiredFields) {
+        if (!filter[field]) {
+            return `Missing required filter property: ${field}`;
+        }
+    }
+    if (!VALID_PANELS.includes(filter.panel)) {
+        return `Invalid panel: ${filter.panel}`;
+    }
+    return null;
+};
+
+// ✅ COMMON: Fetch staff and validate
+const getValidStaff = async (staffId: number) => {
+    if (!staffId || isNaN(staffId)) return { message: "Invalid staff ID" };
+
+    const staff = await prisma.adminStaff.findUnique({
+        where: { id: staffId },
+    });
+
+    if (!staff || !staff.roleId) return { message: "Staff not found" };
+    return { staff };
+};
+
+// 🔍 Get Permissions based on optional filter
+export const getRolePermissions = async (filter: StaffPermissionFilter = {}) => {
+    console.log("📥 getRolePermissions - Input Filter:", filter);
     try {
-        const staffPermissions = await prisma.adminStaffPermission.findMany({
+        const staffPermissions = await prisma.rolePermission.findMany({
             where: {
                 ...(filter.panel && { panel: filter.panel }),
                 ...(filter.module && { module: filter.module }),
@@ -30,12 +60,13 @@ export const getStaffPermissions = async (filter: StaffPermissionFilter = {}) =>
             orderBy: { id: "desc" },
         });
 
+        console.log("✅ getRolePermissions - Fetched Records:", staffPermissions.length);
         return {
             status: true,
             staffPermissions: serializeBigInt(staffPermissions),
         };
     } catch (error) {
-        console.error("❌ getStaffPermissions Error:", error);
+        console.error("❌ getRolePermissions Error:", error);
         return {
             status: false,
             message: "Error fetching staff permissions",
@@ -43,56 +74,56 @@ export const getStaffPermissions = async (filter: StaffPermissionFilter = {}) =>
     }
 };
 
+// ✅ Check Permission Status for a Staff
 export const checkStaffPermissionStatus = async (filter: StaffPermissionFilter = {}, staffId: number) => {
+    console.log("📥 checkStaffPermissionStatus - Input:", { filter, staffId });
+
     try {
+        const validationError = validateFilter(filter);
+        if (validationError) return { status: false, message: validationError };
 
-        if (!staffId || isNaN(staffId)) {
+        const { staff, message: staffError } = await getValidStaff(staffId);
+        if (staffError) return { status: false, message: staffError };
+
+        if (!staff || !staff.roleId) {
+            console.warn("⚠️ Staff not found with ID:", staffId);
             return {
                 status: false,
-                message: "Invalid staff ID",
+                message: "Staff not found",
             };
         }
 
-        // Fetch staff permissions based on the provided filter and staff ID
-        if (!filter.panel || !filter.module || !filter.action) {
-            return {
-                status: false,
-                message: "all of filter must be provided",
-            };
-        }
+        console.log("👤 Fetched Staff:", { id: staff.id, roleId: staff.roleId });
 
-        const isValidPanel = ["Admin", "Supplier", "Dropshipper"].includes(filter.panel);
-        if (!isValidPanel) {
-            return {
-                status: false,
-                message: "Invalid panel provided",
-            };
-        }
-
-        const staffPermissionsExist = await prisma.adminStaffPermission.findFirst({
+        const permission = await prisma.rolePermission.findFirst({
             where: {
                 panel: filter.panel,
                 module: filter.module,
-                action: filter.action
+                action: filter.action,
             },
         });
 
-        if (!staffPermissionsExist) {
+        if (!permission) {
+            console.warn("❌ No matching permission found");
             return {
                 status: false,
-                message: "No permissions found for the given filter",
+                message: "No matching permission found for the given filter",
             };
         }
 
-        const staffPermissions = await prisma.adminStaffHasPermission.findFirst({
+        console.log("🔎 Found Permission:", permission);
+
+        const roleHasPermission = await prisma.roleHasPermission.findFirst({
             where: {
-                adminStaffPermissionId: staffPermissionsExist.id,
-                adminStaffId: staffId
+                rolePermissionId: permission.id,
+                roleId: staff.roleId,
             },
             orderBy: { id: "desc" },
         });
 
-        if (!staffPermissions) {
+        console.log("🔐 Role Permission Check:", roleHasPermission);
+
+        if (!roleHasPermission) {
             return {
                 status: false,
                 message: "Action Unauthorized",
@@ -103,8 +134,9 @@ export const checkStaffPermissionStatus = async (filter: StaffPermissionFilter =
             status: true,
             message: "Action Authorized",
         };
+
     } catch (error) {
-        console.error("❌ getStaffPermissions Error:", error);
+        console.error("❌ checkStaffPermissionStatus Error:", error);
         return {
             status: false,
             message: "Error fetching staff permissions",
@@ -112,19 +144,24 @@ export const checkStaffPermissionStatus = async (filter: StaffPermissionFilter =
     }
 };
 
-export const getStaffPermissionsByStaffId = async (filter: StaffPermissionFilter = {}, staffId: number) => {
+// ✅ Get Permissions assigned to Staff
+export const getRolePermissionsByStaffId = async (filter: StaffPermissionFilter = {}, staffId: number) => {
+    console.log("📥 getRolePermissionsByStaffId - Input:", { filter, staffId });
+
     try {
-        // Validate staff ID
-        if (!staffId || isNaN(staffId)) {
+        const { staff, message: staffError } = await getValidStaff(staffId);
+        if (staffError) return { status: false, message: staffError };
+
+        if (!staff || !staff.roleId) {
+            console.warn("⚠️ Staff not found with ID:", staffId);
             return {
                 status: false,
-                message: "Invalid staff ID",
+                message: "Staff not found",
             };
         }
 
-        // Validate panel if provided
         if (filter.panel) {
-            const isValidPanel = ["Admin", "Supplier", "Dropshipper"].includes(filter.panel);
+            const isValidPanel = VALID_PANELS.includes(filter.panel);
             if (!isValidPanel) {
                 return {
                     status: false,
@@ -133,8 +170,7 @@ export const getStaffPermissionsByStaffId = async (filter: StaffPermissionFilter
             }
         }
 
-        // Fetch permissions matching the filter
-        const matchingPermissions = await prisma.adminStaffPermission.findMany({
+        const matchingPermissions = await prisma.rolePermission.findMany({
             where: {
                 ...(filter.panel && { panel: filter.panel }),
                 ...(filter.module && { module: filter.module }),
@@ -142,6 +178,8 @@ export const getStaffPermissionsByStaffId = async (filter: StaffPermissionFilter
             },
             orderBy: { id: 'desc' },
         });
+
+        console.log("🔎 Matching Permissions Found:", matchingPermissions.length);
 
         if (!matchingPermissions.length) {
             return {
@@ -151,20 +189,20 @@ export const getStaffPermissionsByStaffId = async (filter: StaffPermissionFilter
         }
 
         const permissionIds = matchingPermissions.map(p => p.id);
+        console.log("🧾 Permission IDs:", permissionIds);
 
-        // Get all permissions assigned to the staff from filtered list
-        const assignedPermissions = await prisma.adminStaffHasPermission.findMany({
+        const assignedPermissions = await prisma.roleHasPermission.findMany({
             where: {
-                adminStaffPermissionId: {
-                    in: permissionIds,
-                },
-                adminStaffId: staffId,
+                rolePermissionId: { in: permissionIds },
+                roleId: staff.roleId,
             },
             include: {
-                permission: true, // optional: if you want full permission data from relation
+                permission: true,
             },
             orderBy: { id: 'desc' },
         });
+
+        console.log("✅ Assigned Permissions:", assignedPermissions.length);
 
         if (!assignedPermissions.length) {
             return {
@@ -176,10 +214,10 @@ export const getStaffPermissionsByStaffId = async (filter: StaffPermissionFilter
         return {
             status: true,
             message: "Permissions retrieved successfully",
-            assignedPermissions,
+            assignedPermissions: serializeBigInt(assignedPermissions),
         };
     } catch (error) {
-        console.error("❌ getStaffPermissionsByStaffId Error:", error);
+        console.error("❌ getRolePermissionsByStaffId Error:", error);
         return {
             status: false,
             message: "Error retrieving staff permissions",

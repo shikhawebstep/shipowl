@@ -23,7 +23,7 @@ export default function DropshipperMiddleWareProvider({ children }) {
         try {
             const shippingData = JSON.parse(localStorage.getItem("shippingData"));
           
-            if (shippingData?.admin?.role === "dropshipper_staff") {
+            if (shippingData?.admin?.role === "dropshipper") {
                 setIsDropshipperStaff(true);
             }
         } catch (err) {

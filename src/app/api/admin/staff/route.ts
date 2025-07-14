@@ -88,11 +88,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const requiredFields = ['name', 'email', 'password'];
+    const requiredFields = ['name', 'email', 'password', 'role'];
     const formData = await req.formData();
     const validation = validateFormData(formData, {
       requiredFields: requiredFields,
-      patternValidations: { status: 'boolean' },
+      patternValidations: { status: 'boolean', role: 'number' },
     });
 
     if (!validation.isValid) {
@@ -156,7 +156,21 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const roleId = extractNumber('role');
+    const hasValidRole = typeof roleId === 'number' && !isNaN(roleId) && roleId > 0;
+
+    const roleField = hasValidRole
+      ? {
+        role: {
+          connect: {
+            id: roleId,
+          },
+        },
+      }
+      : {};
+
     const adminPayload = {
+      ...roleField,
       admin: {
         connect: {
           id: adminId,
@@ -166,7 +180,6 @@ export async function POST(req: NextRequest) {
       profilePicture: adminUploadedFiles['profilePicture'],
       email,
       phoneNumber: extractString('phoneNumber') || '',
-      permissions: extractString('permissions') || '',
       password: hashedPassword,
       permanentAddress: extractString('permanentAddress') || '',
       permanentPostalCode: extractString('permanentPostalCode') || '',

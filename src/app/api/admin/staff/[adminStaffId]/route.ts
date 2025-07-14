@@ -7,7 +7,7 @@ import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
 import { isLocationHierarchyCorrect } from '@/app/models/location/city';
 import { getAdminStaffById, checkEmailAvailabilityForUpdate, updateAdminStaff, restoreAdminStaff, softDeleteAdminStaff } from '@/app/models/admin/staff';
-import { getStaffPermissions } from '@/app/models/staffPermission';
+import { getRolePermissions } from '@/app/models/staffPermission';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
         panel: 'Admin',
       };
 
-      const staffPermissionsResult = await getStaffPermissions(options);
+      const staffPermissionsResult = await getRolePermissions(options);
       logMessage('info', 'Fetched staff permissions:', staffPermissionsResult);
 
       return NextResponse.json({ status: true, adminStaff: adminStaffResult.adminStaff, staffPermissions: staffPermissionsResult?.staffPermissions }, { status: 200 });

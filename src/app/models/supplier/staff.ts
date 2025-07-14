@@ -69,7 +69,7 @@ export async function checkEmailAvailability(email: string) {
         });
 
         // If the email is already in use by a supplierStaff
-        if (existingSupplierStaff && existingSupplierStaff.role === 'supplier_staff') {
+        if (existingSupplierStaff && existingSupplierStaff.role === 'supplier') {
             return {
                 status: false,
                 message: `Email "${email}" is already in use by a supplierStaff.`,
@@ -105,7 +105,7 @@ export async function checkEmailAvailabilityForUpdate(email: string, supplierSta
         });
 
         // If the email is already in use by a supplierStaff
-        if (existingSupplierStaff && existingSupplierStaff.role === 'supplier_staff') {
+        if (existingSupplierStaff && existingSupplierStaff.role === 'supplier') {
             return {
                 status: false,
                 message: `Email "${email}" is already in use by a supplierStaff.`,
@@ -145,7 +145,7 @@ export async function createSupplierStaff(supplierId: number, supplierRole: stri
                 email,
                 phoneNumber,
                 password,
-                role: 'supplier_staff',
+                role: 'supplier',
                 permanentAddress,
                 permanentPostalCode,
                 permanentCity,
@@ -167,7 +167,7 @@ export async function createSupplierStaff(supplierId: number, supplierRole: stri
                 }
 
                 const permissionExists = await prisma.adminStaffPermission.findFirst({
-                    where: { id: Number(permission), panel: 'supplier' }
+                    where: { id: Number(permission), panel: 'supplier_staff' }
                 });
 
                 if (permissionExists) {
@@ -197,10 +197,10 @@ export const getSupplierStaffsByStatus = async (
 
         switch (status) {
             case "notDeleted":
-                whereCondition = { role: 'supplier_staff', deletedAt: null };
+                whereCondition = { role: 'supplier', deletedAt: null };
                 break;
             case "deleted":
-                whereCondition = { role: 'supplier_staff', deletedAt: { not: null } };
+                whereCondition = { role: 'supplier', deletedAt: { not: null } };
                 break;
             default:
                 throw new Error("Invalid status");
@@ -224,7 +224,7 @@ export const getSupplierStaffsByStatus = async (
 export const getSupplierStaffById = async (id: number, withPassword: boolean | string | number = false) => {
     try {
         const supplierStaff = await prisma.adminStaff.findUnique({
-            where: { id, role: 'supplier_staff' },
+            where: { id, role: 'supplier' },
             include: {
                 adminStaffPermissions: true,
             }
@@ -304,7 +304,7 @@ export const updateSupplierStaff = async (
             email,
             phoneNumber,
             password: finalPassword,
-            role: 'supplier_staff',
+            role: 'supplier',
             permanentAddress,
             permanentPostalCode,
             permanentCity,
@@ -338,7 +338,7 @@ export const updateSupplierStaff = async (
                 }
 
                 const permissionExists = await prisma.adminStaffPermission.findFirst({
-                    where: { id: permissionId, panel: 'supplier' },
+                    where: { id: permissionId, panel: 'supplier_staff' },
                 });
 
                 if (!permissionExists) {
@@ -387,7 +387,7 @@ export const softDeleteSupplierStaff = async (supplierId: number, supplierStaffR
     try {
         // Soft delete the supplierStaff
         const updatedSupplierStaff = await prisma.adminStaff.update({
-            where: { id, role: 'supplier_staff' },
+            where: { id, role: 'supplier' },
             data: {
                 deletedBy: supplierId,
                 deletedAt: new Date(),
@@ -438,7 +438,7 @@ export const restoreSupplierStaff = async (supplierId: number, supplierStaffRole
 export const deleteSupplierStaff = async (id: number) => {
     try {
         console.log(`id - `, id);
-        await prisma.adminStaff.delete({ where: { id, role: 'supplier_staff' } });
+        await prisma.adminStaff.delete({ where: { id, role: 'supplier' } });
         return { status: true, message: "SupplierStaff deleted successfully" };
     } catch (error) {
         console.error("❌ deleteSupplierStaff Error:", error);
