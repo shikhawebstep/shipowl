@@ -22,7 +22,7 @@ export default function SupplierMiddleWareProvider({ children }) {
     const checkSupplierRole = () => {
         try {
             const shippingData = JSON.parse(localStorage.getItem("shippingData"));
-            if (shippingData?.supplier?.role === "supplier") {
+            if (shippingData?.supplier?.role === "supplier_staff") {
                 setIsSupplierStaff(true);
             }
         } catch (err) {

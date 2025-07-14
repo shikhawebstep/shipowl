@@ -91,14 +91,7 @@ export default function ShippingDetails() {
           showConfirmButton: true,
         }).then((res) => {
           if (res.isConfirmed) {
-            let images = formData[type]?.split(",") || [];
-            images.splice(index, 1);
-
-            // Update state using setFormData
-            setFormData((prev) => ({
-              ...prev,
-              [type]: images.join(","),
-            }));
+            window.location.reload(); // ✅ Works for Pages Router
           }
         });
       }

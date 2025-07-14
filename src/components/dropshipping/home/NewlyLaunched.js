@@ -419,25 +419,13 @@ const NewlyLaunched = () => {
               </div>
 
               {products.map((product, index) => {
+
                 const productName = product?.product?.name || "NIL";
                 const variants = product?.variants || [];
-                const firstVariantImageString = product?.product?.gallery;
-                let imageSortingIndex = {};
-                try {
-                  imageSortingIndex = JSON.parse(product.imageSortingIndex || product?.product?.imageSortingIndex || '{}');
-                } catch (err) {
-                  console.error('Failed to parse imageSortingIndex:', err);
-                }
 
-                // Default to [] if no .gallery present
-                const productImageSortingIndex = Array.isArray(imageSortingIndex.gallery)
-                  ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value) - parseInt(b.value))
-                  : [];
+                const firstVariantImageString =product?.product?.gallery
 
-
-                const firstImageIndex = productImageSortingIndex[0]?.index ?? 0;
-
-                const imageUrl = firstVariantImageString.split(",")[firstImageIndex]?.trim() || "/default-image.jpg";
+                const imageUrl = firstVariantImageString.split(",")[0]?.trim() || "/default-image.jpg";
 
                 return (
                   <div
@@ -616,7 +604,7 @@ const NewlyLaunched = () => {
                           <VariantCard
                             variant={variant}
                             handleVariantChange={handleVariantChange}
-
+                           
                           />
                         );
                       }
@@ -641,7 +629,7 @@ const NewlyLaunched = () => {
                                     <VariantCard
                                       variant={variant}
                                       handleVariantChange={handleVariantChange}
-
+                                     
                                     />
                                   </div>
                                 ))}
@@ -671,7 +659,7 @@ const NewlyLaunched = () => {
                                     <VariantCard
                                       variant={variant}
                                       handleVariantChange={handleVariantChange}
-
+                                     
                                     />
                                   )}
                                 </label>
@@ -717,7 +705,7 @@ const NewlyLaunched = () => {
                                     <VariantCard
                                       variant={variant}
                                       handleVariantChange={handleVariantChange}
-
+                                      
                                     />
                                   </div>
                                 ))}
@@ -776,7 +764,7 @@ const NewlyLaunched = () => {
                       ...v
                     };
                   }
-
+                  
 
                   const isExists = selectedProduct?.product?.isVarientExists;
 
@@ -786,7 +774,7 @@ const NewlyLaunched = () => {
                       className="bg-white p-4 rounded-md  border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
                     >
                       <div className='flex gap-2 relative'>
-
+                      
                         <div className="w-full text-center bg-orange-500 p-2 text-white ">Suggested Price : {v.price || v?.supplierProductVariant?.price || "—"}</div>
 
 
@@ -839,7 +827,7 @@ const VariantCard = ({ variant, handleVariantChange }) => {
   return (
     <div key={variant.id} className="space-y-5 border p-4 rounded-lg shadow-sm">
       <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
-
+        
         <div>
           <p className="text-sm font-medium leading-5 line-clamp-2">
             {variant.name || 'Stainless Steel Cable Lock Ties'}

@@ -7,10 +7,10 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import Image from 'next/image';
 
 const dummyPermissions = [
-  { module: 'admin', panel: 'admin_staff', action: 'listing' },
-  { module: 'admin', panel: 'admin_staff', action: 'view' },
-  { module: 'admin', panel: 'admin_staff', action: 'update' },
-  { module: 'admin', panel: 'admin_staff', action: 'soft-delete' },
+  { module: 'admin', panel: 'admin', action: 'listing' },
+  { module: 'admin', panel: 'admin', action: 'view' },
+  { module: 'admin', panel: 'admin', action: 'update' },
+  { module: 'admin', panel: 'admin', action: 'soft-delete' },
   { module: 'dropshipper', panel: 'product-request', action: 'create' },
 ];
 

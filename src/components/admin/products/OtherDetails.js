@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Swal from 'sweetalert2';
 
 export default function OtherDetails() {
-  const { formData, setFormData, files,setFiles } = useContext(ProductContextEdit);
+  const { formData, setFormData, files } = useContext(ProductContextEdit);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({});
 
@@ -66,7 +66,6 @@ export default function OtherDetails() {
       const form = new FormData();
 
       const combinedData = { ...formData, ...files };
-      console.log('files(!)_',files)
 
       for (const key in combinedData) {
         let value = combinedData[key];
@@ -122,7 +121,6 @@ export default function OtherDetails() {
       }).then((res) => {
         if (res.isConfirmed) {
           setFormData({});
-          setFiles({});
           router.push('/admin/products/list');
         }
       });

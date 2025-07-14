@@ -95,7 +95,7 @@ export default function Login() {
                 },
             };
 
-            if (admin.role === "admin" && Array.isArray(assignedPermissions)) {
+            if (admin.role === "admin_staff" && Array.isArray(assignedPermissions)) {
                 localStorage.setItem("permissions", JSON.stringify(assignedPermissions));
             } else {
                 localStorage.removeItem("permissions");

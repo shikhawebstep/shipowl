@@ -47,7 +47,7 @@ export default function ProductDetails() {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [activeModal, setActiveModal] = useState('Shipowl');
   const [activeModalPushToShopify, setActiveModalPushToShopify] = useState('Shipowl');
-  const [images, setImages] = useState(productDetails?.gallery?.split(",") || productDetails?.gallery?.split(",") || []);
+  const images = productDetails?.gallery?.split(",") || productDetails?.gallery?.split(",") || [];
   const [selectedImage, setSelectedImage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [inventoryData, setInventoryData] = useState({
@@ -65,45 +65,14 @@ export default function ProductDetails() {
     setTooltipIndex(prev => (prev === index ? null : index));
   };
   console.log('selectedVariant', selectedVariant)
-
   useEffect(() => {
-    let imageSortingIndex = {};
-    try {
-      imageSortingIndex = JSON.parse(productDetails.imageSortingIndex || '{}');
-    } catch (err) {
-      console.error('Failed to parse imageSortingIndex:', err);
-    }
-
     const images =
       productDetails?.gallery?.split(",") ||
       productDetails?.gallery?.split(",") ||
       [];
 
-    const sortingList = Array.isArray(imageSortingIndex.gallery)
-      ? [...imageSortingIndex.gallery]
-      : [];
-
-    // Create a map for fast lookup
-    const indexMap = new Map();
-    sortingList.forEach(item => {
-      if (typeof item.index === 'number') {
-        indexMap.set(item.index, parseInt(item.value));
-      }
-    });
-
-    // Sort images according to sorting index
-    const sortedImages = [...images]
-      .map((img, idx) => ({
-        img,
-        sortOrder: indexMap.has(idx) ? indexMap.get(idx) : Number.MAX_SAFE_INTEGER
-      }))
-      .sort((a, b) => a.sortOrder - b.sortOrder)
-      .map(obj => obj.img);
-
-    setImages(sortedImages);
-    setSelectedImage(sortedImages[0] ?? '');
-  }, [selectedVariant, productDetails]);
-
+    setSelectedImage(images[0] ?? "");
+  }, [selectedVariant]);
 
   const handleVariantChange = (id, field, value) => {
     // If field is global (e.g., shopifyStore), update it at root level
@@ -675,7 +644,7 @@ export default function ProductDetails() {
                                       >
 
                                         <div className="">
-
+                                        
                                           <div className=" text-gray-700 space-y-1 text-left">
                                             <div>Name: <span className="font-medium">{variant.name}</span></div>
                                             <div className="flex items-center gap-1 text-sm text-gray-700">
@@ -773,7 +742,7 @@ export default function ProductDetails() {
                                           }`}
                                       >
                                         <div className="">
-
+                                        
                                           <div className=" text-gray-700 space-y-1 text-left">
                                             <div>Name: <span className="font-medium">{variant.name}</span></div>
                                             <div className="flex items-center gap-1 text-sm text-gray-700">
@@ -1395,8 +1364,8 @@ export default function ProductDetails() {
               const variants = item.variants || [];
 
               const firstVariantImageString =
-                product?.gallery || // case 1
-                product?.gallery ||                         // case 2
+               product?.gallery || // case 1
+                product?.gallery||                         // case 2
                 "";
 
               const imageUrl = firstVariantImageString.split(",")[0]?.trim() || "/default-image.jpg";

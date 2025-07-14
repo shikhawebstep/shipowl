@@ -16,7 +16,7 @@ const ProductProviderEdit = ({ children }) => {
   const [countryData, setCountryData] = useState([]);
   const [isEdit, setIsEdit] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState({});
 
   const [formData, setFormData] = useState({
     category: '',
@@ -57,7 +57,6 @@ const ProductProviderEdit = ({ children }) => {
     isVarientExists: '',
     supplierIds: '',
     status: true,
-    imageSortingIndex:"",
   });
 
   const fetchCategory = useCallback(async () => {

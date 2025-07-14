@@ -48,10 +48,8 @@ export default function Header() {
 
 useEffect(() => {
   const data = JSON.parse(localStorage.getItem("shippingData"));
-  
-
   if (data) {
-    setUserName(data?.supplier?.companyName || data?.supplier?.name || 'User');
+    setUserName(data?.supplier?.name || 'User');
     setActivePanel(data?.project?.active_panel || 'Panel');
   }
 }, []);

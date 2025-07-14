@@ -117,7 +117,6 @@ export default function Login() {
                         name: admin.name,
                         email: admin.email,
                         role: admin.role,
-                        companyName: admin.companyName,
                     },
                     session: {
                         is_authenticated: true,
@@ -130,7 +129,7 @@ export default function Login() {
 
                 localStorage.setItem("shippingData", JSON.stringify(shippingData));
 
-                if (admin.role === "supplier" && Array.isArray(result.assignedPermissions)) {
+                if (admin.role === "supplier_staff" && Array.isArray(result.assignedPermissions)) {
                     localStorage.setItem("supplierPermissions", JSON.stringify(result.assignedPermissions));
                 } else {
                     localStorage.removeItem("supplierPermissions");
