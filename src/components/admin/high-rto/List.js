@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useAdminActions } from "@/components/commonfunctions/MainContext";
-
+import { IoFilterSharp } from "react-icons/io5";
 export default function List() {
     const [isTrashed, setIsTrashed] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -20,6 +20,11 @@ export default function List() {
     const [countryData, setCountryData] = useState([]);
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("high-rto", "highRtos");
+    const [countryFilter, setCountryFilter] = useState('');
+    const [stateFilter, setStateFilter] = useState('');
+    const [cityFilter, setCityFilter] = useState('');
+    const [pincodeFilter, setPincodeFilter] = useState('');
+    const [activeFilter, setActiveFilter] = useState(null);
 
 
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
@@ -76,23 +81,6 @@ export default function List() {
     }, []);
 
 
-    // Initial Auth + fetch
-    useEffect(() => {
-        const fetchInitialData = async () => {
-            await verifyAdminAuth();
-            await checkAdminRole();
-            await fetchAll(setData, setLoading);
-
-            // Fetch all countries, states, and cities unconditionally
-            await Promise.all([
-                fetchCountry(),
-                fetchState(),
-                fetchCity()
-            ]);
-        };
-
-        fetchInitialData();
-    }, [fetchAll, fetchCity, fetchState, fetchCountry]);
 
 
     const handleToggleTrash = async () => {
@@ -108,9 +96,12 @@ export default function List() {
     const handleRestore = (id) => restore(id, () => fetchTrashed(setData, setLoading));
     const handleDestroy = (id) => destroy(id, () => fetchTrashed(setData, setLoading));
 
+
     useEffect(() => {
-        if (typeof window !== "undefined" && data.length > 0 && !loading) {
-          Promise.all([
+        if (typeof window !== 'undefined' && data.length > 0 && !loading) {
+            let table = null;
+
+            Promise.all([
                 import('jquery'),
                 import('datatables.net'),
                 import('datatables.net-dt'),
@@ -145,9 +136,31 @@ export default function List() {
                         $('#highRto').empty();
                     }
                 };
-            }).catch(console.error);
+            }).catch((error) => {
+                console.error('Failed to load DataTables dependencies:', error);
+            });
         }
     }, [data, loading]);
+
+
+
+    // Initial Auth + fetch
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            await verifyAdminAuth();
+            await checkAdminRole();
+            await fetchAll(setData, setLoading);
+
+            // Fetch all countries, states, and cities unconditionally
+            await Promise.all([
+                fetchCountry(),
+                fetchState(),
+                fetchCity()
+            ]);
+        };
+
+        fetchInitialData();
+    }, [fetchAll, fetchCity, fetchState, fetchCountry]);
 
     if (loading) {
         return (
@@ -163,15 +176,32 @@ export default function List() {
                 <h2 className="text-2xl font-bold text-[#2B3674]">High Rto List</h2>
                 <div className="flex gap-3 flex-wrap items-center">
                     <div className="md:flex hidden justify-start gap-5 items-end">
+                        <button
+                            onClick={() => {
+                                setCountryFilter('');
+                                setStateFilter('');
+                                setCityFilter('');
+                                setPincodeFilter('');
+                                setActiveFilter(null);
+                                if (window.$.fn.DataTable.isDataTable('#highRto')) {
+                                    window.$('#highRto').DataTable().columns().search('').draw();
+                                }
+                            }}
+                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+
+                        >
+                            Clear All Filters
+                        </button>
+
                         {canViewTrashed && <button
-                            className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                            className={`p-3 py-2 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                             onClick={handleToggleTrash}
                         >
                             {isTrashed ? "Bad Pincodes Listing (Simple)" : "Trashed Pincodes"}
                         </button>
                         }
                         {canAdd && <Link href="/admin/high-rto/create">
-                            <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'>Add New</button>
+                            <button className='bg-[#4285F4] text-white rounded-md p-3 py-2 px-8'>Add New</button>
                         </Link>
                         }
                     </div>
@@ -209,19 +239,169 @@ export default function List() {
                     </button>
                 </div>
             </div>
+            {activeFilter && (
+                <div
+                    className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                    style={{
+                        top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                        left: activeFilter.position.left + 'px',
+                    }}
+                >
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="text-sm font-medium text-gray-700">{activeFilter.label}</label>
+                        <button
+                            onClick={() => {
+                                activeFilter.setValue('');
+                                setActiveFilter(null);
+                                if (window.$.fn.DataTable.isDataTable('#highRto')) {
+                                    window.$('#highRto').DataTable().column(activeFilter.columnIndex).search('').draw();
+                                }
+                            }}
+                            className="text-red-500 text-xs hover:underline"
+                        >
+                            Reset
+                        </button>
+                    </div>
+
+                    <input
+                        type="text"
+                        value={
+                            activeFilter.key === 'country' ? countryFilter :
+                                activeFilter.key === 'state' ? stateFilter :
+                                    activeFilter.key === 'city' ? cityFilter :
+                                        activeFilter.key === 'pincode' ? pincodeFilter :
+                                            ''
+                        }
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (activeFilter.key === 'city') setCityFilter(val);
+                            if (activeFilter.key === 'state') setStateFilter(val);
+                            if (activeFilter.key === 'country') setCountryFilter(val);
+                            if (activeFilter.key === 'pincode') setPincodeFilter(val);
+                        }}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                        placeholder={`Enter ${activeFilter.label}`}
+                    />
+
+                    <div className="flex justify-between mt-4">
+                        <button
+                            onClick={() => setActiveFilter(null)}
+                            className="text-sm text-gray-500 hover:underline"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                const filterValue =
+                                    activeFilter.key === 'city'
+                                        ? cityFilter
+                                        : activeFilter.key === 'state'
+                                            ? stateFilter
+                                            : activeFilter.key === 'country'
+                                                ? countryFilter
+                                                : activeFilter.key === 'pincode'
+                                                    ? pincodeFilter
+                                                    : '';
+
+                                if (window.$.fn.DataTable.isDataTable('#highRto')) {
+                                    window.$('#highRto')
+                                        .DataTable()
+                                        .column(activeFilter.columnIndex)
+                                        .search(filterValue)
+                                        .draw();
+                                }
+                                setActiveFilter(null);
+                            }}
+                            className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                        >
+                            Apply
+                        </button>
+                    </div>
+                </div>
+            )}
+
 
             {data.length > 0 ? (
                 <div className="overflow-x-auto relative main-outer-wrapper w-full">
                     <table className="md:w-full w-auto display main-tables" id="highRto">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country</th>
-                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">State</th>
-                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">City</th>
-                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Pincode</th>
+                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'country',
+                                                label: 'Country',
+                                                setValue: setCountryFilter,
+                                                value: countryFilter,
+                                                columnIndex: 0,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Country <IoFilterSharp />
+                                    </button>
+                                </th>
+
+                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'state',
+                                                label: 'State',
+                                                setValue: setStateFilter,
+                                                value: stateFilter,
+                                                columnIndex: 1,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        State <IoFilterSharp />
+                                    </button>
+                                </th>
+
+                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'city',
+                                                label: 'City',
+                                                setValue: setCityFilter,
+                                                value: cityFilter,
+                                                columnIndex: 2,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        City <IoFilterSharp />
+                                    </button>
+                                </th>
+
+                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'pincode',
+                                                label: 'Pincode',
+                                                setValue: setPincodeFilter,
+                                                value: pincodeFilter,
+                                                columnIndex: 3,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Pincode <IoFilterSharp />
+                                    </button>
+                                </th>
+
                                 <th className="p-2 whitespace-nowrap px-5 text-end uppercase flex justify-end">Action</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {data.map((item) => (
                                 <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">

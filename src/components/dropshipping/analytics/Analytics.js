@@ -79,7 +79,7 @@ export default function Analytics() {
                     text:
                         result.message ||
                         result.error ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     result.message || result.error || "Something Wrong!"

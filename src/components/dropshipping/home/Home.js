@@ -7,7 +7,6 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const Home = () => {
-    console.log(`Step 1111`);
     const [loading, setLoading] = useState(true);
     const { verifyDropShipperAuth } = useDropshipper();
     const router = useRouter();
@@ -47,7 +46,6 @@ const Home = () => {
                 return response.text();
             })
             .then((result) => {
-                console.log("Success:", result);
                 localStorage.removeItem("shopifyStore");
             })
             .catch((error) => {
@@ -62,7 +60,6 @@ const Home = () => {
     useEffect(() => {
         const checkAuthAndFetch = async () => {
             const isValid = await verifyDropShipperAuth();
-            console.log('isValid && shopifyStore', isValid, shopifyStore)
             if (isValid && shopifyStore) {
                 fetchShopifyStore();
             } else {

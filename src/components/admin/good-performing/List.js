@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useAdminActions } from "@/components/commonfunctions/MainContext";
-
+import { IoFilterSharp } from "react-icons/io5";
 export default function List() {
     const [isTrashed, setIsTrashed] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -19,6 +19,8 @@ export default function List() {
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("good-pincode", "goodPincodes");
+const [pincodeFilter, setPincodeFilter] = useState('');
+const [activeFilter, setActiveFilter] = useState(null);
 
     // Initial Auth + fetch
     useEffect(() => {
@@ -153,20 +155,99 @@ export default function List() {
                         )}
                     </button>
                     <div className="md:flex hidden justify-start gap-5 items-end">
+                        <button
+                            onClick={() => {
+                                setPincodeFilter('');
+                                if (window.$.fn.DataTable.isDataTable('#goodPincodes')) {
+                                    window.$('#goodPincodes').DataTable().columns().search('').draw();
+                                }
+                            }}
+                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                        >
+                            Clear All Filters
+                        </button>
+
                         {canViewTrashed && <button
-                            className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                            className={`p-3 py-2 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                             onClick={handleToggleTrash}
                         >
                             {isTrashed ? "Good Pincodes Listing (Simple)" : "Trashed Pincodes"}
                         </button>
                         }
-                        {canAdd && <button className="bg-[#4285F4] text-white rounded-md p-3 px-8">
+                        {canAdd && <button className="bg-[#4285F4] text-white rounded-md p-3 py-2 px-8">
                             <Link href="/admin/good-pincodes/create">Add New</Link>
                         </button>
                         }
                     </div>
                 </div>
             </div>
+            {activeFilter && (
+                <div
+                    className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                    style={{
+                        top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                        left: activeFilter.position.left + 'px',
+                    }}
+                >
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="text-sm font-medium text-gray-700">
+                            {activeFilter.label}
+                        </label>
+                        <button
+                            onClick={() => {
+                                activeFilter.setValue('');
+                                setActiveFilter(null);
+                                if (window.$.fn.DataTable.isDataTable('#goodPincodes')) {
+                                    window.$('#goodPincodes')
+                                        .DataTable()
+                                        .column(activeFilter.columnIndex)
+                                        .search('')
+                                        .draw();
+                                }
+                            }}
+                            className="text-red-500 text-xs hover:underline"
+                        >
+                            Reset
+                        </button>
+                    </div>
+
+                    <input
+                        type="text"
+                        value={
+                            activeFilter.key === 'pincode' ? pincodeFilter : ''
+                        }
+                        onChange={(e) => activeFilter.setValue(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                        placeholder={`Enter ${activeFilter.label}`}
+                    />
+
+                    <div className="flex justify-between mt-4">
+                        <button
+                            onClick={() => setActiveFilter(null)}
+                            className="text-sm text-gray-500 hover:underline"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (window.$.fn.DataTable.isDataTable('#goodPincodes')) {
+                                    window.$('#goodPincodes')
+                                        .DataTable()
+                                        .column(activeFilter.columnIndex)
+                                        .search(
+                                            activeFilter.key === 'pincode' ? pincodeFilter : ''
+                                        )
+                                        .draw();
+                                }
+                                setActiveFilter(null);
+                            }}
+                            className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                        >
+                            Apply
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {data.length > 0 ? (
                 <div className="overflow-x-auto relative main-outer-wrapper w-full">
@@ -174,10 +255,29 @@ export default function List() {
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                 <th className="p-2 px-5 text-left uppercase">SR.</th>
-                                <th className="p-2 px-5 text-left uppercase">Pincode</th>
+
+                                <th className="p-2 px-5 text-left uppercase relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'pincode',
+                                                label: 'Pincode',
+                                                setValue: setPincodeFilter,
+                                                getValue: () => pincodeFilter,
+                                                columnIndex: 1,
+                                                position: e.currentTarget.getBoundingClientRect()
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Pincode <IoFilterSharp />
+                                    </button>
+                                </th>
+
                                 <th className="p-2 px-5 text-left uppercase">Action</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {data.map((item, index) => (
                                 <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">

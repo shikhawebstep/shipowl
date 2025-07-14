@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 
-
+import { IoFilterSharp } from "react-icons/io5";
 export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isTrashed, setIsTrashed] = useState(false);
@@ -20,6 +20,13 @@ export default function List() {
     const [countryData, setCountryData] = useState([]);
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const router = useRouter();
+    const [nameFilter, setNameFilter] = useState('');
+    const [iso2Filter, setIso2Filter] = useState('');
+    const [iso3Filter, setIso3Filter] = useState('');
+    const [phoneCodeFilter, setPhoneCodeFilter] = useState('');
+    const [currencyFilter, setCurrencyFilter] = useState('');
+    const [nationalityFilter, setNationalityFilter] = useState('');
+    const [activeFilter, setActiveFilter] = useState(null);
 
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
@@ -63,7 +70,7 @@ export default function List() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -117,7 +124,7 @@ export default function List() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -371,7 +378,7 @@ export default function List() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -552,6 +559,26 @@ export default function List() {
                                 )}
                             </button>
                             <div className="md:flex hidden justify-end gap-2">
+                                <button
+                                    onClick={() => {
+                                        setNameFilter('');
+                                        setIso2Filter('');
+                                        setIso3Filter('');
+                                        setPhoneCodeFilter('');
+                                        setCurrencyFilter('');
+                                        setNationalityFilter('');
+                                        setActiveFilter(null);
+
+                                        if ($.fn.DataTable.isDataTable('#countryTable')) {
+                                            const table = $('#countryTable').DataTable();
+                                            table.search('').columns().search('').draw();
+                                        }
+                                    }}
+                                    className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                                >
+                                    Clear All Filters
+                                </button>
+
                                 {canViewTrashed && <button
                                     className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                     onClick={async () => {
@@ -577,21 +604,252 @@ export default function List() {
                             </div>
                         </div>
                     </div>
+                    {activeFilter && (
+                        <div
+                            className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                            style={{
+                                top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                                left: activeFilter.position.left + 'px',
+                            }}
+                        >
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="text-sm font-medium text-gray-700">
+                                    {activeFilter.label}
+                                </label>
+                                <button
+                                    onClick={() => {
+                                        switch (activeFilter.key) {
+                                            case 'name':
+                                                setNameFilter('');
+                                                break;
+                                            case 'iso2':
+                                                setIso2Filter('');
+                                                break;
+                                            case 'iso3':
+                                                setIso3Filter('');
+                                                break;
+                                            case 'phonecode':
+                                                setPhoneCodeFilter('');
+                                                break;
+                                            case 'currency':
+                                                setCurrencyFilter('');
+                                                break;
+                                            case 'nationality':
+                                                setNationalityFilter('');
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                        setActiveFilter(null);
+                                        if ($.fn.DataTable.isDataTable('#countryTable')) {
+                                            $('#countryTable').DataTable().column(activeFilter.columnIndex).search('').draw();
+                                        }
+                                    }}
+                                    className="text-red-500 text-xs hover:underline"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+
+                            <input
+                                type="text"
+                                value={
+                                    activeFilter.key === 'name' ? nameFilter :
+                                        activeFilter.key === 'iso2' ? iso2Filter :
+                                            activeFilter.key === 'iso3' ? iso3Filter :
+                                                activeFilter.key === 'phonecode' ? phoneCodeFilter :
+                                                    activeFilter.key === 'currency' ? currencyFilter :
+                                                        activeFilter.key === 'nationality' ? nationalityFilter :
+                                                            ''
+                                }
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    switch (activeFilter.key) {
+                                        case 'name':
+                                            setNameFilter(val);
+                                            break;
+                                        case 'iso2':
+                                            setIso2Filter(val);
+                                            break;
+                                        case 'iso3':
+                                            setIso3Filter(val);
+                                            break;
+                                        case 'phonecode':
+                                            setPhoneCodeFilter(val);
+                                            break;
+                                        case 'currency':
+                                            setCurrencyFilter(val);
+                                            break;
+                                        case 'nationality':
+                                            setNationalityFilter(val);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }}
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                                placeholder={`Enter ${activeFilter.label}`}
+                            />
+
+                            <div className="flex justify-between mt-4">
+                                <button
+                                    onClick={() => setActiveFilter(null)}
+                                    className="text-sm text-gray-500 hover:underline"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        let value = '';
+                                        switch (activeFilter.key) {
+                                            case 'name':
+                                                value = nameFilter;
+                                                break;
+                                            case 'iso2':
+                                                value = iso2Filter;
+                                                break;
+                                            case 'iso3':
+                                                value = iso3Filter;
+                                                break;
+                                            case 'phonecode':
+                                                value = phoneCodeFilter;
+                                                break;
+                                            case 'currency':
+                                                value = currencyFilter;
+                                                break;
+                                            case 'nationality':
+                                                value = nationalityFilter;
+                                                break;
+                                            default:
+                                                break;
+                                        }
+
+                                        if ($.fn.DataTable.isDataTable('#countryTable')) {
+                                            $('#countryTable').DataTable().column(activeFilter.columnIndex).search(value).draw();
+                                        }
+
+                                        setActiveFilter(null);
+                                    }}
+                                    className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                                >
+                                    Apply
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
 
                     {countryData.length > 0 ? (
                         <div className="overflow-x-auto w-full relative">
                             <table id="countryTable" className="display main-tables">
                                 <thead>
                                     <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">Name</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">ISO2 Code</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">iso3 code</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">phonecode</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">currency</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">nationality</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
+                                        <th className="p-2 text-left uppercase relative">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'name',
+                                                        label: 'Name',
+                                                        value: nameFilter,
+                                                        setValue: setNameFilter,
+                                                        columnIndex: 0,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                Name <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="p-2 text-left uppercase relative">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'iso2',
+                                                        label: 'ISO2 Code',
+                                                        value: iso2Filter,
+                                                        setValue: setIso2Filter,
+                                                        columnIndex: 1,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                ISO2 <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="p-2 text-left uppercase relative">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'iso3',
+                                                        label: 'ISO3 Code',
+                                                        value: iso3Filter,
+                                                        setValue: setIso3Filter,
+                                                        columnIndex: 2,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                ISO3 <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="p-2 text-left uppercase relative">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'phonecode',
+                                                        label: 'Phonecode',
+                                                        value: phoneCodeFilter,
+                                                        setValue: setPhoneCodeFilter,
+                                                        columnIndex: 3,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                Phonecode <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="p-2 text-left uppercase relative">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'currency',
+                                                        label: 'Currency',
+                                                        value: currencyFilter,
+                                                        setValue: setCurrencyFilter,
+                                                        columnIndex: 4,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                Currency <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="p-2 text-left uppercase relative">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'nationality',
+                                                        label: 'Nationality',
+                                                        value: nationalityFilter,
+                                                        setValue: setNationalityFilter,
+                                                        columnIndex: 5,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                Nationality <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="p-2 text-center uppercase">Action</th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     {countryData.map((item) => (
                                         <tr key={item.id} className=" text-left bg-transparent border-b border-[#E9EDF7] text-[#2B3674] font-semibold">

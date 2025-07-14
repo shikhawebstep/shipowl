@@ -79,7 +79,7 @@ export default function NewProducts() {
           text:
             errorMessage.error ||
             errorMessage.message ||
-            "Your session has expired. Please log in again.",
+            "Network Error.",
         });
         throw new Error(errorMessage.message || errorMessage.error || "Something Went Wrong!");
       }
@@ -224,6 +224,17 @@ export default function NewProducts() {
               const imageUrl = product?.gallery?.split(',') || [];
 
               const productName = product.name || "Unnamed Product";
+              let imageSortingIndex = {};
+              try {
+                imageSortingIndex = JSON.parse(product.imageSortingIndex || '{}');
+              } catch (err) {
+                console.error('Failed to parse imageSortingIndex:', err);
+              }
+
+              const productImageSortingIndex = [...imageSortingIndex.gallery].sort((a, b) => {
+                return parseInt(a.value) - parseInt(b.value);
+              });
+              const firstImageIndex = productImageSortingIndex[0]?.index || 0;
 
               const getPriceDisplay = (variants) => {
                 if (!variants?.length) return <span>N/A</span>;
@@ -270,6 +281,7 @@ export default function NewProducts() {
                 );
               };
 
+
               return (
                 <div
                   key={index}
@@ -282,7 +294,7 @@ export default function NewProducts() {
                       <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                         {/* FRONT */}
                         <Image
-                          src={fetchImages(imageUrl[0])}
+                          src={fetchImages(imageUrl[firstImageIndex])}
                           alt={productName}
                           height={200}
                           width={100}

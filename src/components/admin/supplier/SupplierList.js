@@ -12,6 +12,8 @@ import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import { useAdminActions } from '@/components/commonfunctions/MainContext';
 import { ProfileContext } from './ProfileContext';
 import Swal from 'sweetalert2';
+import { IoFilterSharp } from "react-icons/io5";
+
 const SupplierList = () => {
     const [currentTab, setCurrentTab] = useState('active');
 
@@ -25,6 +27,15 @@ const SupplierList = () => {
     const [expandPassModal, setExpandPassModal] = useState(null);
     const [selected, setSelected] = useState([]);
     const { setActiveSubTab } = useContext(ProfileContext);
+
+    const [activeFilter, setActiveFilter] = useState(null);
+    const [nameFilter, setNameFilter] = useState('');
+    const [emailFilter, setEmailFilter] = useState('');
+    const [permanentAddressFilter, setPermanentAddressFilter] = useState('');
+
+    const [statusFilter, setStatusFilter] = useState('');
+    const [localInputValue, setLocalInputValue] = useState('');
+
 
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
@@ -254,7 +265,7 @@ const SupplierList = () => {
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+                    text: errorMessage.error || errorMessage.message || "Network Error.",
                 });
                 throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
             }
@@ -275,6 +286,21 @@ const SupplierList = () => {
     });
 
     const isDisabled = !inactiveSuppliers || inactiveSuppliers.length === 0;
+    const handleClearFilters = () => {
+        // Reset local filter states
+        setNameFilter('');
+        setEmailFilter('');
+        setPermanentAddressFilter('');
+        setStatusFilter('');
+        setActiveFilter(null);
+
+        // Clear DataTable filters
+        if ($.fn.DataTable.isDataTable("#supplierTable")) {
+            const table = $("#supplierTable").DataTable();
+            table.columns().search('').draw(); // Clear all column searches
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-[300px]">
@@ -317,6 +343,12 @@ const SupplierList = () => {
                         )}
                     </button>
                     <div className="md:flex hidden justify-end gap-2">
+                        <button
+                            onClick={handleClearFilters}
+                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                        >
+                            Clear Filters
+                        </button>
                         {canAdd && <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
                             <Link href="/admin/supplier/create">Add New</Link>
                         </button>
@@ -373,23 +405,164 @@ const SupplierList = () => {
 
 
             </div>
+
+            {activeFilter && (
+                <div
+                    className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                    style={{
+                        top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                        left: activeFilter.position.left + 'px',
+                    }}
+                >
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="text-sm font-medium text-gray-700">{activeFilter.label}</label>
+                        <button
+                            onClick={() => {
+                                activeFilter.setValue('');
+                                setActiveFilter(null);
+                                if ($.fn.DataTable.isDataTable("#supplierTable")) {
+                                    $("#supplierTable").DataTable().column(activeFilter.columnIndex).search("").draw();
+                                }
+                            }}
+                            className="text-red-500 text-xs hover:underline"
+                        >
+                            Reset
+                        </button>
+                    </div>
+
+                    {activeFilter.isSelect ? (
+                        <select
+                            value={localInputValue}
+                            onChange={(e) => setLocalInputValue(e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                        >
+                            <option value="">All</option>
+                            {activeFilter.options.map((opt, idx) => (
+                                <option key={idx} value={opt}>
+                                    {opt}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <input
+                            type="text"
+                            value={localInputValue}
+                            onChange={(e) => setLocalInputValue(e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                            placeholder={`Enter ${activeFilter.label}`}
+                        />
+                    )}
+
+                    <div className="flex justify-between mt-4">
+                        <button onClick={() => setActiveFilter(null)} className="text-sm text-gray-500 hover:underline">
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                activeFilter.setValue(localInputValue);
+                                if ($.fn.DataTable.isDataTable("#supplierTable")) {
+                                    $("#supplierTable").DataTable().column(activeFilter.columnIndex).search(localInputValue).draw();
+                                }
+                                setActiveFilter(null);
+                            }}
+                            className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                        >
+                            Apply
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {filteredSuppliers.length > 0 ? (
                 <div className="overflow-x-auto w-full relative main-outer-wrapper">
                     <table className="display main-tables w-full" id="supplierTable">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                 <th className="p-3 text-left uppercase whitespace-nowrap">Sr.</th>
-                                <th className="p-3 text-left uppercase whitespace-nowrap">Name</th>
-                                <th className="p-3 text-left uppercase whitespace-nowrap">Email</th>
-                                <th className="p-3 text-left uppercase whitespace-nowrap">Permanent Address</th>
+
+                                <th className="p-3 text-left uppercase whitespace-nowrap relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'name',
+                                                label: 'Name',
+                                                value: nameFilter,
+                                                setValue: setNameFilter,
+                                                columnIndex: 1,
+                                                position: e.currentTarget.getBoundingClientRect()
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Name <IoFilterSharp />
+                                    </button>
+                                </th>
+
+                                <th className="p-3 text-left uppercase whitespace-nowrap relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'email',
+                                                label: 'Email',
+                                                value: emailFilter,
+                                                setValue: setEmailFilter,
+                                                columnIndex: 2,
+                                                position: e.currentTarget.getBoundingClientRect()
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Email <IoFilterSharp />
+                                    </button>
+                                </th>
+
+                                <th className="p-3 text-left uppercase whitespace-nowrap relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'permanentAddress',
+                                                label: 'Permanent Address',
+                                                value: permanentAddressFilter,
+                                                setValue: setPermanentAddressFilter,
+                                                columnIndex: 3,
+                                                position: e.currentTarget.getBoundingClientRect()
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Permanent Address <IoFilterSharp />
+                                    </button>
+                                </th>
+
                                 <th className="p-3 text-left uppercase whitespace-nowrap">View More</th>
                                 <th className="p-3 text-left uppercase whitespace-nowrap">View Profile</th>
-                                <th className="p-3 text-left uppercase whitespace-nowrap">Status</th>
+
+                                <th className="p-3 text-left uppercase whitespace-nowrap relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'status',
+                                                label: 'Status',
+                                                value: statusFilter,
+                                                setValue: setStatusFilter,
+                                                columnIndex: 6,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                                isSelect: true,
+                                                options: ['Active', 'Inactive']
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Status <IoFilterSharp />
+                                    </button>
+                                </th>
+
                                 <th className="p-3 text-left uppercase whitespace-nowrap">Check Reporting</th>
                                 <th className="p-3 text-left uppercase whitespace-nowrap">Update Password</th>
                                 <th className="p-3 text-left uppercase whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {filteredSuppliers.map((item, index) => {
                                 return (

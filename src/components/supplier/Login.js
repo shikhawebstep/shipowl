@@ -117,6 +117,7 @@ export default function Login() {
                         name: admin.name,
                         email: admin.email,
                         role: admin.role,
+                        companyName: admin.companyName,
                     },
                     session: {
                         is_authenticated: true,

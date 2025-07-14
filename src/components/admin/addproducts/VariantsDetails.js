@@ -146,7 +146,7 @@ export default function VariantDetails() {
         )}
 
 
-        <div className={`mt-5 lg:grid  hidden overflow-auto grid-cols-1 gap-6 items-center justify-between border-b border-[#E9EDF7] pb-2 mb-4 text-gray-600 font-semibold ${!showAddButton ? 'lg:grid-cols-5' : 'lg:grid-cols-8'}`}>
+        <div className={`mt-5 lg:grid  hidden overflow-auto grid-cols-1 gap-6 items-center justify-between border-b border-[#E9EDF7] pb-2 mb-4 text-gray-600 font-semibold ${!showAddButton ? 'lg:grid-cols-4' : 'lg:grid-cols-7'}`}>
           {formData.isVarientExists && (
             <span className="text-[#A3AED0] whitespace-nowrap">Model</span>
 
@@ -180,7 +180,7 @@ export default function VariantDetails() {
               formData.variants.map((variant, index) => (
                 <div
                   key={index}
-                  className={`md:grid p-3 rounded-md border  mt-5 border-dotted overflow-auto md:grid-cols-2 gap-6 justify-between mb-4 border-b border-[#E9EDF7] pb-4  ${!showAddButton ? 'lg:grid-cols-5' : 'lg:grid-cols-8'}`}
+                  className={`md:grid p-3 rounded-md border  mt-5 border-dotted overflow-auto md:grid-cols-2 gap-6 justify-between mb-4 border-b border-[#E9EDF7] pb-4  ${!showAddButton ? 'lg:grid-cols-4' : 'lg:grid-cols-7'}`}
                 >
                   {formData.isVarientExists && (
                     <div>

@@ -43,7 +43,7 @@ export default function ProfileView() {
                 Swal.fire({
                     icon: "error",
                     title: "Something went wrong!",
-                    text: errorMessage.message || "Your session has expired. Please log in again.",
+                    text: errorMessage.message || "Network Error.",
                 });
                 throw new Error(errorMessage.message);
             }

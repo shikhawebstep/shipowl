@@ -61,7 +61,6 @@ const AccountDetails = () => {
     setErrors({});
   };
 
-  console.log('errors',errors)
   return (
     <div className='md:flex gap-4 xl:w-10/12 py-10 bg-white rounded-tl-none rounded-tr-none p-3 xl:p-10 rounded-2xl'>
       <div className='md:w-2/12'>

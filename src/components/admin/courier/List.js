@@ -10,13 +10,26 @@ import { useRouter } from "next/navigation";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useAdminActions } from "@/components/commonfunctions/MainContext";
-
+import { IoFilterSharp } from "react-icons/io5";
 export default function List() {
     const [isTrashed, setIsTrashed] = useState(false);
     const [selected, setSelected] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
+
+    // States for each filter
+    const [courierNameFilter, setCourierNameFilter] = useState('');
+    const [courierCodeFilter, setCourierCodeFilter] = useState('');
+    const [websiteFilter, setWebsiteFilter] = useState('');
+    const [contactEmailFilter, setContactEmailFilter] = useState('');
+    const [contactNumberFilter, setContactNumberFilter] = useState('');
+    const [rtoChargesFilter, setRtoChargesFilter] = useState('');
+    const [flatRateFilter, setFlatRateFilter] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+
+    const [activeFilter, setActiveFilter] = useState(null);
+
     const { verifyAdminAuth, isAdminStaff, extractedPermissions } = useAdmin();
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("courier-company", "courierCompanies");
@@ -132,6 +145,27 @@ export default function List() {
                     <div className="flex gap-3  flex-wrap items-center">
 
                         <div className="md:flex hidden justify-start gap-5 items-end">
+                            <button
+                                onClick={() => {
+                                    setCourierNameFilter('');
+                                    setCourierCodeFilter('');
+                                    setWebsiteFilter('');
+                                    setContactEmailFilter('');
+                                    setContactNumberFilter('');
+                                    setRtoChargesFilter('');
+                                    setFlatRateFilter('');
+                                    setStatusFilter('');
+                                    setActiveFilter(null);
+
+                                    if ($.fn.DataTable.isDataTable('#courierCompanytable')) {
+                                        $('#courierCompanytable').DataTable().columns().search('').draw();
+                                    }
+                                }}
+                                className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                            >
+                                Clear All Filters
+                            </button>
+
                             {
                                 canViewTrashed && <button
                                     className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
@@ -175,22 +209,129 @@ export default function List() {
                         </button>
                     </div>
                 </div>
+
+                {activeFilter && (
+                    <div
+                        className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                        style={{
+                            top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                            left: activeFilter.position.left + 'px'
+                        }}
+                    >
+                        {/* Label and Reset */}
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="text-sm font-medium text-gray-700">
+                                {activeFilter.label}
+                            </label>
+                            <button
+                                onClick={() => {
+                                    activeFilter.setValue('');
+                                    setActiveFilter(null);
+                                    if (window.$.fn.DataTable.isDataTable('#courierCompanytable')) {
+                                        window.$('#courierCompanytable')
+                                            .DataTable()
+                                            .column(activeFilter.columnIndex)
+                                            .search('')
+                                            .draw();
+                                    }
+                                }}
+                                className="text-red-500 text-xs hover:underline"
+                            >
+                                Reset
+                            </button>
+                        </div>
+
+                        {/* Input Field */}
+                        <input
+                            type="text"
+                            value={
+                                activeFilter.key === 'courierName' ? courierNameFilter :
+                                    activeFilter.key === 'courierCode' ? courierCodeFilter :
+                                    activeFilter.key === 'website' ? websiteFilter :
+                                    activeFilter.key === 'contactEmail' ? contactEmailFilter :
+                                    activeFilter.key === 'contactNumber' ? contactNumberFilter :
+                                    activeFilter.key === 'rtoCharges' ? rtoChargesFilter :
+                                    activeFilter.key === 'flatRate' ? flatRateFilter :
+                                    activeFilter.key === 'status' ? statusFilter : ''
+                            }
+                            onChange={(e) => activeFilter.setValue(e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                            placeholder={`Enter ${activeFilter.label}`}
+                        />
+
+                        {/* Actions */}
+                        <div className="flex justify-between mt-4">
+                            <button
+                                onClick={() => setActiveFilter(null)}
+                                className="text-sm text-gray-500 hover:underline"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (window.$.fn.DataTable.isDataTable('#courierCompanytable')) {
+                                        window.$('#courierCompanytable')
+                                            .DataTable()
+                                            .column(activeFilter.columnIndex)
+                                            .search(
+                                                activeFilter.key === 'courierName' ? courierNameFilter :
+                                                activeFilter.key === 'courierCode' ? courierCodeFilter :
+                                                activeFilter.key === 'website' ? websiteFilter :
+                                                activeFilter.key === 'contactEmail' ? contactEmailFilter :
+                                                activeFilter.key === 'contactNumber' ? contactNumberFilter :
+                                                activeFilter.key === 'rtoCharges' ? rtoChargesFilter :
+                                                activeFilter.key === 'flatRate' ? flatRateFilter :
+                                                activeFilter.key === 'status' ? statusFilter : ''
+                                            )
+                                            .draw();
+                                    }
+                                    setActiveFilter(null);
+                                }}
+                                className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {data.length > 0 ? (
                     <div className="overflow-x-auto relative main-outer-wrapper w-full">
                         <table className="md:w-full w-auto display main-tables" id="courierCompanytable">
                             <thead>
                                 <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Name</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Code</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Website</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Email</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Number</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase"> RTO Charges</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase"> Flat Shipping Rate</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Status</th>
+                                    {[
+                                        { key: 'courierName', label: 'Courier Name', state: courierNameFilter, setState: setCourierNameFilter, colIndex: 0 },
+                                        { key: 'courierCode', label: 'Courier Code', state: courierCodeFilter, setState: setCourierCodeFilter, colIndex: 1 },
+                                        { key: 'website', label: 'Website', state: websiteFilter, setState: setWebsiteFilter, colIndex: 2 },
+                                        { key: 'contactEmail', label: 'Contact Email', state: contactEmailFilter, setState: setContactEmailFilter, colIndex: 3 },
+                                        { key: 'contactNumber', label: 'Contact Number', state: contactNumberFilter, setState: setContactNumberFilter, colIndex: 4 },
+                                        { key: 'rtoCharges', label: 'RTO Charges', state: rtoChargesFilter, setState: setRtoChargesFilter, colIndex: 5 },
+                                        { key: 'flatRate', label: 'Flat Shipping Rate', state: flatRateFilter, setState: setFlatRateFilter, colIndex: 6 },
+                                        { key: 'status', label: 'Status', state: statusFilter, setState: setStatusFilter, colIndex: 7 }
+                                    ].map((col) => (
+                                        <th key={col.key} className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: col.key,
+                                                        label: col.label,
+                                                        getValue: () => col.state,
+                                                        setValue: col.setState,
+                                                        columnIndex: col.colIndex,
+                                                        position: e.currentTarget.getBoundingClientRect()
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                {col.label} <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                    ))}
                                     <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 {data.map((item) => (
                                     <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">

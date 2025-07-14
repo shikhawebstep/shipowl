@@ -69,7 +69,7 @@ export default function Update() {
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: result.message || result.error || "Your session has expired. Please log in again.",
+                    text: result.message || result.error || "Network Error.",
                 });
                 throw new Error(result.message || result.error || "Something Wrong!");
             }
@@ -118,7 +118,7 @@ export default function Update() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -172,7 +172,7 @@ export default function Update() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -262,7 +262,7 @@ export default function Update() {
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: errorMessage.message || errorMessage.error || "Your session has expired. Please log in again.",
+                    text: errorMessage.message || errorMessage.error || "Network Error.",
                 });
                 throw new Error(errorMessage.message);
             }

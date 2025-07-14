@@ -61,7 +61,7 @@ const AddProduct = () => {
         Swal.fire({
           icon: "error",
           title: "Something went wrong!",
-          text: errorMessage.message || "Your session has expired. Please log in again.",
+          text: errorMessage.message || "Network Error.",
         });
         throw new Error(errorMessage.message);
       }
@@ -140,6 +140,14 @@ const AddProduct = () => {
           Array.isArray(products.supplierVisibility) && products.supplierVisibility.length > 0
             ? products.supplierVisibility.map((item) => item.supplierId).join(',')
             : '',
+        imageSortingIndex: (() => {
+          try {
+            return JSON.parse(products.imageSortingIndex || '{}');
+          } catch (err) {
+            console.error("Invalid imageSortingIndex JSON:", err);
+            return {};
+          }
+        })(),
       });
 
 

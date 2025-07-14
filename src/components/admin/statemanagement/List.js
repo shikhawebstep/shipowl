@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 
-
+import { IoFilterSharp } from "react-icons/io5";
 export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isTrashed, setIsTrashed] = useState(false);
@@ -19,6 +19,12 @@ export default function List() {
     const [stateData, setStateData] = useState([]);
     const [country, setCountry] = useState([]);
     const router = useRouter();
+    const [stateNameFilter, setStateNameFilter] = useState('');
+    const [isoFilter, setIsoFilter] = useState('');
+    const [countryFilter, setCountryFilter] = useState('');
+    const [typeFilter, setTypeFilter] = useState('');
+
+    const [activeFilter, setActiveFilter] = useState(null);
 
 
 
@@ -58,7 +64,7 @@ export default function List() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -113,7 +119,7 @@ export default function List() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -390,7 +396,7 @@ export default function List() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -517,7 +523,7 @@ export default function List() {
                                 {isPopupOpen && (
                                     <div className="absolute md:left-0 mt-2 w-40 right-0 bg-white rounded-md shadow-lg z-10">
                                         <ul className="py-2 text-sm text-[#2B3674]">
-                                           
+
                                             <li className="px-4 md:hidden block py-2 hover:bg-gray-100 cursor-pointer">
                                                 {canViewTrashed && <button
                                                     className={`p-2 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
@@ -541,7 +547,7 @@ export default function List() {
                                                 </button>
                                                 }
                                             </li>
-                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => exportCsv()}>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => exportCsv()}>
                                                 Export CSV
                                             </li>
                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleBulkDelete()}>
@@ -553,6 +559,29 @@ export default function List() {
                                 )}
                             </button>
                             <div className="md:flex hidden justify-end gap-2">
+                                <button
+                                    onClick={() => {
+                                        setStateNameFilter('');
+                                        setIsoFilter('');
+                                        setCountryFilter('');
+                                        setTypeFilter('');
+                                        setActiveFilter(null);
+
+                                        if ($.fn.DataTable.isDataTable('#statetable')) {
+                                            const table = $('#statetable').DataTable();
+                                            table
+                                                .search('')
+                                                .columns()
+                                                .search('')
+                                                .draw();
+                                        }
+                                    }}
+                                    className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                                >
+                                    Clear All Filters
+                                </button>
+
+
                                 {canViewTrashed && <button
                                     className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                     onClick={async () => {
@@ -574,19 +603,158 @@ export default function List() {
                             </div>
                         </div>
                     </div>
+                    {activeFilter && (
+                        <div
+                            className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                            style={{
+                                top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                                left: activeFilter.position.left + 'px',
+                            }}
+                        >
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="text-sm font-medium text-gray-700">{activeFilter.label}</label>
+                                <button
+                                    onClick={() => {
+                                        activeFilter.setValue('');
+                                        setActiveFilter(null);
+                                        if ($.fn.DataTable.isDataTable('#statetable')) {
+                                            $('#statetable').DataTable().column(activeFilter.columnIndex).search('').draw();
+                                        }
+                                    }}
+                                    className="text-red-500 text-xs hover:underline"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+
+                            <input
+                                type="text"
+                                value={
+                                    activeFilter.key === 'stateName'
+                                        ? stateNameFilter
+                                        : activeFilter.key === 'iso'
+                                            ? isoFilter
+                                            : activeFilter.key === 'country'
+                                                ? countryFilter
+                                                : activeFilter.key === 'type'
+                                                    ? typeFilter
+                                                    : ''
+                                }
+                                onChange={(e) => activeFilter.setValue(e.target.value)}
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                                placeholder={`Enter ${activeFilter.label}`}
+                            />
+
+                            <div className="flex justify-between mt-4">
+                                <button
+                                    onClick={() => setActiveFilter(null)}
+                                    className="text-sm text-gray-500 hover:underline"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if ($.fn.DataTable.isDataTable('#statetable')) {
+                                            const searchVal =
+                                                activeFilter.key === 'stateName'
+                                                    ? stateNameFilter
+                                                    : activeFilter.key === 'iso'
+                                                        ? isoFilter
+                                                        : activeFilter.key === 'country'
+                                                            ? countryFilter
+                                                            : activeFilter.key === 'type'
+                                                                ? typeFilter
+                                                                : '';
+                                            $('#statetable').DataTable().column(activeFilter.columnIndex).search(searchVal).draw();
+                                        }
+                                        setActiveFilter(null);
+                                    }}
+                                    className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                                >
+                                    Apply
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
 
                     {stateData.length > 0 ? (
                         <div className="overflow-x-auto w-full relative">
                             <table className="display main-tables w-full" id="statetable">
                                 <thead>
                                     <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">State Name</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">ISO 2 CODE</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Type</th>
+                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase relative">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'stateName',
+                                                        label: 'State Name',
+                                                        value: stateNameFilter,
+                                                        setValue: setStateNameFilter,
+                                                        columnIndex: 0,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                State Name <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'iso',
+                                                        label: 'ISO 2 Code',
+                                                        value: isoFilter,
+                                                        setValue: setIsoFilter,
+                                                        columnIndex: 1,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                ISO 2 CODE <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'country',
+                                                        label: 'Country',
+                                                        value: countryFilter,
+                                                        setValue: setCountryFilter,
+                                                        columnIndex: 2,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                Country <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'type',
+                                                        label: 'Type',
+                                                        value: typeFilter,
+                                                        setValue: setTypeFilter,
+                                                        columnIndex: 3,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                Type <IoFilterSharp />
+                                            </button>
+                                        </th>
                                         <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     {stateData.map((item, index) => (
                                         <tr key={index} className="bg-white border-b border-[#E9EDF7] hover:bg-gray-50">

@@ -46,7 +46,7 @@ const AccountDetails = () => {
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: result.message || result.error || "Your session has expired. Please log in again.",
+                    text: result.message || result.error || "Network Error.",
                 });
                 throw new Error(result.message || result.error || "Something Wrong!");
             }
@@ -92,7 +92,7 @@ const AccountDetails = () => {
             Swal.fire({
               icon: "error",
               title: "Something went wrong!",
-              text: result.message || result.error || "Your session has expired. Please log in again.",
+              text: result.message || result.error || "Network Error.",
             });
             throw new Error(result.message || result.error || "Something Wrong!");
           }
@@ -264,7 +264,7 @@ useEffect(() => {
 
    
   </div>
-  <div className='relative'>
+  <div className='relative mt-2'>
   <label className={labelClasses('permanentCity')}>
     City <span className="text-red-500">*</span>
   </label>

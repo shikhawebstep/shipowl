@@ -45,7 +45,7 @@ const DropshipperProfileProvider = ({ children }) => {
         Swal.fire({
           icon: "error",
           title: "Something Wrong!",
-          text: result.message || result.error || "Your session has expired. Please log in again.",
+          text: result.message || result.error || "Network Error.",
         });
         throw new Error(result.message || result.error || "Something Wrong!");
       }
@@ -128,7 +128,7 @@ const DropshipperProfileProvider = ({ children }) => {
         Swal.fire({
           icon: "error",
           title: "Something went wrong!",
-          text: errorMessage.message || "Your session has expired. Please log in again.",
+          text: errorMessage.message || "Network Error.",
         });
         throw new Error(errorMessage.message);
       }
@@ -211,7 +211,7 @@ const DropshipperProfileProvider = ({ children }) => {
         Swal.fire({
           icon: "error",
           title: "Something Wrong!",
-          text: result.message || result.error || "Your session has expired. Please log in again.",
+          text: result.message || result.error || "Network Error.",
         });
         throw new Error(result.message || result.error || "Something Wrong!");
       }
@@ -257,7 +257,7 @@ const DropshipperProfileProvider = ({ children }) => {
         Swal.fire({
           icon: "error",
           title: "Something went wrong!",
-          text: result.message || result.error || "Your session has expired. Please log in again.",
+          text: result.message || result.error || "Network Error.",
         });
         throw new Error(result.message || result.error || "Something Wrong!");
       }

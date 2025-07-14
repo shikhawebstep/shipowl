@@ -5,11 +5,19 @@ import { useRouter } from "next/navigation";
 import { HashLoader } from "react-spinners";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
+import { IoFilterSharp } from "react-icons/io5";
 
 function DropshipperBankChange() {
     const router = useRouter();
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [activeFilter, setActiveFilter] = useState(null);
+
+    const [dropshipperNameFilter, setDropshipperNameFilter] = useState('');
+    const [accountNumberFilter, setAccountNumberFilter] = useState('');
+    const [bankNameFilter, setBankNameFilter] = useState('');
+    const [ifscFilter, setIfscFilter] = useState('');
+
 
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
 
@@ -61,7 +69,7 @@ function DropshipperBankChange() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something went wrong!"
@@ -168,6 +176,19 @@ function DropshipperBankChange() {
             });
         }
     }, [loading]);
+
+    const handleClearFilters = () => {
+        setDropshipperNameFilter('');
+        setAccountNumberFilter('');
+        setBankNameFilter('');
+        setIfscFilter('');
+        setActiveFilter(null);
+
+        if ($.fn.DataTable.isDataTable('#bankTable')) {
+            $('#bankTable').DataTable().search('').columns().search('').draw();
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-[80vh]">
@@ -179,19 +200,164 @@ function DropshipperBankChange() {
 
     return (
         <div className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Bank Account Change Requests</h2>
+            <div className="flex items-center justify-between my-4">
+                <h2 className="text-xl font-semibold ">Bank Account Change Requests</h2>
+                <button
+                    onClick={handleClearFilters}
+                    className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                >
+                    Clear Filters
+                </button>
+            </div>
+            {activeFilter && (
+                <div
+                    className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                    style={{
+                        top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                        left: activeFilter.position.left + 'px',
+                    }}
+                >
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="text-sm font-medium text-gray-700">{activeFilter.label}</label>
+                        <button
+                            onClick={() => {
+                                activeFilter.setValue('');
+                                setActiveFilter(null);
+                                if ($.fn.DataTable.isDataTable('#bankTable')) {
+                                    $('#bankTable').DataTable().column(activeFilter.columnIndex).search('').draw();
+                                }
+                            }}
+                            className="text-red-500 text-xs hover:underline"
+                        >
+                            Reset
+                        </button>
+                    </div>
+
+                    <input
+                        type="text"
+                        value={
+                            activeFilter.key === 'dropshipperName' ? dropshipperNameFilter :
+                                activeFilter.key === 'accountNumber' ? accountNumberFilter :
+                                    activeFilter.key === 'bankName' ? bankNameFilter :
+                                        activeFilter.key === 'ifsc' ? ifscFilter : ''
+                        }
+                        onChange={(e) => activeFilter.setValue(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                        placeholder={`Enter ${activeFilter.label}`}
+                    />
+
+                    <div className="flex justify-between mt-4">
+                        <button
+                            onClick={() => setActiveFilter(null)}
+                            className="text-sm text-gray-500 hover:underline"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                if ($.fn.DataTable.isDataTable('#bankTable')) {
+                                    $('#bankTable')
+                                        .DataTable()
+                                        .column(activeFilter.columnIndex)
+                                        .search(
+                                            activeFilter.key === 'dropshipperName' ? dropshipperNameFilter :
+                                                activeFilter.key === 'accountNumber' ? accountNumberFilter :
+                                                    activeFilter.key === 'bankName' ? bankNameFilter :
+                                                        activeFilter.key === 'ifsc' ? ifscFilter : ''
+                                        )
+                                        .draw();
+                                }
+                                setActiveFilter(null);
+                            }}
+                            className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                        >
+                            Apply
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="bg-white p-4 rounded-md">
                 <div className="overflow-x-auto relative main-outer-wrapper w-full">
                     <table className="md:w-full w-auto display main-tables" id="bankTable">
-                        <thead className="">
+                        <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">dropshipper Name</th>
-                                <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">Account Number</th>
-                                <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">Bank Name</th>
-                                <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">IFSC</th>
+                                <th className="p-2 whitespace-nowrap pe-5 text-left uppercase relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'dropshipperName',
+                                                label: 'Dropshipper Name',
+                                                value: dropshipperNameFilter,
+                                                setValue: setDropshipperNameFilter,
+                                                columnIndex: 0,
+                                                position: e.currentTarget.getBoundingClientRect()
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Dropshipper Name <IoFilterSharp />
+                                    </button>
+                                </th>
+
+                                <th className="p-2 whitespace-nowrap pe-5 text-left uppercase relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'accountNumber',
+                                                label: 'Account Number',
+                                                value: accountNumberFilter,
+                                                setValue: setAccountNumberFilter,
+                                                columnIndex: 1,
+                                                position: e.currentTarget.getBoundingClientRect()
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Account Number <IoFilterSharp />
+                                    </button>
+                                </th>
+
+                                <th className="p-2 whitespace-nowrap pe-5 text-left uppercase relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'bankName',
+                                                label: 'Bank Name',
+                                                value: bankNameFilter,
+                                                setValue: setBankNameFilter,
+                                                columnIndex: 2,
+                                                position: e.currentTarget.getBoundingClientRect()
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Bank Name <IoFilterSharp />
+                                    </button>
+                                </th>
+
+                                <th className="p-2 whitespace-nowrap pe-5 text-left uppercase relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'ifsc',
+                                                label: 'IFSC',
+                                                value: ifscFilter,
+                                                setValue: setIfscFilter,
+                                                columnIndex: 3,
+                                                position: e.currentTarget.getBoundingClientRect()
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        IFSC <IoFilterSharp />
+                                    </button>
+                                </th>
+
                                 <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">Actions</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {requests.map((req) => (
                                 <tr key={req.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">

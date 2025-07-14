@@ -76,7 +76,7 @@ export default function My() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -145,7 +145,7 @@ export default function My() {
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+                    text: errorMessage.error || errorMessage.message || "Network Error.",
                 });
                 throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
             }
@@ -462,7 +462,7 @@ export default function My() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -518,7 +518,7 @@ export default function My() {
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: errorMessage.message || "Your session has expired. Please log in again.",
+                    text: errorMessage.message || "Network Error.",
                 });
                 throw new Error(errorMessage.message);
             }
@@ -601,8 +601,23 @@ export default function My() {
                         {products.map((product, index) => {
                             const variantsImage = product?.variants || [];
                             const imageString = product?.product?.gallery || "";
-                            const imageUrl = imageString.split(",")[0]?.trim() || "/default-image.jpg";
                             const productName = product?.product?.name || "NIL";
+                            let imageSortingIndex = {};
+                            try {
+                                imageSortingIndex = JSON.parse(product?.product?.imageSortingIndex || '{}');
+                            } catch (err) {
+                                console.error('Failed to parse imageSortingIndex:', err);
+                            }
+                            
+                            // Default to [] if no .gallery present
+                            const productImageSortingIndex = Array.isArray(imageSortingIndex.gallery)
+                            ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value) - parseInt(b.value))
+                            : [];
+                            
+                            
+                            const firstImageIndex = productImageSortingIndex[0]?.index ?? 0;
+                            
+                            const imageUrl = imageString.split(",")[firstImageIndex]?.trim() || "/default-image.jpg";
 
                             const getPriceDisplay = (variants) => {
                                 if (!variants?.length) return <span>N/A</span>;

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { IoMdAnalytics } from "react-icons/io";
 import {
   Home, ShoppingCart, Package, Gift, BarChart, CreditCard,
-  FileText, Settings, Link, Volume2, MapPin, ChevronDown, X
+  FileText, Settings, Link, Volume2, MapPin, ChevronDown, X,Ticket
 } from "lucide-react";
 import { HiBars3CenterLeft } from "react-icons/hi2";
 import { FaShopify } from "react-icons/fa";
@@ -48,6 +48,13 @@ const hasPermission = (module, actionList) => {
       name: "Manage Orders", icon: ShoppingCart, href: "#", section: "MENU",
       subMenu: [
         { name: "All Orders (In progress)", module: "All Orders (In progress)", href: "/dropshipping/manage-orders" },
+        { name: "Pending Orders (In progress)", module: "Pending Orders (In progress)", href: "/dropshipping/pending-orders" }
+      ]
+    },
+    {
+      name: "Raise ticket", icon: Ticket, href: "#", section: "MENU",
+      subMenu: [
+        { name: "Complaints", module: "Raise Ticket", href: "/dropshipping/complaints" },
         { name: "Pending Orders (In progress)", module: "Pending Orders (In progress)", href: "/dropshipping/pending-orders" }
       ]
     },

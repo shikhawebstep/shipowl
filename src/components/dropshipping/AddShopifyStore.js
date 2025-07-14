@@ -49,7 +49,7 @@ export default function AddShopifyStore() {
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: result.error || result.message || "Your session has expired. Please log in again.",
+                    text: result.error || result.message || "Network Error.",
                 });
                 throw new Error(result.message || result.error || "Something Wrong!");
             }

@@ -73,6 +73,11 @@ const AccountInfo = () => {
         }
       });
 
+
+
+
+    
+
       const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/${formData.id}/company/${id}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
@@ -103,6 +108,7 @@ const AccountInfo = () => {
           showConfirmButton: true,
         }).then((res) => {
           if (res.isConfirmed) {
+            
           }
         });
       }

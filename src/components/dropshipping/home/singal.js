@@ -230,7 +230,7 @@ export default function ProductDetails() {
         Swal.fire({
           icon: "error",
           title: "Something went wrong!",
-          text: result.error || result.message || "Your session has expired. Please log in again.",
+          text: result.error || result.message || "Network Error.",
         });
         throw new Error(result.message || result.error || "Something went wrong!");
       }
@@ -282,7 +282,7 @@ export default function ProductDetails() {
         Swal.fire({
           icon: "error",
           title: "Something went wrong!",
-          text: result.error || result.message || "Your session has expired. Please log in again.",
+          text: result.error || result.message || "Network Error.",
         });
         throw new Error(result.message || result.error || "Something went wrong!");
       }

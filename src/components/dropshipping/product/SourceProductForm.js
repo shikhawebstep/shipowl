@@ -187,7 +187,7 @@ const SourceProductForm = () => {
             if (response.ok) {
                 setCategoryData(result?.categories || []);
             } else {
-                console.log(result.message || result.error || "Failed to fetch categories.");
+               
             }
         } catch (error) {
             console.error("Error fetching categories:", error);

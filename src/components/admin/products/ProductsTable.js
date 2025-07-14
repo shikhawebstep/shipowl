@@ -14,7 +14,7 @@ import Image from 'next/image';
 import { ProductContext } from '../addproducts/ProductContext';
 import { Trash2, RotateCcw, Pencil } from "lucide-react";
 import { useImageURL } from "@/components/ImageURLContext";
-
+import { IoFilterSharp } from "react-icons/io5";
 const ProductTable = () => {
     const { fetchImages, getProductDescription } = useImageURL();
     const { setActiveTab } = useContext(ProductContextEdit);
@@ -36,7 +36,16 @@ const ProductTable = () => {
         getProductDescription(id, setDescription);
 
     }
-    console.log('description',description)
+
+    const [productNameFilter, setProductNameFilter] = useState("");
+    const [skuFilter, setSkuFilter] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
+    const [modelFilter, setModelFilter] = useState("");
+    const [rtoStatusFilter, setRtoStatusFilter] = useState("");
+    const [activeFilter, setActiveFilter] = useState(null); // { key, label, value, setValue, columnIndex }
+
+    const [filterInputValue, setFilterInputValue] = useState("");
+
 
     const [selected, setSelected] = useState([]);
     const [selectedMonth, setSelectedMonth] = useState(() => {
@@ -49,6 +58,65 @@ const ProductTable = () => {
         setSelected((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
+    };
+    const handleBulkDelete = async () => {
+        if (selected.length === 0) {
+            Swal.fire("No Product selected", "Please select at least one image.", "info");
+            return;
+        }
+
+        try {
+            Swal.fire({
+                title: "Deleting selected Product...",
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+            });
+
+            const raw = JSON.stringify({
+                ids: selected.join(","),
+            });
+
+            const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+            if (dropshipperData?.project?.active_panel !== "admin") {
+                localStorage.removeItem("shippingData");
+                router.push("/admin/auth/login");
+                return;
+            }
+
+            const token = dropshipperData?.security?.token;
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/product/bulk`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`, // insert token here
+                    },
+                    body: raw,
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.close();
+                Swal.fire({
+                    icon: "error",
+                    title: "Delete Failed",
+                    text: errorMessage.message || "An error occurred",
+                });
+                return;
+            }
+
+            Swal.close();
+            Swal.fire("Deleted!", "Selected Product deleted.", "success");
+
+            fetchAll(setProducts, setLoading);
+            setSelected([]);
+
+        } catch (error) {
+            Swal.close();
+            Swal.fire("Error", error.message || "Something went wrong.", "error");
+        }
     };
 
     const handleToggleTrash = async () => {
@@ -66,58 +134,6 @@ const ProductTable = () => {
 
 
 
-
-
-    const fetchCategory = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text: errorMessage.message || "Your session has expired. Please log in again.",
-                });
-                throw new Error(errorMessage.message);
-            }
-
-            const result = await response.json();
-            const category = result?.categories || {};
-            setCategoryData(category)
-
-
-        } catch (error) {
-            console.error("Error fetching category:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router]);
-
     useEffect(() => {
         const fetchData = async () => {
             setIsTrashed(false);
@@ -125,56 +141,80 @@ const ProductTable = () => {
             await checkAdminRole();
             await verifyAdminAuth();
             await fetchAll(setProducts, setLoading);
-            await fetchCategory();
             setLoading(false);
         };
         fetchData();
     }, [verifyAdminAuth]);
 
-    const tableRef = useRef(null);
+    const getColumnIndex = (key) => {
+        const baseColumns = [
+            "name",         // 0
+            "description",  // 1
+            "sku",          // 2
+        ];
 
-    useEffect(() => {
-        let $ = null; // declare in parent scope
-        let table;
-
-        if (typeof window !== "undefined" && products.length > 0) {
-            Promise.all([
-                import("jquery"),
-                import("datatables.net"),
-                import("datatables.net-dt"),
-                import("datatables.net-buttons"),
-                import("datatables.net-buttons-dt")
-            ])
-                .then(([jQuery]) => {
-                    $ = jQuery.default;
-                    window.$ = $;
-
-                    if ($.fn.DataTable.isDataTable(tableRef.current)) {
-                        $(tableRef.current).DataTable().clear().destroy(); // Safe destroy
-                    }
-
-                    table = $(tableRef.current).DataTable({
-                        pagingType: window.innerWidth <= 768 ? "simple" : "simple_numbers",
-                        language: {
-                            paginate: {
-                                previous: "<",
-                                next: ">"
-                            }
-                        }
-                    });
-                })
-                .catch((error) => {
-                    console.error("DataTable init failed:", error);
-                });
+        // If RTO count is shown, insert "liveRtoStock"
+        if (showRtoLiveCount) {
+            baseColumns.push("liveRtoStock"); // 3
+            baseColumns.push("status");       // 4
+            baseColumns.push("rtoStatus");    // 5
+        } else {
+            baseColumns.push("status");       // 3
+            baseColumns.push("model");        // 4
         }
 
-        return () => {
-            if ($ && $.fn.DataTable.isDataTable(tableRef.current)) {
-                $(tableRef.current).DataTable().clear().destroy(); // Clean up
-            }
-        };
-    }, [products]);
+        baseColumns.push("viewVariant");
+        baseColumns.push("action");
 
+        return baseColumns.indexOf(key);
+    };
+
+
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && products.length > 0 && !loading) {
+            let table = null;
+
+            Promise.all([
+                import('jquery'),
+                import('datatables.net'),
+                import('datatables.net-dt'),
+                import('datatables.net-buttons'),
+                import('datatables.net-buttons-dt')
+            ]).then(([jQuery]) => {
+                window.jQuery = window.$ = jQuery.default;
+
+                // Destroy existing DataTable if it exists
+                if ($.fn.DataTable.isDataTable('#productTable')) {
+                    $('#productTable').DataTable().destroy();
+                    $('#productTable').empty();
+                }
+
+                // Reinitialize DataTable with new data
+                const isMobile = window.innerWidth <= 768;
+                const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+                table = $('#productTable').DataTable({
+                    pagingType,
+                    language: {
+                        paginate: {
+                            previous: "<",
+                            next: ">"
+                        }
+                    }
+                });
+
+                return () => {
+                    if (table) {
+                        table.destroy();
+                        $('#productTable').empty();
+                    }
+                };
+            }).catch((error) => {
+                console.error('Failed to load DataTables dependencies:', error);
+            });
+        }
+    }, [products]);
 
     const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
 
@@ -195,6 +235,23 @@ const ProductTable = () => {
     const canRestore = hasPermission("Restore");
 
 
+    const handleClearFilters = () => {
+        // Clear all filter states
+        setProductNameFilter('');
+        setSkuFilter('');
+        setStatusFilter('');
+        setModelFilter('');
+        setRtoStatusFilter('');
+        setFilterInputValue('');
+        setActiveFilter(null);
+
+        // Clear all filters in DataTable
+        if ($.fn.DataTable.isDataTable('#productTable')) {
+            const table = $('#productTable').DataTable();
+            table.columns().search(''); // clear all column searches
+            table.draw();
+        }
+    };
 
     return (
         <div className="">
@@ -234,8 +291,16 @@ const ProductTable = () => {
 
 
 
+
                 </div>
-                <div className='flex gap-1 flex-wrap mt-3 md:mt-0 items-center'>   <button className="bg-[#EE5D50] text-white px-4 py-2 rounded-lg text-sm">Details for approval</button>
+                <div className='flex gap-1 flex-wrap mt-3 md:mt-0 items-center'>
+                    <button
+                        onClick={handleClearFilters}
+                        className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md transition-all duration-200"
+                    >
+                        Clear Filters
+                    </button>
+                    <button className="bg-[#EE5D50] text-white px-4 py-2 rounded-lg text-sm">Details for approval</button>
                     <button className="bg-[#2B3674] text-white px-4 py-2 rounded-lg text-sm">Import Inventory</button>
                     <button className="bg-[#05CD99] text-white px-4 py-2 rounded-lg text-sm">Export</button>
                     <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm">Import</button>{
@@ -292,6 +357,9 @@ const ProductTable = () => {
                                     </span>
                                 </h5>
                             )}
+                            {selected.length > 0 && (
+                                <button className='bg-red-500 text-white p-2 rounded-md' onClick={handleBulkDelete}>Delete Selected</button>
+                            )}
 
                             <button className="bg-[#F4F7FE] w-9/12 md:w-auto rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
                                 {/* Month Input */}
@@ -324,19 +392,117 @@ const ProductTable = () => {
                         </div>
                     </div>
 
+                    {activeFilter && (
+                        <div
+                            className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                            style={{
+                                top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                                left: activeFilter.position.left + 'px',
+                            }}
+                        >
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="text-sm font-medium text-gray-700">
+                                    {activeFilter.label}
+                                </label>
+                                <button
+                                    onClick={() => {
+                                        activeFilter.setValue('');
+                                        setFilterInputValue('');
+                                        setActiveFilter(null);
+                                        if ($.fn.DataTable.isDataTable('#productTable')) {
+                                            $('#productTable')
+                                                .DataTable()
+                                                .column(activeFilter.columnIndex)
+                                                .search('')
+                                                .draw();
+                                        }
+                                    }}
+                                    className="text-red-500 text-xs hover:underline"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+
+                            <input
+                                type="text"
+                                value={filterInputValue}
+                                onChange={(e) => setFilterInputValue(e.target.value)}
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                                placeholder={`Enter ${activeFilter.label}`}
+                            />
+
+                            <div className="flex justify-between mt-4">
+                                <button
+                                    onClick={() => setActiveFilter(null)}
+                                    className="text-sm text-gray-500 hover:underline"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        activeFilter.setValue(filterInputValue);
+                                        if ($.fn.DataTable.isDataTable('#productTable')) {
+                                            $('#productTable')
+                                                .DataTable()
+                                                .column(activeFilter.columnIndex)
+                                                .search(filterInputValue)
+                                                .draw();
+                                        }
+                                        setActiveFilter(null);
+                                    }}
+                                    className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                                >
+                                    Apply
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {products.length > 0 ? (
                         <div className="overflow-x-auto relative main-outer-wrapper w-full">
-                            <table ref={tableRef} className="md:w-full w-auto display main-tables" id="productTable">
+                            <table className="md:w-full w-auto display main-tables" id="productTable">
                                 <thead>
                                     <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                        <th className="p-2 px-5  whitespace-nowrap text-left uppercase">
-                                            Name
+                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                            <button
+                                                onClick={(e) => {
+                                                    setFilterInputValue(productNameFilter);
+                                                    setActiveFilter({
+                                                        key: 'name',
+                                                        label: 'Product Name',
+                                                        value: productNameFilter,
+                                                        setValue: setProductNameFilter,
+                                                        columnIndex: getColumnIndex('name'),
+                                                        position: e.currentTarget.getBoundingClientRect()
+                                                    });
+                                                }}
+                                                className="flex gap-2 items-center"
+                                            >
+                                                Name <IoFilterSharp className="w-4 h-4" />
+                                            </button>
                                         </th>
+
                                         <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
                                             Description
                                         </th>
+
                                         <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            SKU
+                                            <button
+                                                onClick={(e) => {
+                                                    setFilterInputValue(skuFilter);
+                                                    setActiveFilter({
+                                                        key: 'sku',
+                                                        label: 'SKU',
+                                                        value: skuFilter,
+                                                        setValue: setSkuFilter,
+                                                        columnIndex: getColumnIndex('sku'),
+                                                        position: e.currentTarget.getBoundingClientRect()
+                                                    });
+                                                }}
+                                                className="flex gap-2 items-center"
+                                            >
+                                                SKU <IoFilterSharp className="w-4 h-4" />
+                                            </button>
                                         </th>
 
                                         {showRtoLiveCount && (
@@ -346,19 +512,66 @@ const ProductTable = () => {
                                         )}
 
                                         <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            Status
+                                            <button
+                                                onClick={(e) => {
+                                                    setFilterInputValue(statusFilter);
+                                                    setActiveFilter({
+                                                        key: 'status',
+                                                        label: 'Status',
+                                                        value: statusFilter,
+                                                        setValue: setStatusFilter,
+                                                        columnIndex: getColumnIndex('status'),
+                                                        position: e.currentTarget.getBoundingClientRect()
+                                                    });
+                                                }}
+                                                className="flex gap-2 items-center"
+                                            >
+                                                Status <IoFilterSharp className="w-4 h-4" />
+                                            </button>
                                         </th>
 
                                         {!showRtoLiveCount && (
                                             <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                                Model
+                                                <button
+                                                    onClick={(e) => {
+                                                        setFilterInputValue(modelFilter);
+                                                        setActiveFilter({
+                                                            key: 'model',
+                                                            label: 'Model',
+                                                            value: modelFilter,
+                                                            setValue: setModelFilter,
+                                                            columnIndex: getColumnIndex('model'),
+                                                            position: e.currentTarget.getBoundingClientRect()
+                                                        });
+                                                    }}
+                                                    className="flex gap-2 items-center"
+                                                >
+                                                    Model <IoFilterSharp className="w-4 h-4" />
+                                                </button>
                                             </th>
                                         )}
+
                                         {showRtoLiveCount && (
                                             <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                                RTO Status
+                                                <button
+                                                    onClick={(e) => {
+                                                        setFilterInputValue(rtoStatusFilter);
+                                                        setActiveFilter({
+                                                            key: 'rtoStatus',
+                                                            label: 'RTO Status',
+                                                            value: rtoStatusFilter,
+                                                            setValue: setRtoStatusFilter,
+                                                            columnIndex: getColumnIndex('rtoStatus'),
+                                                            position: e.currentTarget.getBoundingClientRect()
+                                                        });
+                                                    }}
+                                                    className="flex gap-2 items-center"
+                                                >
+                                                    RTO Status <IoFilterSharp className="w-4 h-4" />
+                                                </button>
                                             </th>
                                         )}
+
                                         <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
                                             View Variant
                                         </th>
@@ -368,6 +581,7 @@ const ProductTable = () => {
                                         </th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     {products.map((item) => {
 
@@ -473,14 +687,14 @@ const ProductTable = () => {
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                             {selectedProduct?.variants?.map((variant, idx) => {
-                                               
+
 
                                                 const varinatExists = selectedProduct?.isVarientExists ? 'yes' : 'no';
                                                 const isExists = varinatExists === 'yes';
 
                                                 return (
                                                     <div key={variant.id || idx} className="border rounded-lg shadow-sm p-4 bg-white">
-                                                      
+
 
                                                         {/* Details */}
                                                         <div className="space-y-2 text-sm text-gray-700">

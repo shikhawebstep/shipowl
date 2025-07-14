@@ -15,6 +15,7 @@ import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useAdminActions } from "@/components/commonfunctions/MainContext";
 import { BadgePlus, Trash2, RotateCcw, Pencil } from "lucide-react";
 import { useImageURL } from "@/components/ImageURLContext";
+import { IoFilterSharp } from "react-icons/io5";
 
 export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -26,6 +27,31 @@ export default function List() {
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/category", "categories");
     const { fetchImages } = useImageURL();
+
+    const [categoryName, setCategoryName] = useState('');
+    const [showFilter, setShowFilter] = useState(null);
+    const [showStatusFilter, setShowStatusFilter] = useState(false);
+    const [statusFilter, setStatusFilter] = useState('');
+
+    const [showDescriptionFilter, setShowDescriptionFilter] = useState(false);
+    const [descriptionFilter, setDescriptionFilter] = useState('');
+
+    const handleClearFilters = () => {
+        setCategoryName('');
+        setDescriptionFilter('');
+        setStatusFilter('');
+
+        // Clear all filters from DataTable
+        if ($.fn.DataTable.isDataTable("#categoryTable")) {
+            const table = $("#categoryTable").DataTable();
+            table.search('').columns().search('').draw(); // clear global + column filters
+        }
+
+        // Hide all filter popups (optional)
+        setShowFilter(false);
+        setShowDescriptionFilter(false);
+        setShowStatusFilter(false);
+    };
 
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
@@ -138,6 +164,12 @@ export default function List() {
                         </h2>
                         <div className="flex gap-3  items-center">
                             <div className="md:flex w-full justify-end gap-2">
+                                <button
+                                    onClick={handleClearFilters}
+                                    className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md transition-all duration-200"
+                                >
+                                    Clear Filters
+                                </button>
                                 {canViewTrashed && (
                                     <button
                                         className={`text-sm p-2  gap-2 md:flex hidden text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
@@ -184,9 +216,222 @@ export default function List() {
                                 <thead>
                                     <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                         <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">Category Image</th>
-                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">Category Name</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Description</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Status</th>
+                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">Created At </th>
+                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase relative">
+
+                                            <button
+                                                onClick={() => setShowFilter(!showFilter)}
+                                                className="flex gap-2 uppercase items-center ml-2"
+                                            >
+                                                Category Name <IoFilterSharp className="w-4 h-4" />
+                                            </button>
+
+                                            {showFilter && (
+                                                <div
+                                                    className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4"
+                                                    ref={(ref) => {
+                                                        if (ref) {
+                                                            const handleClickOutside = (e) => {
+                                                                if (!ref.contains(e.target)) setShowFilter(false);
+                                                            };
+                                                            document.addEventListener("mousedown", handleClickOutside);
+                                                            // Clean up
+                                                            return () => {
+                                                                document.removeEventListener("mousedown", handleClickOutside);
+                                                            };
+                                                        }
+                                                    }}
+                                                >
+                                                    {/* Header */}
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <label className="text-sm font-medium text-gray-700">Category Name</label>
+                                                        <button
+                                                            onClick={() => {
+                                                                setCategoryName("");
+                                                                if ($.fn.DataTable.isDataTable("#categoryTable")) {
+                                                                    $("#categoryTable").DataTable().search("").draw();
+                                                                }
+                                                            }}
+                                                            className="text-red-500 text-xs hover:underline"
+                                                        >
+                                                            Reset
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Input Search */}
+                                                    <input
+                                                        type="text"
+                                                        value={categoryName}
+                                                        onChange={(e) => setCategoryName(e.target.value)}
+                                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring focus:ring-orange-500"
+                                                        placeholder="Enter category name"
+                                                    />
+
+                                                    {/* Action Buttons */}
+                                                    <div className="flex justify-between mt-4">
+                                                        <button
+                                                            onClick={() => {
+                                                                setShowFilter(false); // Close filter
+                                                            }}
+                                                            className="text-sm text-gray-500 hover:underline"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                if ($.fn.DataTable.isDataTable("#categoryTable")) {
+                                                                    $("#categoryTable").DataTable().search(categoryName).draw();
+                                                                }
+                                                                setShowFilter(false); // Close filter
+                                                            }}
+                                                            className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </th>
+
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                            <button
+                                                onClick={() => setShowDescriptionFilter(!showDescriptionFilter)}
+                                                className="flex gap-2 items-center"
+                                            >
+                                                Description <IoFilterSharp className="w-4 h-4" />
+                                            </button>
+
+                                            {showDescriptionFilter && (
+                                                <div
+                                                    className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4"
+                                                    ref={(ref) => {
+                                                        if (ref) {
+                                                            const handleClickOutside = (e) => {
+                                                                if (!ref.contains(e.target)) setShowDescriptionFilter(false);
+                                                            };
+                                                            document.addEventListener("mousedown", handleClickOutside);
+                                                            return () => {
+                                                                document.removeEventListener("mousedown", handleClickOutside);
+                                                            };
+                                                        }
+                                                    }}
+                                                >
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <label className="text-sm font-medium text-gray-700">Description</label>
+                                                        <button
+                                                            onClick={() => {
+                                                                setDescriptionFilter('');
+                                                                if ($.fn.DataTable.isDataTable("#categoryTable")) {
+                                                                    $("#categoryTable").DataTable().column(3).search("").draw(); // column index: Description
+                                                                }
+                                                            }}
+                                                            className="text-red-500 text-xs hover:underline"
+                                                        >
+                                                            Reset
+                                                        </button>
+                                                    </div>
+
+                                                    <input
+                                                        type="text"
+                                                        value={descriptionFilter}
+                                                        onChange={(e) => setDescriptionFilter(e.target.value)}
+                                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                                                        placeholder="Enter description"
+                                                    />
+
+                                                    <div className="flex justify-between mt-4">
+                                                        <button
+                                                            onClick={() => setShowDescriptionFilter(false)}
+                                                            className="text-sm text-gray-500 hover:underline"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                if ($.fn.DataTable.isDataTable("#categoryTable")) {
+                                                                    $("#categoryTable").DataTable().column(3).search(descriptionFilter).draw();
+                                                                }
+                                                                setShowDescriptionFilter(false);
+                                                            }}
+                                                            className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </th>
+
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                            <button
+                                                onClick={() => setShowStatusFilter(!showStatusFilter)}
+                                                className="flex gap-2 items-center"
+                                            >
+                                                Status <IoFilterSharp className="w-4 h-4" />
+                                            </button>
+
+                                            {showStatusFilter && (
+                                                <div
+                                                    className="absolute z-10 mt-2 w-50 bg-white border rounded-xl shadow-lg p-4"
+                                                    ref={(ref) => {
+                                                        if (ref) {
+                                                            const handleClickOutside = (e) => {
+                                                                if (!ref.contains(e.target)) setShowStatusFilter(false);
+                                                            };
+                                                            document.addEventListener("mousedown", handleClickOutside);
+                                                            return () => {
+                                                                document.removeEventListener("mousedown", handleClickOutside);
+                                                            };
+                                                        }
+                                                    }}
+                                                >
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <label className="text-sm font-medium text-gray-700">Status</label>
+                                                        <button
+                                                            onClick={() => {
+                                                                setStatusFilter('');
+                                                                if ($.fn.DataTable.isDataTable("#categoryTable")) {
+                                                                    $("#categoryTable").DataTable().column(4).search("").draw(); // column index: Status
+                                                                }
+                                                            }}
+                                                            className="text-red-500 text-xs hover:underline"
+                                                        >
+                                                            Reset
+                                                        </button>
+                                                    </div>
+
+                                                    <select
+                                                        value={statusFilter}
+                                                        onChange={(e) => setStatusFilter(e.target.value)}
+                                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                                                    >
+                                                        <option value="">All</option>
+                                                        <option value="Active">Active</option>
+                                                        <option value="Inactive">Inactive</option>
+                                                    </select>
+
+                                                    <div className="flex justify-between mt-4">
+                                                        <button
+                                                            onClick={() => setShowStatusFilter(false)}
+                                                            className="text-sm text-gray-500 hover:underline"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                if ($.fn.DataTable.isDataTable("#categoryTable")) {
+                                                                    $("#categoryTable").DataTable().column(4).search(statusFilter).draw();
+                                                                }
+                                                                setShowStatusFilter(false);
+                                                            }}
+                                                            className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                                                        >
+                                                            Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </th>
                                         <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
                                     </tr>
                                 </thead>
@@ -236,6 +481,14 @@ export default function List() {
                                                             )}
                                                         </label>
                                                     </div>
+                                                </td>
+                                                <td className="p-2 bg-transparent whitespace-nowrap border-0 pe-5">
+
+                                                    {new Date(item.createdAt).toLocaleDateString("en-IN", {
+                                                        year: "numeric",
+                                                        month: "short",
+                                                        day: "numeric"
+                                                    })}
                                                 </td>
                                                 <td className="p-2 bg-transparent whitespace-nowrap border-0 pe-5">
 

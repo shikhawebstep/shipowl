@@ -225,7 +225,7 @@ const SourceAProduct = () => {
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+                    text: errorMessage.error || errorMessage.message || "Network Error.",
                 });
                 throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
             }

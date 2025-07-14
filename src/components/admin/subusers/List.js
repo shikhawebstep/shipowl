@@ -11,7 +11,32 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useImageURL } from "@/components/ImageURLContext";
 import Image from "next/image";
+import { IoFilterSharp } from "react-icons/io5";
+
 export default function List() {
+    const [nameFilter, setNameFilter] = useState('');
+    const [emailFilter, setEmailFilter] = useState('');
+    const [roleFilter, setRoleFilter] = useState('');
+    const [phoneFilter, setPhoneFilter] = useState('');
+    const [activeFilter, setActiveFilter] = useState(null);
+
+
+    const handleClearAllFilters = () => {
+        setNameFilter('');
+        setEmailFilter('');
+        setRoleFilter('');
+        setPhoneFilter('');
+        setActiveFilter(null);
+
+        if ($.fn.DataTable.isDataTable('#subuserAdmin')) {
+            const table = $('#subuserAdmin').DataTable();
+            table.columns().every(function () {
+                this.search('');
+            });
+            table.draw();
+        }
+    };
+
     const { fetchImages } = useImageURL();
     const [isTrashed, setIsTrashed] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -52,7 +77,7 @@ export default function List() {
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: result.message || result.error || "Your session has expired. Please log in again.",
+                    text: result.message || result.error || "Network Error.",
                 });
                 throw new Error(result.message || result.error || "Something Wrong!");
             }
@@ -101,7 +126,7 @@ export default function List() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -320,7 +345,7 @@ export default function List() {
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                        "Network Error.",
                 });
                 throw new Error(
                     errorMessage.message || errorMessage.error || "Something Wrong!"
@@ -478,6 +503,14 @@ export default function List() {
                             )}
                         </button>
                         <div className="md:flex hidden justify-start gap-5 items-end">
+                            <button
+                                onClick={handleClearAllFilters}
+                                className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+
+                            >
+                                Clear All Filters
+                            </button>
+
                             {canViewTrashed && <button
                                 className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                 onClick={async () => {
@@ -496,20 +529,195 @@ export default function List() {
                         </div>
                     </div>
                 </div>
+                {activeFilter && (
+                    <div
+                        className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                        style={{
+                            top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                            left: activeFilter.position.left + 'px',
+                        }}
+                    >
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="text-sm font-medium text-gray-700">{activeFilter.label}</label>
+                            <button
+                                onClick={() => {
+                                    switch (activeFilter.key) {
+                                        case 'name':
+                                            setNameFilter('');
+                                            break;
+                                        case 'email':
+                                            setEmailFilter('');
+                                            break;
+                                        case 'role':
+                                            setRoleFilter('');
+                                            break;
+                                        case 'phone':
+                                            setPhoneFilter('');
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    setActiveFilter(null);
+                                    if ($.fn.DataTable.isDataTable('#subuserAdmin')) {
+                                        $('#subuserAdmin')
+                                            .DataTable()
+                                            .column(activeFilter.columnIndex)
+                                            .search('')
+                                            .draw();
+                                    }
+                                }}
+                                className="text-red-500 text-xs hover:underline"
+                            >
+                                Reset
+                            </button>
+                        </div>
+
+                        <input
+                            type="text"
+                            value={
+                                activeFilter.key === 'name' ? nameFilter :
+                                    activeFilter.key === 'email' ? emailFilter :
+                                        activeFilter.key === 'role' ? roleFilter :
+                                            activeFilter.key === 'phone' ? phoneFilter :
+                                                ''
+                            }
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                switch (activeFilter.key) {
+                                    case 'name':
+                                        setNameFilter(val);
+                                        break;
+                                    case 'email':
+                                        setEmailFilter(val);
+                                        break;
+                                    case 'role':
+                                        setRoleFilter(val);
+                                        break;
+                                    case 'phone':
+                                        setPhoneFilter(val);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                            placeholder={`Enter ${activeFilter.label}`}
+                        />
+
+                        <div className="flex justify-between mt-4">
+                            <button onClick={() => setActiveFilter(null)} className="text-sm text-gray-500 hover:underline">
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    let value = '';
+                                    switch (activeFilter.key) {
+                                        case 'name':
+                                            value = nameFilter;
+                                            break;
+                                        case 'email':
+                                            value = emailFilter;
+                                            break;
+                                        case 'role':
+                                            value = roleFilter;
+                                            break;
+                                        case 'phone':
+                                            value = phoneFilter;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
+                                    if ($.fn.DataTable.isDataTable('#subuserAdmin')) {
+                                        $('#subuserAdmin').DataTable().column(activeFilter.columnIndex).search(value).draw();
+                                    }
+
+                                    setActiveFilter(null);
+                                }}
+                                className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {data.length > 0 ? (
                     <div className="overflow-x-auto relative main-outer-wrapper w-full">
                         <table className="md:w-full w-auto display main-tables" id="subuserAdmin">
                             <thead>
                                 <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                     <th className="p-2 whitespace-nowrap px-5 text-left uppercase">SR.</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Name</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Email</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Role</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Phone Number</th>
+
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                        <button
+                                            onClick={(e) =>
+                                                setActiveFilter({
+                                                    key: 'name',
+                                                    label: 'Name',
+                                                    columnIndex: 1,
+                                                    position: e.currentTarget.getBoundingClientRect(),
+                                                })
+                                            }
+                                            className="flex items-center gap-2 uppercase"
+                                        >
+                                            Name <IoFilterSharp />
+                                        </button>
+                                    </th>
+
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                        <button
+                                            onClick={(e) =>
+                                                setActiveFilter({
+                                                    key: 'email',
+                                                    label: 'Email',
+                                                    columnIndex: 2,
+                                                    position: e.currentTarget.getBoundingClientRect(),
+                                                })
+                                            }
+                                            className="flex items-center gap-2 uppercase"
+                                        >
+                                            Email <IoFilterSharp />
+                                        </button>
+                                    </th>
+
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                        <button
+                                            onClick={(e) =>
+                                                setActiveFilter({
+                                                    key: 'role',
+                                                    label: 'Role',
+                                                    columnIndex: 3,
+                                                    position: e.currentTarget.getBoundingClientRect(),
+                                                })
+                                            }
+                                            className="flex items-center gap-2 uppercase"
+                                        >
+                                            Role <IoFilterSharp />
+                                        </button>
+                                    </th>
+
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                        <button
+                                            onClick={(e) =>
+                                                setActiveFilter({
+                                                    key: 'phone',
+                                                    label: 'Phone Number',
+                                                    columnIndex: 4,
+                                                    position: e.currentTarget.getBoundingClientRect(),
+                                                })
+                                            }
+                                            className="flex items-center gap-2 uppercase"
+                                        >
+                                            Phone Number <IoFilterSharp />
+                                        </button>
+                                    </th>
+
                                     <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Profile Picture</th>
                                     <th className="p-2 whitespace-nowrap px-5 text-end uppercase flex justify-end">Action</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 {data.map((item, index) => (
                                     <tr key={item.id} className="border-b capitalize border-[#E9EDF7] text-[#2B3674] font-semibold">

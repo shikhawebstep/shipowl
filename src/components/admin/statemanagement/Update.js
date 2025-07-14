@@ -81,7 +81,7 @@ export default function Update() {
         Swal.fire({
           icon: "error",
           title: "Something Wrong!",
-          text: errorMessage.message || "Your session has expired. Please log in again.",
+          text: errorMessage.message || "Network Error.",
         });
         throw new Error(errorMessage.message);
       }

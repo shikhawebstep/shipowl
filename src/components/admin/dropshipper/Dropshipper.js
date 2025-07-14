@@ -12,6 +12,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import { useAdminActions } from '@/components/commonfunctions/MainContext';
 import { DropshipperProfileContext } from './DropshipperProfileContext';
+import { IoFilterSharp } from "react-icons/io5";
 
 const Dropshipper = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -33,6 +34,12 @@ const Dropshipper = () => {
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
     };
+
+    const [nameFilter, setNameFilter] = useState('');
+    const [emailFilter, setEmailFilter] = useState('');
+    const [addressFilter, setAddressFilter] = useState('');
+    const [activeFilter, setActiveFilter] = useState(null); // common popup control
+
 
     const handleToggleTrash = async () => {
         setIsTrashed(prev => !prev);
@@ -262,6 +269,23 @@ const Dropshipper = () => {
                         )}
                     </button>
                     <div className="md:flex hidden justify-end gap-2">
+                        <button
+                            onClick={() => {
+                                setNameFilter('');
+                                setEmailFilter('');
+                                setAddressFilter('');
+                                setActiveFilter(null);
+
+                                if ($.fn.DataTable.isDataTable('#dropshipperTable')) {
+                                    const table = $('#dropshipperTable').DataTable();
+                                    table.search('').columns().search('').draw();
+                                }
+                            }}
+                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                        >
+                            Clear Filters
+                        </button>
+
                         {canAdd && (
                             <button onClick={setActiveTab('account_details')} className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
                                 <Link href="/admin/dropshipper/create">Add New</Link>
@@ -281,6 +305,73 @@ const Dropshipper = () => {
                 </div>
             </div>
 
+            {activeFilter && (
+                <div
+                    className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                    style={{
+                        top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                        left: activeFilter.position.left + 'px',
+                    }}
+                >
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="text-sm font-medium text-gray-700">{activeFilter.label}</label>
+                        <button
+                            onClick={() => {
+                                activeFilter.setValue('');
+                                setActiveFilter(null);
+                                if ($.fn.DataTable.isDataTable('#dropshipperTable')) {
+                                    $('#dropshipperTable').DataTable().column(activeFilter.columnIndex).search('').draw();
+                                }
+                            }}
+                            className="text-red-500 text-xs hover:underline"
+                        >
+                            Reset
+                        </button>
+                    </div>
+
+                    {/* 👇 This is key: use activeFilter.key to get fresh value */}
+                    <input
+                        type="text"
+                        value={
+                            activeFilter.key === 'name' ? nameFilter :
+                                activeFilter.key === 'email' ? emailFilter :
+                                    activeFilter.key === 'address' ? addressFilter : ''
+                        }
+                        onChange={(e) => activeFilter.setValue(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                        placeholder={`Enter ${activeFilter.label}`}
+                    />
+
+                    <div className="flex justify-between mt-4">
+                        <button
+                            onClick={() => setActiveFilter(null)}
+                            className="text-sm text-gray-500 hover:underline"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                if ($.fn.DataTable.isDataTable('#dropshipperTable')) {
+                                    $('#dropshipperTable')
+                                        .DataTable()
+                                        .column(activeFilter.columnIndex)
+                                        .search(
+                                            activeFilter.key === 'name' ? nameFilter :
+                                                activeFilter.key === 'email' ? emailFilter :
+                                                    activeFilter.key === 'address' ? addressFilter : ''
+                                        )
+                                        .draw();
+                                }
+                                setActiveFilter(null);
+                            }}
+                            className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                        >
+                            Apply
+                        </button>
+                    </div>
+                </div>
+            )}
+
 
             {dropshippers.length > 0 ? (
                 <div className="overflow-x-auto w-full relative main-outer-wrapper">
@@ -288,9 +379,61 @@ const Dropshipper = () => {
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Sr.</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Name</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Email</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Permanent Address</th>
+
+                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'name',
+                                                label: 'Name',
+                                                value: nameFilter,
+                                                setValue: setNameFilter,
+                                                columnIndex: 1,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Name <IoFilterSharp />
+                                    </button>
+                                </th>
+
+                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'email',
+                                                label: 'Email',
+                                                value: emailFilter,
+                                                setValue: setEmailFilter,
+                                                columnIndex: 2,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Email <IoFilterSharp />
+                                    </button>
+                                </th>
+
+                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap relative">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'address',
+                                                label: 'Permanent Address',
+                                                value: addressFilter,
+                                                setValue: setAddressFilter,
+                                                columnIndex: 3,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Permanent Address <IoFilterSharp />
+                                    </button>
+                                </th>
+
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">View More</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Check Reporting</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Update Password</th>
@@ -298,6 +441,7 @@ const Dropshipper = () => {
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {dropshippers.map((item, index) => {
                                 return (
@@ -324,7 +468,7 @@ const Dropshipper = () => {
                                             <td className="p-3 px-4 text-left">{item.permanentAddress || '-'}</td>
                                             <td className="p-3 px-4 text-center whitespace-nowrap">
                                                 <button
-                                                 disabled={!item.bankAccount}
+                                                    disabled={!item.bankAccount}
                                                     onClick={() =>
                                                         expandedItem?.id === item.id
                                                             ? setExpandedItem(null)

@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Menu, X, Mail, Home, ShoppingCart, Package, Gift, BarChart, CreditCard,
-  FileText, Settings, Volume2, MapPin, User, Warehouse, ClipboardList,
+  FileText, Settings, Volume2, MapPin, User, Warehouse, ClipboardList,Ticket,
   BadgeDollarSign, ShieldCheck, LayoutDashboard, UserCheck, Users, Image as LucideImage, Banknote, Tags
 } from "lucide-react";
 import { GoUnverified } from "react-icons/go";
@@ -42,6 +42,7 @@ export default function Sidebar() {
     { title: "Product Management", module: "Product", action: actions, icon: Package, href: "/admin/products/list" },
     { title: "Dropshipper Banners", module: "dropshiperBanners", action: actions, icon: LucideImage, href: "/admin/dropshipper/banner" },
     { title: "Email Settings", module: "Mail", action: actions, icon: Mail, href: "/admin/email-settings" },
+    { title: "Tickets", module: "Tickets", action: actions, icon: Ticket, href: "/admin/ticket" },
 
     {
       children: [

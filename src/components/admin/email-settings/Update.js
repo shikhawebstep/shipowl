@@ -87,7 +87,7 @@ export default function Update() {
                     icon: "error",
                     title: "Something Wrong!",
                     text:
-                        errorMessage.message || "Your session has expired. Please log in again.",
+                        errorMessage.message || "Network Error.",
                 });
                 throw new Error(errorMessage.message);
             }

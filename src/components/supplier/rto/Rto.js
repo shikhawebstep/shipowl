@@ -186,7 +186,7 @@ export default function RTO() {
           text:
             result.error ||
             result.message ||
-            "Your session has expired. Please log in again.",
+            "Network Error.",
         });
         throw new Error(result.message || result.error);
       }
@@ -245,7 +245,7 @@ export default function RTO() {
           text:
             errorMessage.error ||
             errorMessage.message ||
-            "Your session has expired. Please log in again.",
+            "Network Error.",
         },
 
         );
@@ -308,7 +308,7 @@ export default function RTO() {
           text:
             errorMessage.error ||
             errorMessage.message ||
-            "Your session has expired. Please log in again.",
+            "Network Error.",
         },
 
         );
