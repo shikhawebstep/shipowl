@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ status: false, error: `User Not Found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
     if (isStaff) {
       const permissionOptions = {
         panel: 'Admin',
@@ -137,7 +137,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: `User Not Found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
     if (isStaff) {
       const options = { panel: 'Admin', module: 'Role', action: 'Update' };
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);
@@ -237,7 +237,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: `User Not Found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
 
     if (isStaff) {
       const options = {
@@ -314,7 +314,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: `Admin not found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
 
     if (isStaff) {
       const options = {

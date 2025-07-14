@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+    const isStaffUser = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
 
     if (isStaffUser) {
       mainDropshipperId = userCheck.admin?.admin?.id ?? dropshipperId;

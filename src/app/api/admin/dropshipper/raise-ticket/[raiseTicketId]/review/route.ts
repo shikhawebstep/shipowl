@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ✅ Check staff permissions (if role is not super admin/dropshipper/supplier)
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(adminRole.toLowerCase());
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(adminRole.toLowerCase());
     if (isStaff) {
       const permissionOptions = {
         panel: 'Admin',

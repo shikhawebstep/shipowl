@@ -114,7 +114,7 @@ export async function handleLogin(req: NextRequest, adminRole: string, adminStaf
 
         // Generate authentication token
         const token = generateToken(admin.id, adminData.role);
-        const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(adminData.role));
+        const isStaffUser = !['admin', 'supplier', 'dropshipper'].includes(String(adminData.role));
 
         let assignedPermissions;
         if (isStaffUser && 'admin' in admin) {

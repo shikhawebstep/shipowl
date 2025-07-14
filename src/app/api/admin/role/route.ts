@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Staff role permission check
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
     if (isStaff) {
       const options = { panel: 'Admin', module: 'Role', action: 'Create' };
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);
@@ -211,7 +211,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Staff role permission check
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
     if (isStaff) {
       const options = { panel: 'Admin', module: 'Role', action: 'View Listing' };
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);

@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
 
         let mainSupplierId = supplierId;
 
-        const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(supplierRole));
+        const isStaffUser = !['admin', 'supplier', 'dropshipper'].includes(String(supplierRole));
 
         let assignedPermissions: Permission[] = [];
         let staffPermissionApplied = false;
@@ -235,7 +235,7 @@ export async function POST(req: NextRequest) {
 
         // let mainSupplierId = supplierId;
 
-        const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(supplierRole));
+        const isStaffUser = !['admin', 'supplier', 'dropshipper'].includes(String(supplierRole));
 
         if (isStaffUser) {
             const supplierPermissionCheck = await checkStaffPermissionStatus({

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isUserExist } from "@/utils/auth/authUtils";
-import { getProductById, deleteProduct } from '@/app/models/admin/product/product';
+import { getCategoryById, deleteCategory } from '@/app/models/admin/category';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 export async function DELETE(req: NextRequest) {
@@ -22,7 +22,7 @@ export async function DELETE(req: NextRequest) {
 
     if (!['admin', 'supplier', 'dropshipper'].includes(String(adminRole))) {
       const permissionCheck = await checkStaffPermissionStatus(
-        { panel: 'Admin', module: 'Product', action: 'Permanent Delete' },
+        { panel: 'Admin', module: 'Category', action: 'Permanent Delete' },
         adminId
       );
       if (!permissionCheck.status) {
@@ -36,26 +36,26 @@ export async function DELETE(req: NextRequest) {
     const deleted = [];
     const notDeleted = [];
 
-    for (const productId of ids) {
-      const productResult = await getProductById(productId);
-      const productName = productResult?.product?.name ?? null;
+    for (const categoryId of ids) {
+      const categoryResult = await getCategoryById(categoryId);
+      const categoryName = categoryResult?.category?.name ?? null;
 
-      if (!productResult?.status || !productResult?.product) {
-        notDeleted.push({ id: productId, name: productName, reason: 'Product not found' });
+      if (!categoryResult?.status || !categoryResult?.category) {
+        notDeleted.push({ id: categoryId, name: categoryName, reason: 'Category not found' });
         continue;
       }
 
-      const deleteResult = await deleteProduct(productId);
+      const deleteResult = await deleteCategory(categoryId);
       if (deleteResult?.status) {
-        deleted.push({ id: productId, name: productName });
+        deleted.push({ id: categoryId, name: categoryName });
       } else {
-        notDeleted.push({ id: productId, name: productName, reason: 'Deletion failed' });
+        notDeleted.push({ id: categoryId, name: categoryName, reason: 'Deletion failed' });
       }
     }
 
     return NextResponse.json({
       status: true,
-      message: 'Product deletion completed',
+      message: 'Category deletion completed',
       deleted,
       notDeleted
     }, { status: 200 });

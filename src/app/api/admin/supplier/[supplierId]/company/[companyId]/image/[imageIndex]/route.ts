@@ -42,7 +42,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: `Admin not found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
 
     if (isStaff) {
       const options = {

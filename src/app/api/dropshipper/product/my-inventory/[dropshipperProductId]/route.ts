@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+    const isStaffUser = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
 
     if (isStaffUser) {
       mainDropshipperId = userCheck.admin?.admin?.id ?? dropshipperId;
@@ -136,7 +136,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ status: false, message: globalPermissionResult.message }, { status: 404 }); //unauthroized
     }
 
-    const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+    const isStaffUser = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
 
     if (isStaffUser) {
       mainDropshipperId = userCheck.admin?.admin?.id ?? dropshipperId;
@@ -273,7 +273,7 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+    const isStaffUser = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
 
     if (isStaffUser) {
       mainDropshipperId = userCheck.admin?.admin?.id ?? dropshipperId;
@@ -337,7 +337,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ status: false, message: globalPermissionResult.message }, { status: 404 }); //unauthroized
     }
 
-    const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+    const isStaffUser = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
 
     if (isStaffUser) {
       mainDropshipperId = userCheck.admin?.admin?.id ?? dropshipperId;

@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaffUser = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
 
     if (isStaffUser) {
       // mainAdminId = userCheck.admin?.admin?.id ?? adminId;

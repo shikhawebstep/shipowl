@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ status: false, error: `User Not Found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
 
     if (isStaff) {
       const options = {

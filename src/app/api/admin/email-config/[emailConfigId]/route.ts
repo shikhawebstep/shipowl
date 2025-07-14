@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
 
     if (isStaff) {
       //  mainAdminId = userCheck.admin?.admin?.id ?? adminId;
@@ -134,7 +134,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: `User Not Found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
 
     if (isStaff) {
       const options = {

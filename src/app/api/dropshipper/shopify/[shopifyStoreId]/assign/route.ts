@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ status: false, error: `User not found: ${userCheck.message}` }, { status: 404 });
         }
 
-        const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+        const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
         const effectiveDropshipperId = isStaff
             ? userCheck.admin?.admin?.id ?? dropshipperId
             : dropshipperId;

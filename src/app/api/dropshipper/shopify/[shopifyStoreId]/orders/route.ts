@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
         }
 
         // Handle staff case (non-admin/dropshipper/supplier)
-        const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+        const isStaffUser = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
         const mainDropshipperId = isStaffUser ? userCheck.admin?.admin?.id ?? dropshipperId : dropshipperId;
 
         // Get Shopify store details

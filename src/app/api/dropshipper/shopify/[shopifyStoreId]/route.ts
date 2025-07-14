@@ -57,7 +57,7 @@ export async function PUT(req: NextRequest) {
             return NextResponse.json({ error: `User Not Found: ${userCheck.message}` }, { status: 404 });
         }
 
-        const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+        const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
         if (isStaff) {
             mainDropshipperId = userCheck.admin?.admin?.id ?? dropshipperId;
 
@@ -194,7 +194,7 @@ export async function DELETE(req: NextRequest) {
             return NextResponse.json({ error: `User Not Found: ${userCheck.message}` }, { status: 404 });
         }
 
-        const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+        const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
         if (isStaff) {
             mainDropshipperId = userCheck.admin?.admin?.id ?? dropshipperId;
 

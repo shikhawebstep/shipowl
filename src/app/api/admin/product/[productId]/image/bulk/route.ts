@@ -28,7 +28,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Admin not found' }, { status: 404 });
     }
 
-    if (!['admin', 'dropshipper', 'supplier'].includes(String(adminRole))) {
+    if (!['admin', 'supplier', 'dropshipper'].includes(String(adminRole))) {
       const permission = await checkStaffPermissionStatus({ panel: 'Admin', module: 'Product', action: 'Update' }, adminId);
       if (!permission.status) {
         return NextResponse.json({ status: false, message: permission.message || "No permission" }, { status: 403 });

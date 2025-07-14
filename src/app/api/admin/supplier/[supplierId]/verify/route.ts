@@ -55,7 +55,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: `Admin user not found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const isStaff = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
 
     if (isStaff) {
       const options = {

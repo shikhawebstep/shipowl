@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isUserExist } from "@/utils/auth/authUtils";
-import { getProductById, deleteProduct } from '@/app/models/admin/product/product';
+import { getDropshipperById, deleteDropshipper } from '@/app/models/dropshipper/dropshipper';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 export async function DELETE(req: NextRequest) {
@@ -22,7 +22,7 @@ export async function DELETE(req: NextRequest) {
 
     if (!['admin', 'supplier', 'dropshipper'].includes(String(adminRole))) {
       const permissionCheck = await checkStaffPermissionStatus(
-        { panel: 'Admin', module: 'Product', action: 'Permanent Delete' },
+        { panel: 'Admin', module: 'Dropshipper', action: 'Permanent Delete' },
         adminId
       );
       if (!permissionCheck.status) {
@@ -36,26 +36,26 @@ export async function DELETE(req: NextRequest) {
     const deleted = [];
     const notDeleted = [];
 
-    for (const productId of ids) {
-      const productResult = await getProductById(productId);
-      const productName = productResult?.product?.name ?? null;
+    for (const dropshipperId of ids) {
+      const dropshipperResult = await getDropshipperById(dropshipperId);
+      const dropshipperName = dropshipperResult?.dropshipper?.name ?? null;
 
-      if (!productResult?.status || !productResult?.product) {
-        notDeleted.push({ id: productId, name: productName, reason: 'Product not found' });
+      if (!dropshipperResult?.status || !dropshipperResult?.dropshipper) {
+        notDeleted.push({ id: dropshipperId, name: dropshipperName, reason: 'Dropshipper not found' });
         continue;
       }
 
-      const deleteResult = await deleteProduct(productId);
+      const deleteResult = await deleteDropshipper(dropshipperId);
       if (deleteResult?.status) {
-        deleted.push({ id: productId, name: productName });
+        deleted.push({ id: dropshipperId, name: dropshipperName });
       } else {
-        notDeleted.push({ id: productId, name: productName, reason: 'Deletion failed' });
+        notDeleted.push({ id: dropshipperId, name: dropshipperName, reason: 'Deletion failed' });
       }
     }
 
     return NextResponse.json({
       status: true,
-      message: 'Product deletion completed',
+      message: 'Dropshipper deletion completed',
       deleted,
       notDeleted
     }, { status: 200 });

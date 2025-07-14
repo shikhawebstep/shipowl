@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ status: false, error: `User Not Found: ${userValidation.message}` }, { status: 404 });
     }
 
-    const isStaffUser = !['admin', 'dropshipper', 'supplier'].includes(String(adminRole));
+    const isStaffUser = !['admin', 'supplier', 'dropshipper'].includes(String(adminRole));
 
     let assignedPermissions: Permission[] = [];
     let staffPermissionApplied = false;
