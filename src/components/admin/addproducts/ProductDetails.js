@@ -165,8 +165,8 @@ export default function ProductDetails() {
 
           {galleryPreviews.length > 0 &&
             galleryPreviews.map((src, index) => (
-              <div>
-              <div key={index} className="relative w-full p-4 h-[300px] rounded overflow-hidden border border-gray-300">
+              <div  key={index}>
+              <div className="relative w-full p-4 h-[300px] rounded overflow-hidden border border-gray-300">
                 <button
                   type="button"
                   className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs z-10"

@@ -389,9 +389,8 @@ export default function ProductDetails() {
               const imageUrl = typeof img === 'string' ? img : URL.createObjectURL(img);
 
               return (
-                <div>
+                <div key={index}>
                   <div
-                    key={index}
                     className="relative w-full h-[300px] rounded overflow-hidden border border-gray-300"
                   >
                     <button
