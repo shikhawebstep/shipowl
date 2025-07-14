@@ -21,7 +21,7 @@ interface VariantSKUInput {
 interface Product {
     name: string;
     categoryId: number;
-    imageSortingIndex: string;
+    imageSortingIndex?: string;
     main_sku: string;
     hsnCode: string | null;
     taxRate: number | null;
