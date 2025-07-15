@@ -403,38 +403,28 @@ model loginLog {
 }
 
 model activityLog {
-  id                      Int       @id @default(autoincrement())
-  adminId                 Int
-  adminRole               String
-  module                  String
-  action                  String
-  endpoint                String
-  method                  String
-  payload                 String?   @db.LongText
-  response                String?   @db.LongText
-  result                  Boolean
-  data                    String?   @db.LongText
-  ipv4                    String?
-  ipv6                    String?
-  internetServiceProvider String?
-  clientInformation       String?
-  userAgent               String?
-  createdAt               DateTime  @default(now())
-  createdBy               Int?
-  createdByRole           String?
-  updatedAt               DateTime  @updatedAt
-  updatedBy               Int?
-  updatedByRole           String?
-  deletedAt               DateTime?
-  deletedBy               Int?
-  deletedByRole           String?
+  id         Int      @id @default(autoincrement())
+  adminId    Int
+  adminRole  String
+  module     String
+  action     String
+  endpoint   String
+  method     String
+  payload    String?  @db.LongText // JSON string
+  response   String?  @db.LongText // JSON string
+  result     Boolean
+  data       String?  @db.LongText // JSON string
+  ipAddress  String?
+  userAgent  String?  @db.LongText // Store as JSON string
+  ispInfo    String?  @db.LongText // Store as JSON string
+  deviceInfo String?  @db.LongText // Store as JSON string
+  createdAt  DateTime @default(now())
 
   @@index([adminId])
   @@index([adminRole])
   @@index([module])
   @@index([action])
   @@index([createdAt])
-  @@index([deletedAt])
 }
 
 model country {

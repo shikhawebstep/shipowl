@@ -443,20 +443,11 @@ exports.Prisma.ActivityLogScalarFieldEnum = {
   response: 'response',
   result: 'result',
   data: 'data',
-  ipv4: 'ipv4',
-  ipv6: 'ipv6',
-  internetServiceProvider: 'internetServiceProvider',
-  clientInformation: 'clientInformation',
+  ipAddress: 'ipAddress',
   userAgent: 'userAgent',
-  createdAt: 'createdAt',
-  createdBy: 'createdBy',
-  createdByRole: 'createdByRole',
-  updatedAt: 'updatedAt',
-  updatedBy: 'updatedBy',
-  updatedByRole: 'updatedByRole',
-  deletedAt: 'deletedAt',
-  deletedBy: 'deletedBy',
-  deletedByRole: 'deletedByRole'
+  ispInfo: 'ispInfo',
+  deviceInfo: 'deviceInfo',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.CountryScalarFieldEnum = {
@@ -1222,14 +1213,10 @@ exports.Prisma.activityLogOrderByRelevanceFieldEnum = {
   payload: 'payload',
   response: 'response',
   data: 'data',
-  ipv4: 'ipv4',
-  ipv6: 'ipv6',
-  internetServiceProvider: 'internetServiceProvider',
-  clientInformation: 'clientInformation',
+  ipAddress: 'ipAddress',
   userAgent: 'userAgent',
-  createdByRole: 'createdByRole',
-  updatedByRole: 'updatedByRole',
-  deletedByRole: 'deletedByRole'
+  ispInfo: 'ispInfo',
+  deviceInfo: 'deviceInfo'
 };
 
 exports.Prisma.countryOrderByRelevanceFieldEnum = {

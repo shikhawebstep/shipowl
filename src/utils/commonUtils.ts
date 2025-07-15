@@ -145,7 +145,7 @@ export async function fetchLogInfo({ module, action, data, response, status }: F
         let payload: unknown = null;
         if (['POST', 'PUT', 'PATCH'].includes(method)) {
             try {
-                payload = await req.json();
+                payload = await req.json(); // await req.formData()
             } catch (err) {
                 logMessage('error', 'Failed to parse JSON payload', err);
             }
@@ -160,11 +160,11 @@ export async function fetchLogInfo({ module, action, data, response, status }: F
             adminRole: adminResult.adminRole,
             module,
             action,
-            url,
+            endpoint: url,
             method,
             payload,
             response, // JSON response from action
-            status,   // Boolean indicating success/failure
+            result: status,   // Boolean indicating success/failure
             data,     // JSON object with additional data
             ipAddress,
             userAgent,
