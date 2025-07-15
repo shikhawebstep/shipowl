@@ -5,6 +5,7 @@ import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { getGoodPincodeById, updateGoodPincode, softDeleteGoodPincode, restoreGoodPincode, getGoodPincodeByPincodeForUpdate } from '@/app/models/goodPincode';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
+import { getPincodeDetails } from '@/utils/location/pincodeUtils';
 
 interface MainAdmin {
   id: number;
@@ -197,6 +198,23 @@ export async function PUT(req: NextRequest) {
       logMessage('warn', 'GoodPincode already exists:', getGoodPincodeByPincodeForUpdateResult?.message || 'Unknown error');
       return NextResponse.json(
         { status: false, error: getGoodPincodeByPincodeForUpdateResult?.message || 'GoodPincode already exists' },
+        { status: 400 }
+      );
+    }
+
+    const {
+      status: pincodeDetailStatus,
+      postOffices,
+      message: pincodeDetailMessage
+    } = await getPincodeDetails(String(pincode));
+
+    if (!pincodeDetailStatus || !postOffices || postOffices.length === 0) {
+      logMessage('warn', 'Invalid or unrecognized pincode:', pincodeDetailMessage || 'No post offices found');
+      return NextResponse.json(
+        {
+          status: false,
+          message: `Invalid or unrecognized pincode (${pincode}). ${pincodeDetailMessage || ''}`,
+        },
         { status: 400 }
       );
     }

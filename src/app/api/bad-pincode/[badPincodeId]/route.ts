@@ -5,28 +5,29 @@ import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { getBadPincodeById, updateBadPincode, softDeleteBadPincode, restoreBadPincode } from '@/app/models/badPincode';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
+import { getPincodeDetails } from '@/utils/location/pincodeUtils';
 
 interface MainAdmin {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    admin?: MainAdmin;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  admin?: MainAdmin;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    admin?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  admin?: SupplierStaff;
 }
 
 export async function GET(req: NextRequest) {
@@ -187,11 +188,29 @@ export async function PUT(req: NextRequest) {
     }
 
     // Extract fields
+    const pincode = extractString('pincode');
     const statusRaw = formData.get('status')?.toString().toLowerCase();
     const status = ['true', '1', true, 1, 'active', 'yes'].includes(statusRaw as string | number | boolean);
 
+    const {
+      status: pincodeDetailStatus,
+      postOffices,
+      message: pincodeDetailMessage
+    } = await getPincodeDetails(String(pincode));
+
+    if (!pincodeDetailStatus || !postOffices || postOffices.length === 0) {
+      logMessage('warn', 'Invalid or unrecognized pincode:', pincodeDetailMessage || 'No post offices found');
+      return NextResponse.json(
+        {
+          status: false,
+          message: `Invalid or unrecognized pincode (${pincode}). ${pincodeDetailMessage || ''}`,
+        },
+        { status: 400 }
+      );
+    }
+
     const badPincodePayload = {
-      pincode: extractString('pincode') || '',
+      pincode: pincode || '',
       status,
       updatedBy: adminId,
       updatedByRole: adminRole || '',
