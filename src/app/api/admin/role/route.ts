@@ -185,9 +185,6 @@ export async function GET(req: NextRequest) {
   try {
     logMessage('debug', 'GET request received for fetching roles');
 
-    const fetchLogInfoResult = await fetchLogInfo('role', 'view', req);
-    logMessage('debug', 'fetchLogInfoResult:', fetchLogInfoResult);
-
     // Extract headers
     const adminIdHeader = req.headers.get("x-admin-id");
     const adminRole = req.headers.get("x-admin-role");

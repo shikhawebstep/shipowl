@@ -439,12 +439,12 @@ exports.Prisma.ActivityLogScalarFieldEnum = {
   action: 'action',
   endpoint: 'endpoint',
   method: 'method',
-  payload: 'payload',
   response: 'response',
   result: 'result',
   data: 'data',
   ipAddress: 'ipAddress',
   userAgent: 'userAgent',
+  location: 'location',
   ispInfo: 'ispInfo',
   deviceInfo: 'deviceInfo',
   createdAt: 'createdAt'
@@ -1210,11 +1210,11 @@ exports.Prisma.activityLogOrderByRelevanceFieldEnum = {
   action: 'action',
   endpoint: 'endpoint',
   method: 'method',
-  payload: 'payload',
   response: 'response',
   data: 'data',
   ipAddress: 'ipAddress',
   userAgent: 'userAgent',
+  location: 'location',
   ispInfo: 'ispInfo',
   deviceInfo: 'deviceInfo'
 };

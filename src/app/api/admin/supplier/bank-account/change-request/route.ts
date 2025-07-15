@@ -74,9 +74,6 @@ export async function GET(req: NextRequest) {
             }
         }
 
-        const fetchLogInfoResult = await fetchLogInfo('bankAccountChangeRequest', 'view', req);
-        logMessage('debug', 'fetchLogInfo result:', fetchLogInfoResult);
-
         const requestResult = await getAllBankAccountChangeRequests();
 
         if (requestResult?.status) {

@@ -99,24 +99,51 @@ export async function logMessage<T>(type: string, message: string, item?: T) {
 // ---------------------------------------------
 // Save Activity to DB
 // ---------------------------------------------
-export async function ActivityLog(params: ActivityLogParams) {
+export async function ActivityLog(
+    { module, action, data, response, status }: FetchLogInfoParams,
+    req: NextRequest
+) {
     try {
-        const { payload, response, data, ...rest } = params;
+        const { logInfo, message } = await fetchLogInfo(
+            { module, action, data, response, status },
+            req
+        ) || {};
+
+        if (!logInfo) {
+            logMessage('warn', 'No log info generated from fetchLogInfo', { module, action });
+            return {
+                status: false,
+                message: message || 'Log information could not be generated.'
+            };
+        }
 
         const activityLog = await prisma.activityLog.create({
             data: {
-                ...rest,
-                payload: JSON.stringify(payload),
-                response: JSON.stringify(response),
-                data: data ? JSON.stringify(data) : null
+                ...logInfo,
+                response: JSON.stringify(logInfo.response ?? {}),
+                data: logInfo.data ? JSON.stringify(logInfo.data) : null,
+                location: logInfo.location ? JSON.stringify(logInfo.location) : null,
+                ispInfo: logInfo.ispInfo ? JSON.stringify(logInfo.ispInfo) : null,
+                deviceInfo: logInfo.deviceInfo ? JSON.stringify(logInfo.deviceInfo) : null,
             }
         });
 
-        logMessage('info', 'Activity Log saved successfully', activityLog);
+        logMessage('info', '✅ Activity Log saved successfully', activityLog);
+
+        return {
+            status: true,
+            message: 'Activity log saved',
+            data: activityLog
+        };
     } catch (error) {
-        logMessage('error', 'Error saving activity log', error);
+        logMessage('error', '❌ Error saving activity log', error);
+        return {
+            status: false,
+            message: 'Failed to save activity log'
+        };
     }
 }
+
 
 // ---------------------------------------------
 // Fetch Log Info (Client + Location)
@@ -156,13 +183,12 @@ export async function fetchLogInfo({ module, action, data, response, status }: F
         const { browser, os, device } = parser.getResult();
 
         const logInfo = {
-            adminId: adminResult.adminId,
-            adminRole: adminResult.adminRole,
+            adminId: adminResult.adminId ?? 0,
+            adminRole: adminResult.adminRole ?? 'Unknown',
             module,
             action,
             endpoint: url,
             method,
-            payload,
             response, // JSON response from action
             result: status,   // Boolean indicating success/failure
             data,     // JSON object with additional data
@@ -192,6 +218,12 @@ export async function fetchLogInfo({ module, action, data, response, status }: F
         };
 
         logMessage('info', 'Generated Activity Log Info:', logInfo);
+
+        return {
+            status: true,
+            message: 'Activity Log Info Generated',
+            logInfo
+        }
 
     } catch (error) {
         logMessage('error', 'Error in fetchLogInfo', error);

@@ -403,12 +403,13 @@ model activityLog {
   action      String
   endpoint    String
   method      String
-  payload     String?   @db.LongText  // JSON string
+  // payload     String?   @db.LongText  // JSON string
   response    String?   @db.LongText  // JSON string
   result      Boolean
   data        String?   @db.LongText  // JSON string
   ipAddress   String?
   userAgent   String?   @db.LongText  // Store as JSON string
+  location    String?   @db.LongText  // Store as JSON string
   ispInfo     String?   @db.LongText  // Store as JSON string
   deviceInfo  String?   @db.LongText  // Store as JSON string
   createdAt   DateTime  @default(now())

@@ -128,8 +128,6 @@ export async function GET(req: NextRequest) {
   try {
     logMessage('debug', 'GET request received for dropshipper banner');
 
-    await fetchLogInfo('dropshipper_banner', 'view', req);
-
     const result = await getDropshipperBanner();
 
     if (result?.status) {

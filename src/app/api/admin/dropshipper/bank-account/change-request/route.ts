@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchLogInfo, logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { getAllBankAccountChangeRequests } from '@/app/models/dropshipper/bankAccount';
 import { isUserExist } from '@/utils/auth/authUtils';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -78,9 +78,6 @@ export async function GET(req: NextRequest) {
                 );
             }
         }
-
-        const fetchLogInfoResult = await fetchLogInfo('bankAccountChangeRequest', 'view', req);
-        logMessage('debug', 'fetchLogInfo result:', fetchLogInfoResult);
 
         const requestResult = await getAllBankAccountChangeRequests();
 

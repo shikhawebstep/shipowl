@@ -79,10 +79,7 @@ export async function GET(req: NextRequest) {
         );
       }
     }
-
-    const fetchLogInfoResult = await fetchLogInfo('mail', 'view', req);
-    logMessage('debug', 'fetchLogInfoResult:', fetchLogInfoResult);
-
+    
     // Fetch all mails
     const mailsResult = await getAllEmailConfig();
 

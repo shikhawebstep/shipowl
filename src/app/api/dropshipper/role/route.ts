@@ -185,9 +185,6 @@ export async function GET(req: NextRequest) {
   try {
     logMessage('debug', 'GET request received for fetching roles');
 
-    const fetchLogInfoResult = await fetchLogInfo('role', 'view', req);
-    logMessage('debug', 'fetchLogInfoResult:', fetchLogInfoResult);
-
     // Extract headers
     const dropshipperIdHeader = req.headers.get("x-dropshipper-id");
     const dropshipperRole = req.headers.get("x-dropshipper-role");

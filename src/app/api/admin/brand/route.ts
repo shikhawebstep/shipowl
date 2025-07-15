@@ -8,7 +8,7 @@ import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
 import { createBrand, getBrandsByStatus } from '@/app/models/admin/brand';
-import { fetchLogInfo } from '@/utils/commonUtils';
+import { ActivityLog } from '@/utils/commonUtils';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     const userCheck: UserCheckResult = await isUserExist(adminId, String(adminRole));
 
     if (!userCheck.status) {
-      await fetchLogInfo(
+      await ActivityLog(
         {
           module: 'Brand',
           action: 'Create',
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
       logMessage('info', 'Fetched staff permissions:', staffPermissionsResult);
 
       if (!staffPermissionsResult.status) {
-        await fetchLogInfo(
+        await ActivityLog(
           {
             module: 'Brand',
             action: 'Create',
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!validation.isValid) {
-      await fetchLogInfo(
+      await ActivityLog(
         {
           module: 'Brand',
           action: 'Create',
@@ -181,7 +181,7 @@ export async function POST(req: NextRequest) {
     const brandCreateResult = await createBrand(adminId, String(adminRole), brandPayload);
 
     if (brandCreateResult?.status) {
-      await fetchLogInfo(
+      await ActivityLog(
         {
           module: 'Brand',
           action: 'Create',
@@ -201,7 +201,7 @@ export async function POST(req: NextRequest) {
       await deleteFile(deletePath(fileData as UploadedFileInfo));
     }
 
-    await fetchLogInfo(
+    await ActivityLog(
       {
         module: 'Brand',
         action: 'Create',
@@ -217,7 +217,7 @@ export async function POST(req: NextRequest) {
     );
   } catch (error) {
 
-    await fetchLogInfo(
+    await ActivityLog(
       {
         module: 'Brand',
         action: 'Create',

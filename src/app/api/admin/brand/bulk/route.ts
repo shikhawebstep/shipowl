@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getBrandById, deleteBrand } from '@/app/models/admin/brand';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
-import { fetchLogInfo } from '@/utils/commonUtils';
+import { ActivityLog } from '@/utils/commonUtils';
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -18,7 +18,7 @@ export async function DELETE(req: NextRequest) {
 
     const userCheck = await isUserExist(adminId, String(adminRole));
     if (!userCheck.status) {
-      await fetchLogInfo(
+      await ActivityLog(
         {
           module: 'Brand',
           action: 'Permanent Delete',
@@ -37,7 +37,7 @@ export async function DELETE(req: NextRequest) {
       );
       if (!permissionCheck.status) {
 
-        await fetchLogInfo(
+        await ActivityLog(
           {
             module: 'Brand',
             action: 'Permanent Delete',
@@ -76,7 +76,7 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
-    await fetchLogInfo(
+    await ActivityLog(
       {
         module: 'Brand',
         action: 'Permanent Delete',
@@ -98,7 +98,7 @@ export async function DELETE(req: NextRequest) {
     }, { status: 200 });
 
   } catch (error) {
-    await fetchLogInfo(
+    await ActivityLog(
       {
         module: 'Brand',
         action: 'Permanent Delete',

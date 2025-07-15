@@ -8,9 +8,6 @@ export async function GET(req: NextRequest) {
   try {
     logMessage('debug', 'GET request received for fetching brands');
 
-    const fetchLogInfoResult = await fetchLogInfo('brand', 'view', req);
-    logMessage('debug', 'fetchLogInfoResult:', fetchLogInfoResult);
-
     // Fetch all brands
     const brandsResult = await getBrandsByStatus("notDeleted");
 
