@@ -34,7 +34,7 @@ const Header = () => {
   }).then((result) => {
     if (result.isConfirmed) {
       // Clear local storage
-     localStorage.clear();
+     localStorage.removeItem("shippingData");;
 
       router.push('/admin/auth/login')
       Swal.fire({

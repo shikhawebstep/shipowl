@@ -113,7 +113,7 @@ export default function Update() {
 
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
         if (adminData?.project?.active_panel !== "admin") {
-            localStorage.clear("shippingData");
+            localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }

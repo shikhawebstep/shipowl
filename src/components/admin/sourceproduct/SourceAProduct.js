@@ -32,7 +32,7 @@ const SourceAProduct = () => {
 
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
         if (!adminData?.project?.active_panel === "admin") {
-            localStorage.clear("shippingData");
+            localStorage.removeItem("shippingData");
             router.push("/dropshipping/auth/login");
             return;
         }

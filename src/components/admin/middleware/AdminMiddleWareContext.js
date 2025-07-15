@@ -74,7 +74,7 @@ export default function AdminMiddleWareProvider({ children }) {
             const result = await response.json();
 
             if (!result.status) {
-                localStorage.clear("shippingData");
+                localStorage.removeItem("shippingData");
                 Swal.fire({
                     icon: "error",
                     title: "Unauthorized",

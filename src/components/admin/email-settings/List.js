@@ -94,7 +94,7 @@ export default function List() {
     };
 
     const handleEdit = (id) => {
-        router.push(`/admin/email-settings/update?id=${id}`)
+        router.push(`/admin/email-settings/template/update?id=${id}`)
     }
     useEffect(() => {
         const init = async () => {

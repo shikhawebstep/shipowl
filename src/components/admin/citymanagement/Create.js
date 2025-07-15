@@ -52,7 +52,7 @@ export default function Create() {
   
       const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
       if (dropshipperData?.project?.active_panel !== "admin") {
-        localStorage.clear();
+        localStorage.removeItem("shippingData");;
         router.push("/admin/auth/login");
         return;
       }

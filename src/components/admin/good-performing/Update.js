@@ -105,7 +105,7 @@ export default function Update() {
     const token = dropshipperData?.security?.token;
 
     if (dropshipperData?.project?.active_panel !== "admin" || !token) {
-      localStorage.clear();
+      localStorage.removeItem("shippingData");;
       router.push("/admin/auth/login");
       return;
     }

@@ -40,6 +40,7 @@ export default function List() {
         setCategoryName('');
         setDescriptionFilter('');
         setStatusFilter('');
+        setSelected([])
 
         // Clear all filters from DataTable
         if ($.fn.DataTable.isDataTable("#categoryTable")) {
@@ -164,6 +165,15 @@ export default function List() {
                         </h2>
 
                         <div className="flex gap-3  items-center">
+                            <button
+                                onClick={() => {
+                                    const allIds = categoryData.map(data => data.id);
+                                    setSelected(allIds);
+                                }}
+                                className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                            >
+                                Select All
+                            </button>
                             {selected.length > 0 && (
                                 <button
                                     onClick={async () => {

@@ -521,6 +521,7 @@ export default function List() {
                                     setIsoFilter('');
                                     setCountryFilter('');
                                     setTypeFilter('');
+                                    setSelected([])
                                     setActiveFilter(null);
 
                                     if ($.fn.DataTable.isDataTable('#statetable')) {
@@ -535,6 +536,15 @@ export default function List() {
                                 className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
                             >
                                 Clear All Filters
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const allIds = stateData.map(data => data.id);
+                                    setSelected(allIds);
+                                }}
+                                className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                            >
+                                Select All
                             </button>
                             {selected.length > 0 && (
                                 <button

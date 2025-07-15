@@ -121,7 +121,7 @@ export default function NewProducts() {
 
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
     if (dropshipperData?.project?.active_panel !== "supplier") {
-      localStorage.clear("shippingData");
+      localStorage.removeItem("shippingData");
       router.push("/supplier/auth/login");
       return;
     }
@@ -221,20 +221,35 @@ export default function NewProducts() {
         {productsRequest.length > 0 ? (
           <div className="grid xl:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-3 productsSection">
             {productsRequest.map((product, index) => {
-              const imageUrl = product?.gallery?.split(',') || [];
+              const imageUrl = typeof product?.gallery === 'string' && product.gallery.trim() !== ''
+                ? product.gallery.split(',')
+                : [];
 
-              const productName = product.name || "Unnamed Product";
+              const productName = product?.name?.trim() || "Unnamed Product";
+
+              // Parse imageSortingIndex safely
               let imageSortingIndex = {};
               try {
-                imageSortingIndex = JSON.parse(product.imageSortingIndex || '{}');
+                imageSortingIndex = product?.imageSortingIndex
+                  ? JSON.parse(product.imageSortingIndex)
+                  : {};
               } catch (err) {
                 console.error('Failed to parse imageSortingIndex:', err);
               }
 
-              const productImageSortingIndex = [...imageSortingIndex.gallery].sort((a, b) => {
-                return parseInt(a.value) - parseInt(b.value);
+              // Extract and sort imageSortingIndex.gallery safely
+              const galleryIndexArray = Array.isArray(imageSortingIndex.gallery)
+                ? imageSortingIndex.gallery.slice() // clone array to avoid mutating original
+                : [];
+
+              const productImageSortingIndex = galleryIndexArray.sort((a, b) => {
+                const aValue = parseInt(a?.value ?? 0);
+                const bValue = parseInt(b?.value ?? 0);
+                return aValue - bValue;
               });
-              const firstImageIndex = productImageSortingIndex[0]?.index || 0;
+
+              const firstImageIndex = productImageSortingIndex[0]?.index ?? 0;
+
 
               const getPriceDisplay = (variants) => {
                 if (!variants?.length) return <span>N/A</span>;

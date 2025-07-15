@@ -518,6 +518,7 @@ export default function List() {
                                     setCurrencyFilter('');
                                     setNationalityFilter('');
                                     setActiveFilter(null);
+                                    setSelected([])
 
                                     if ($.fn.DataTable.isDataTable('#countryTable')) {
                                         const table = $('#countryTable').DataTable();
@@ -528,6 +529,15 @@ export default function List() {
                             >
                                 Clear All Filters
                             </button>
+                             <button
+                        onClick={() => {
+                            const allIds = countryData.map(data => data.id);
+                            setSelected(allIds);
+                        }}
+                        className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                    >
+                        Select All
+                    </button>
                             {selected.length > 0 && (
                                 <button
                                     onClick={async () => {

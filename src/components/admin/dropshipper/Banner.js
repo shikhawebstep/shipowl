@@ -17,8 +17,6 @@ export default function Banner() {
         image: "",
         status: '',
     });
-
-
     useEffect(() => {
         verifyAdminAuth();
     }, [verifyAdminAuth]);
@@ -102,7 +100,7 @@ export default function Banner() {
                 });
             }
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/dropshipper/Banner`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/dropshipper/banner`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -129,7 +127,7 @@ export default function Banner() {
                 if (res.isConfirmed) {
                     setFormData({ productUrl: '', image: '', status: false });
                     setFiles([]);
-                    router.push("/admin/Banner/list");
+
                 }
             });
 

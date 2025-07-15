@@ -334,7 +334,7 @@ export default function ProductDetails() {
 
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
     if (dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.clear("shippingData");
+      localStorage.removeItem("shippingData");
       router.push("/dropshipper/auth/login");
       return;
     }
@@ -1159,7 +1159,7 @@ export default function ProductDetails() {
                 >
                   <div className="p-3">
                     {/* FLIP CARD */}
-                    <div className="relative h-[200px] h-[100px] perspective">
+                    <div className="relative h-[200px]  perspective">
                       <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                         {/* FRONT */}
                         <Image

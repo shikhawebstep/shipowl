@@ -164,7 +164,7 @@ export default function Create() {
     const adminData = JSON.parse(localStorage.getItem("shippingData"));
     const token = adminData?.security?.token;
     if (!token || adminData?.project?.active_panel !== "admin") {
-      localStorage.clear();
+      localStorage.removeItem("shippingData");;
       router.push("/admin/auth/login");
       return;
     }

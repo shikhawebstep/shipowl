@@ -226,7 +226,7 @@ export default function AddWarehouse() {
 
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
     if (!supplierData?.project?.active_panel === "supplier") {
-      localStorage.clear("shippingData");
+      localStorage.removeItem("shippingData");
       router.push("/supplier/auth/login");
       return;
     }
@@ -256,7 +256,7 @@ export default function AddWarehouse() {
         }
       });
 
-      const url = "/api/warehouse";
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/warehouse`;
 
       const form = new FormData();
       for (const key in formData) {
@@ -450,6 +450,7 @@ export default function AddWarehouse() {
                 value={formData.country}
                 placeholder="California"
               >
+                <option value=''>Select Country</option>
                 {countryData?.map((item, index) => {
                   return (
                     <option value={item.id} key={index}>{item.name}</option>

@@ -18,13 +18,6 @@ export default function Update() {
     const [bccMails, setBccMails] = useState([{ name: '', email: '' }]);
     const [formData, setFormData] = useState({
         subject: "",
-        smtp_host: "",
-        smtp_secure: '',
-        smtp_port: 465,
-        smtp_username: "",
-        smtp_password: "",
-        from_email: "",
-        from_name: "",
     })
     const handleEditorChange = (value) => {
         setDescription(value);
@@ -100,13 +93,6 @@ export default function Update() {
             setDescription(emails.html_template || '');
             setFormData({
                 subject: emails.subject || "",
-                smtp_host: emails.smtp_host || "",
-                smtp_secure: emails.smtp_secure || "",
-                smtp_port: emails.smtp_port || "",
-                smtp_username: emails.smtp_username || "",
-                smtp_password: emails.smtp_password || "",
-                from_email: emails.from_email || "",
-                from_name: emails.from_name || "",
             })
             setFromEmailVariables(emails.variables)
             setToMails(() => {
@@ -183,13 +169,6 @@ export default function Update() {
 
         data.append("html_template", description);
         data.append("status", status);
-        data.append("smtp_host", "smtp.gmail.com");
-        data.append("smtp_secure", formData.smtp_secure); // Boolean: true/false
-        data.append("smtp_port", formData.smtp_port);     // e.g., 465, 587, etc.
-        data.append("smtp_username", formData.smtp_username); // e.g., rohitwebstep@gmail.com
-        data.append("smtp_password", formData.smtp_password); // e.g., app password
-        data.append("from_email", formData.from_email);       // e.g., sender's email
-        data.append("from_name", formData.from_name);         // e.g., Shipping OWL
         data.append("subject", formData.subject);
         data.append("to", safeStringify(toMails.filter(({ name, email }) => name || email)));
         data.append("cc", safeStringify(ccMails.filter(({ name, email }) => name || email)));
@@ -216,7 +195,7 @@ export default function Update() {
             setCcMails([{ name: '', email: '' }]);
             setBccMails([{ name: '', email: '' }]);
 
-            router.push('/admin/email-settings')
+            router.push('/admin/email-settings/template')
         } catch (err) {
             Swal.fire("Error", err.message, "error");
         } finally {
@@ -322,110 +301,16 @@ export default function Update() {
                         </ul>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Subject */}
-                        <div>
-                            <label className="block mb-1 font-medium text-gray-700">Subject</label>
-                            <input
-                                type="text"
-                                placeholder="Email Subject"
-                                value={formData.subject}
-                                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                className="w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]"
-                            />
-                        </div>
-
-                        {/* SMTP Host */}
-                        <div>
-                            <label className="block mb-1 font-medium text-gray-700">SMTP Host</label>
-                            <input
-                                type="text"
-                                placeholder="smtp.gmail.com"
-                                value={formData.smtp_host}
-                                onChange={(e) => setFormData({ ...formData, smtp_host: e.target.value })}
-                                className="w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]"
-                            />
-                        </div>
-
-                        {/* SMTP Secure */}
-                        <div>
-                            <label className="block mb-1 font-medium text-gray-700">SMTP Secure</label>
-                            <select
-                                value={formData.smtp_secure}
-                                onChange={(e) => setFormData({ ...formData, smtp_secure: e.target.value === 'true' })}
-                                className="w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]"
-                            >
-                                <option value="true">True</option>
-                                <option value="false">False</option>
-                            </select>
-                        </div>
-
-                        {/* SMTP Port */}
-                        <div>
-                            <label className="block mb-1 font-medium text-gray-700">SMTP Port</label>
-                            <select
-                                value={formData.smtp_port}
-                                onChange={(e) => setFormData({ ...formData, smtp_port: parseInt(e.target.value, 10) })}
-                                className="w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]"
-                            >
-                                <option value={465}>465</option>
-                                <option value={587}>587</option>
-                                <option value={940}>940</option>
-                            </select>
-                        </div>
-
-
-
-                        {/* SMTP Username */}
-                        <div>
-                            <label className="block mb-1 font-medium text-gray-700">SMTP Username</label>
-                            <input
-                                type="email"
-                                placeholder="your-smtp-email@example.com"
-                                value={formData.smtp_username}
-                                onChange={(e) => setFormData({ ...formData, smtp_username: e.target.value })}
-                                className="w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]"
-                            />
-                        </div>
-
-                        {/* SMTP Password */}
-                        <div>
-                            <label className="block mb-1 font-medium text-gray-700">SMTP Password</label>
-                            <input
-                                type="password"
-                                placeholder="SMTP App Password"
-                                value={formData.smtp_password}
-                                onChange={(e) => setFormData({ ...formData, smtp_password: e.target.value })}
-                                className="w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]"
-                            />
-                        </div>
-
-                        {/* From Email */}
-                        <div>
-                            <label className="block mb-1 font-medium text-gray-700">From Email</label>
-                            <input
-                                type="email"
-                                placeholder="noreply@example.com"
-                                value={formData.from_email}
-                                onChange={(e) => setFormData({ ...formData, from_email: e.target.value })}
-                                className="w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]"
-                            />
-                        </div>
-
-                        {/* From Name */}
-                        <div>
-                            <label className="block mb-1 font-medium text-gray-700">From Name</label>
-                            <input
-                                type="text"
-                                placeholder="Shipping OWL"
-                                value={formData.from_name}
-                                onChange={(e) => setFormData({ ...formData, from_name: e.target.value })}
-                                className="w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]"
-                            />
-                        </div>
+                    <div>
+                        <label className="block mb-1 font-medium text-gray-700">Subject</label>
+                        <input
+                            type="text"
+                            placeholder="Email Subject"
+                            value={formData.subject}
+                            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                            className="w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]"
+                        />
                     </div>
-
-
                     <div>
                         <label className="block text-[#232323] font-bold mb-1 capitalize">Status</label>
                         <select

@@ -61,7 +61,7 @@ export default function Allroducts() {
 
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
         if (dropshipperData?.project?.active_panel !== "dropshipper") {
-            localStorage.clear("shippingData");
+            localStorage.removeItem("shippingData");
             router.push("/dropshipper/auth/login");
             return;
         }

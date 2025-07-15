@@ -32,6 +32,8 @@ const ProductTable = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [description, setDescription] = useState("");
+    const [viewType, setViewType] = useState("table"); // "table" or "grid"
+
     const fetchDescription = (id) => {
         getProductDescription(id, setDescription);
 
@@ -148,6 +150,7 @@ const ProductTable = () => {
 
     const getColumnIndex = (key) => {
         const baseColumns = [
+            "",
             "name",         // 0
             "description",  // 1
             "sku",          // 2
@@ -214,7 +217,7 @@ const ProductTable = () => {
                 console.error('Failed to load DataTables dependencies:', error);
             });
         }
-    }, [products]);
+    }, [products, viewType]);
 
     const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
 
@@ -244,6 +247,7 @@ const ProductTable = () => {
         setRtoStatusFilter('');
         setFilterInputValue('');
         setActiveFilter(null);
+        setSelected([])
 
         // Clear all filters in DataTable
         if ($.fn.DataTable.isDataTable('#productTable')) {
@@ -300,10 +304,21 @@ const ProductTable = () => {
                     >
                         Clear Filters
                     </button>
-                    <button className="bg-[#EE5D50] text-white px-4 py-2 rounded-lg text-sm">Details for approval</button>
+                    {/* <button className="bg-[#EE5D50] text-white px-4 py-2 rounded-lg text-sm">Details for approval</button>
                     <button className="bg-[#2B3674] text-white px-4 py-2 rounded-lg text-sm">Import Inventory</button>
                     <button className="bg-[#05CD99] text-white px-4 py-2 rounded-lg text-sm">Export</button>
-                    <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm">Import</button>{
+                    <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap">Import</button> */}
+                    <button
+                        onClick={() => {
+                            const allIds = products.map(product => product.id);
+                            setSelected(allIds);
+                        }}
+                        className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                    >
+                        Select All
+                    </button>
+
+                    {
                         canAdd && <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm" onClick={() => {
                             setActiveTab('product-details');
                             setActiveTabs('product-details')
@@ -319,11 +334,8 @@ const ProductTable = () => {
                             <Trash2 className="text-sm" /> {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
                         </button>
                     }
-                    <button className="bg-[#4285F4] text-white px-4 py-2 rounded-lg text-sm">Filters</button></div>
+                </div>
             </div>
-
-
-
 
             {loading ? (
                 <div className="flex justify-center items-center h-96">
@@ -458,298 +470,524 @@ const ProductTable = () => {
                         </div>
                     )}
 
-                    {products.length > 0 ? (
-                        <div className="overflow-x-auto relative main-outer-wrapper w-full">
-                            <table className="md:w-full w-auto display main-tables" id="productTable">
-                                <thead>
-                                    <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            <button
-                                                onClick={(e) => {
-                                                    setFilterInputValue(productNameFilter);
-                                                    setActiveFilter({
-                                                        key: 'name',
-                                                        label: 'Product Name',
-                                                        value: productNameFilter,
-                                                        setValue: setProductNameFilter,
-                                                        columnIndex: getColumnIndex('name'),
-                                                        position: e.currentTarget.getBoundingClientRect()
-                                                    });
-                                                }}
-                                                className="flex gap-2 items-center"
-                                            >
-                                                Name <IoFilterSharp className="w-4 h-4" />
-                                            </button>
-                                        </th>
+                    <div className="flex justify-end mb-4 gap-2">
+                        <button
+                            onClick={() => setViewType("table")}
+                            className={`px-4 py-2 rounded ${viewType === "table" ? "bg-[#F98F5C] text-white" : "bg-gray-200 text-gray-700"}`}
+                        >
+                            Table View
+                        </button>
+                        <button
+                            onClick={() => setViewType("grid")}
+                            className={`px-4 py-2 rounded ${viewType === "grid" ? "bg-[#F98F5C] text-white" : "bg-gray-200 text-gray-700"}`}
+                        >
+                            Grid View
+                        </button>
+                    </div>
+                    {
+                        viewType === "grid" && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 h-full">
+                                {products.map((item) => {
+                                    // Ensure gallery is a valid string and split to array
+                                    const imageUrl = typeof item?.gallery === 'string' && item.gallery.trim() !== ''
+                                        ? item.gallery.split(',')
+                                        : [];
 
-                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            Description
-                                        </th>
+                                    // Try to parse imageSortingIndex safely
+                                    let imageSortingIndex = {};
+                                    try {
+                                        imageSortingIndex = item?.imageSortingIndex
+                                            ? JSON.parse(item.imageSortingIndex)
+                                            : {};
+                                    } catch (err) {
+                                        console.error('Failed to parse imageSortingIndex:', err);
+                                    }
 
-                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            <button
-                                                onClick={(e) => {
-                                                    setFilterInputValue(skuFilter);
-                                                    setActiveFilter({
-                                                        key: 'sku',
-                                                        label: 'SKU',
-                                                        value: skuFilter,
-                                                        setValue: setSkuFilter,
-                                                        columnIndex: getColumnIndex('sku'),
-                                                        position: e.currentTarget.getBoundingClientRect()
-                                                    });
-                                                }}
-                                                className="flex gap-2 items-center"
-                                            >
-                                                SKU <IoFilterSharp className="w-4 h-4" />
-                                            </button>
-                                        </th>
+                                    // Ensure gallery inside imageSortingIndex is an array
+                                    const productImageSortingIndex = Array.isArray(imageSortingIndex?.gallery)
+                                        ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value) - parseInt(b.value))
+                                        : [];
 
-                                        {showRtoLiveCount && (
-                                            <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-blue-500">
-                                                Live RTO Stock
-                                            </th>
-                                        )}
+                                    // Get the first index safely, default to 0
+                                    const firstImageIndex = productImageSortingIndex.length > 0
+                                        ? productImageSortingIndex[0]?.index || 0
+                                        : 0;
 
-                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            <button
-                                                onClick={(e) => {
-                                                    setFilterInputValue(statusFilter);
-                                                    setActiveFilter({
-                                                        key: 'status',
-                                                        label: 'Status',
-                                                        value: statusFilter,
-                                                        setValue: setStatusFilter,
-                                                        columnIndex: getColumnIndex('status'),
-                                                        position: e.currentTarget.getBoundingClientRect()
-                                                    });
-                                                }}
-                                                className="flex gap-2 items-center"
-                                            >
-                                                Status <IoFilterSharp className="w-4 h-4" />
-                                            </button>
-                                        </th>
+                                    return (
+                                        <div key={item.id} className="border border-gray-200 h-full rounded-lg shadow-sm p-4 bg-white relative">
+                                            <Image
+                                                src={imageUrl[firstImageIndex]}
+                                                alt={item.name}
+                                                height={100}
+                                                width={100}
+                                                className="w-full h-[150px] object-cover backface-hidden"
+                                            />
+                                            <div className=" mt-2 flex justify-between items-center mb-2">
+                                                <div className="font-semibold text-[#2B3674] truncate">{item.name || 'NIL'}</div>
+                                                <span className="text-xs px-2 py-1 rounded-sm border font-medium
+${item.status ? 'bg-green-100 text-green-800 border-green-400' : 'bg-red-100 text-red-800 border-red-400'}">
+                                                    {item.status ? 'Active' : 'Inactive'}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-gray-600 mb-2">SKU: {item.main_sku || 'NIL'}</p>
+                                            {showRtoLiveCount && <p className="text-sm text-blue-500 mb-2">Live RTO Stock: {item.liveRtoStock || 'NIL'}</p>}
+                                            {!showRtoLiveCount && <p className="text-sm text-gray-700 mb-2">Model: {item.list_as || 'NIL'}</p>}
+                                            {showRtoLiveCount && (
+                                                <p className={`text-sm font-semibold mb-2 text-white px-2 py-1 inline-block rounded 
+${item.rtoStatus === "Free" ? "bg-green-500" : item.rtoStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}>
+                                                    {item.rtoStatus || 'NIL'}
+                                                </p>
+                                            )}
+                                            <div className="mt-3">
 
-                                        {!showRtoLiveCount && (
-                                            <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                                <button
-                                                    onClick={(e) => {
-                                                        setFilterInputValue(modelFilter);
-                                                        setActiveFilter({
-                                                            key: 'model',
-                                                            label: 'Model',
-                                                            value: modelFilter,
-                                                            setValue: setModelFilter,
-                                                            columnIndex: getColumnIndex('model'),
-                                                            position: e.currentTarget.getBoundingClientRect()
-                                                        });
-                                                    }}
-                                                    className="flex gap-2 items-center"
-                                                >
-                                                    Model <IoFilterSharp className="w-4 h-4" />
-                                                </button>
-                                            </th>
-                                        )}
+                                                <div className="flex mb-2 gap-2">
+                                                    {isTrashed ? (
+                                                        <>
+                                                            {canRestore && (
+                                                                <div className="bg-white p-2 rounded shadow-sm">
+                                                                    <RotateCcw
+                                                                        onClick={() => handleRestore(item.id)}
+                                                                        className="cursor-pointer text-2xl text-green-500"
+                                                                    />
+                                                                </div>
+                                                            )}
 
-                                        {showRtoLiveCount && (
-                                            <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                                <button
-                                                    onClick={(e) => {
-                                                        setFilterInputValue(rtoStatusFilter);
-                                                        setActiveFilter({
-                                                            key: 'rtoStatus',
-                                                            label: 'RTO Status',
-                                                            value: rtoStatusFilter,
-                                                            setValue: setRtoStatusFilter,
-                                                            columnIndex: getColumnIndex('rtoStatus'),
-                                                            position: e.currentTarget.getBoundingClientRect()
-                                                        });
-                                                    }}
-                                                    className="flex gap-2 items-center"
-                                                >
-                                                    RTO Status <IoFilterSharp className="w-4 h-4" />
-                                                </button>
-                                            </th>
-                                        )}
-
-                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            View Variant
-                                        </th>
-
-                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            Action
-                                        </th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    {products.map((item) => {
-
-                                        return (
-                                            <tr key={item.id} className="border-b capitalize border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                                <td className="p-2 px-5  text-left whitespace-nowrap">
-                                                    <div className="flex items-center">
-                                                        <label className="flex items-center cursor-pointer me-2">
-                                                            <input type="checkbox" checked={selected.includes(item.id)} onChange={() => handleCheckboxChange(item.id)} className="peer hidden" />
-                                                            <div
-                                                                className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                                                peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white"
-                                                            >
-                                                                <FaCheck className=" peer-checked:block text-white w-3 h-3" />
-                                                            </div>
-                                                        </label>
-
-                                                        <span className="truncate"> {item.name || 'NIL'}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="p-2 px-5 text-left whitespace-nowrap">
-                                                    <button
-                                                        onClick={() => fetchDescription(item.id)}
-                                                        className="text-blue-600"
-                                                    >
-                                                        View Description
-                                                    </button>
-
-                                                </td>
-
-
-
-
-                                                <td className="p-2 px-5  text-left whitespace-nowrap">{item.main_sku || 'NIL'}</td>
-                                                {showRtoLiveCount && <td className="p-2 px-5  text-left whitespace-nowrap text-blue-500">{item.liveRtoStock || 'NIL'}</td>}
-
-                                                <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
-                                                    {item.status ? (
-                                                        <span className="bg-green-100 text-green-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
+                                                            {canDelete && (
+                                                                <div className="bg-white p-2 rounded shadow-sm">
+                                                                    <Trash2
+                                                                        onClick={() => handleDestroy(item.id)}
+                                                                        className="cursor-pointer text-2xl text-red-500"
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </>
                                                     ) : (
-                                                        <span className="bg-red-100 text-red-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
-                                                    )}
-                                                </td>
+                                                        <>
+                                                            {canEdit && (
+                                                                <div className="bg-white p-2 rounded shadow-sm">
+                                                                    <Pencil
+                                                                        onClick={() => {
+                                                                            setActiveTab('product-details');
+                                                                            router.push(`/admin/products/update?id=${item.id}`);
+                                                                        }}
+                                                                        className="cursor-pointer text-2xl"
+                                                                    />
+                                                                </div>
+                                                            )}
 
-                                                {!showRtoLiveCount && (
-                                                    <td className="p-2 px-5  text-left  whitespace-nowrap">
-                                                        <button
-                                                            className={`py-2 text-white rounded-md text-sm p-3  min-w-[95px] 
-    ${item.list_as?.toLowerCase() === "shipowl" ? "bg-[#01B574]" : "bg-[#5CA4F9]"}`}
-                                                        >
-                                                            {item.list_as || 'NIL'}
-                                                        </button>
-                                                    </td>
-                                                )}
-                                                {showRtoLiveCount && (
-                                                    <td className="p-2 px-5  text-left whitespace-nowrap">
-                                                        {" "}
-                                                        <button
-                                                            className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px]
-            ${item.rtoStatus === "Free" ? "bg-green-500" : item.rtoStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
-                                                        >
-                                                            {item.rtoStatus || 'NIL'}
-                                                        </button>
-                                                    </td>
-                                                )}
-                                                <td className="p-2 px-5 text-left whitespace-nowrap">
+                                                            {canSoftDelete && (
+                                                                <div className="relative group inline-block bg-white p-2 rounded shadow-sm">
+                                                                    <Trash2
+                                                                        onClick={() => handleSoftDelete(item.id)}
+                                                                        className="cursor-pointer text-2xl"
+                                                                    />
+                                                                    <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                        Soft Delete
+                                                                    </span>
+                                                                </div>
+                                                            )}
+
+                                                            {canDelete && (
+                                                                <div className="relative group inline-block bg-white p-2 rounded shadow-sm">
+                                                                    <Trash2
+                                                                        onClick={() => handleDestroy(item.id)}
+                                                                        className="cursor-pointer text-2xl text-red-500"
+                                                                    />
+                                                                    <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                        Permanent Delete
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                </div>
+                                                <div className="flex gap-2 items-center">
                                                     <button
                                                         onClick={() => {
-                                                            setSelectedProduct(item); // `item` is your current product row
+                                                            setSelectedProduct(item);
                                                             setShowVariantPopup(true);
                                                         }}
-                                                        className="py-2 px-4 text-white rounded-md text-sm bg-[#3965FF]"
+                                                        className="text-white bg-[#3965FF]  p-2 rounded text-sm"
                                                     >
                                                         View Variants
                                                     </button>
-                                                </td>
-                                                <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
+                                                    <button
+                                                        onClick={() => fetchDescription(item.id)}
+                                                        className="bg-[#2B3674] text-white p-2 rounded-lg text-sm"
+                                                    >
+                                                        View Description
+                                                    </button>
+                                                </div>
 
-                                                    <div className="flex justify-center gap-2"> {isTrashed ? (
-                                                        <>
-                                                            {canRestore && <RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-2xl text-green-500" />}
-                                                            {canDelete && <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl text-red-500" />}
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            {canEdit && <Pencil onClick={() => {
-                                                                setActiveTab('product-details')
-                                                                router.push(`/admin/products/update?id=${item.id}`)
-                                                            }} className="cursor-pointer text-2xl" />}
-                                                               {canSoftDelete && (
-                                                                    <div className="relative group inline-block">
-                                                                      <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-2xl " />
-                                                                        <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
-                                                                            Soft Delete
-                                                                        </span>
-                                                                    </div>
-                                                                )}
-
-                                                                {canDelete && (
-                                                                    <div className="relative group inline-block">
-                                                                        
-                                                                            <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl text-red-500" />
-                                                                        <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
-                                                                            Permanent Delete
-                                                                        </span>
-                                                                    </div>
-                                                                )}
-                                                        </>
-                                                    )}</div>
-                                                </td>
-                                            </tr>
-                                        )
-                                    })}
-                                </tbody>
-                            </table>
-                            {showVariantPopup && selectedProduct && (
-                                <div className="fixed inset-0  p-4 bg-[#00000054] bg-opacity-40 flex items-center justify-center z-50">
-                                    <div className="bg-white overflow-auto  h-[500px] p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
-                                        <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            {selectedProduct?.variants?.map((variant, idx) => {
-
-
-                                                const varinatExists = selectedProduct?.isVarientExists ? 'yes' : 'no';
-                                                const isExists = varinatExists === 'yes';
-
-                                                return (
-                                                    <div key={variant.id || idx} className="border rounded-lg shadow-sm p-4 bg-white">
-
-
-                                                        {/* Details */}
-                                                        <div className="space-y-2 text-sm text-gray-700">
-                                                            <div><strong>Model:</strong> {variant.model || 'NIL'}</div>
-                                                            <div><strong>Product Link:</strong> {variant.product_link || 'NIL'}</div>
-                                                            <div><strong>Suggested Price:</strong> {variant.suggested_price ?? 'NIL'}</div>
-                                                            <div><strong>SKU:</strong> {variant.sku || 'NIL'}</div>
-
-                                                            {isExists && (
-                                                                <>
-                                                                    <div><strong>Name:</strong> {variant.name || 'NIL'}</div>
-                                                                    <div><strong>Color:</strong> {variant.color || 'NIL'}</div>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
+                                            </div>
                                         </div>
+                                    )
+                                }
+                                )}
+                            </div>
+                        )
+                    }
+                    {viewType === "table" && (
+                        <div>
+                            {
+                                products.length > 0 ? (
+                                    <div className="overflow-x-auto relative main-outer-wrapper w-full">
+                                        <table className="md:w-full w-auto display main-tables" id="productTable">
+                                            <thead>
+                                                <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+                                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                                        Gallery
+                                                    </th>
+                                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                setFilterInputValue(productNameFilter);
+                                                                setActiveFilter({
+                                                                    key: 'name',
+                                                                    label: 'Product Name',
+                                                                    value: productNameFilter,
+                                                                    setValue: setProductNameFilter,
+                                                                    columnIndex: getColumnIndex('name'),
+                                                                    position: e.currentTarget.getBoundingClientRect()
+                                                                });
+                                                            }}
+                                                            className="flex gap-2 items-center uppercase"
+                                                        >
+                                                            Name <IoFilterSharp className="w-4 h-4" />
+                                                        </button>
+                                                    </th>
+
+                                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                                        Description
+                                                    </th>
+
+                                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                setFilterInputValue(skuFilter);
+                                                                setActiveFilter({
+                                                                    key: 'sku',
+                                                                    label: 'SKU',
+                                                                    value: skuFilter,
+                                                                    setValue: setSkuFilter,
+                                                                    columnIndex: getColumnIndex('sku'),
+                                                                    position: e.currentTarget.getBoundingClientRect()
+                                                                });
+                                                            }}
+                                                            className="flex gap-2 items-center uppercase"
+                                                        >
+                                                            SKU <IoFilterSharp className="w-4 h-4" />
+                                                        </button>
+                                                    </th>
+
+                                                    {showRtoLiveCount && (
+                                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-blue-500">
+                                                            Live RTO Stock
+                                                        </th>
+                                                    )}
+
+                                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                setFilterInputValue(statusFilter);
+                                                                setActiveFilter({
+                                                                    key: 'status',
+                                                                    label: 'Status',
+                                                                    value: statusFilter,
+                                                                    setValue: setStatusFilter,
+                                                                    columnIndex: getColumnIndex('status'),
+                                                                    position: e.currentTarget.getBoundingClientRect()
+                                                                });
+                                                            }}
+                                                            className="flex gap-2 items-center uppercase"
+                                                        >
+                                                            Status <IoFilterSharp className="w-4 h-4" />
+                                                        </button>
+                                                    </th>
+
+                                                    {!showRtoLiveCount && (
+                                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    setFilterInputValue(modelFilter);
+                                                                    setActiveFilter({
+                                                                        key: 'model',
+                                                                        label: 'Model',
+                                                                        value: modelFilter,
+                                                                        setValue: setModelFilter,
+                                                                        columnIndex: getColumnIndex('model'),
+                                                                        position: e.currentTarget.getBoundingClientRect()
+                                                                    });
+                                                                }}
+                                                                className="flex gap-2 items-center uppercase"
+                                                            >
+                                                                Model <IoFilterSharp className="w-4 h-4" />
+                                                            </button>
+                                                        </th>
+                                                    )}
+
+                                                    {showRtoLiveCount && (
+                                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    setFilterInputValue(rtoStatusFilter);
+                                                                    setActiveFilter({
+                                                                        key: 'rtoStatus',
+                                                                        label: 'RTO Status',
+                                                                        value: rtoStatusFilter,
+                                                                        setValue: setRtoStatusFilter,
+                                                                        columnIndex: getColumnIndex('rtoStatus'),
+                                                                        position: e.currentTarget.getBoundingClientRect()
+                                                                    });
+                                                                }}
+                                                                className="flex gap-2 items-center uppercase"
+                                                            >
+                                                                RTO Status <IoFilterSharp className="w-4 h-4" />
+                                                            </button>
+                                                        </th>
+                                                    )}
+
+                                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                                        View Variant
+                                                    </th>
+
+                                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                                        Action
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {products.map((item) => {
+                                                    const imageUrl = typeof item?.gallery === 'string' && item.gallery.trim() !== ''
+                                                        ? item.gallery.split(',')
+                                                        : [];
+
+                                                    // Try to parse imageSortingIndex safely
+                                                    let imageSortingIndex = {};
+                                                    try {
+                                                        imageSortingIndex = item?.imageSortingIndex
+                                                            ? JSON.parse(item.imageSortingIndex)
+                                                            : {};
+                                                    } catch (err) {
+                                                        console.error('Failed to parse imageSortingIndex:', err);
+                                                    }
+
+                                                    // Ensure gallery inside imageSortingIndex is an array
+                                                    const productImageSortingIndex = Array.isArray(imageSortingIndex?.gallery)
+                                                        ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value) - parseInt(b.value))
+                                                        : [];
+
+                                                    // Get the first index safely, default to 0
+                                                    const firstImageIndex = productImageSortingIndex.length > 0
+                                                        ? productImageSortingIndex[0]?.index || 0
+                                                        : 0;
+
+                                                    return (
+                                                        <tr key={item.id} className="border-b capitalize border-[#E9EDF7] text-[#2B3674] font-semibold">
+                                                            <td className="p-2 px-5  text-left whitespace-nowrap">
+                                                                <div className="flex items-center">
+                                                                    <label className="flex items-center cursor-pointer me-2">
+                                                                        <input type="checkbox" checked={selected.includes(item.id)} onChange={() => handleCheckboxChange(item.id)} className="peer hidden" />
+                                                                        <div
+                                                                            className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
+                                                peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white"
+                                                                        >
+                                                                            <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                                                                        </div>
+                                                                    </label>
+                                                                    <Image
+                                                                        src={imageUrl[firstImageIndex]}
+                                                                        alt={item.name}
+                                                                        height={100}
+                                                                        width={50}
+                                                                        className="w-[60px] h-[50px] rounded-md object-cover backface-hidden"
+                                                                    />
+
+                                                                </div>
+                                                            </td>
+                                                            <td className="p-2 px-5  text-left whitespace-nowrap">
+                                                                <span className="truncate"> {item.name || 'NIL'}</span>
+                                                            </td>
+                                                            <td className="p-2 px-5 text-left whitespace-nowrap">
+                                                                <button
+                                                                    onClick={() => fetchDescription(item.id)}
+                                                                    className="text-blue-600"
+                                                                >
+                                                                    View Description
+                                                                </button>
+
+                                                            </td>
+
+                                                            <td className="p-2 px-5  text-left whitespace-nowrap">{item.main_sku || 'NIL'}</td>
+                                                            {showRtoLiveCount && <td className="p-2 px-5  text-left whitespace-nowrap text-blue-500">{item.liveRtoStock || 'NIL'}</td>}
+
+                                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
+                                                                {item.status ? (
+                                                                    <span className="bg-green-100 text-green-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
+                                                                ) : (
+                                                                    <span className="bg-red-100 text-red-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
+                                                                )}
+                                                            </td>
+
+                                                            {!showRtoLiveCount && (
+                                                                <td className="p-2 px-5  text-left  whitespace-nowrap">
+                                                                    <button
+                                                                        className={`py-2 text-white rounded-md text-sm p-3  min-w-[95px] 
+    ${item.list_as?.toLowerCase() === "shipowl" ? "bg-[#01B574]" : "bg-[#5CA4F9]"}`}
+                                                                    >
+                                                                        {item.list_as || 'NIL'}
+                                                                    </button>
+                                                                </td>
+                                                            )}
+                                                            {showRtoLiveCount && (
+                                                                <td className="p-2 px-5  text-left whitespace-nowrap">
+                                                                    {" "}
+                                                                    <button
+                                                                        className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px]
+            ${item.rtoStatus === "Free" ? "bg-green-500" : item.rtoStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
+                                                                    >
+                                                                        {item.rtoStatus || 'NIL'}
+                                                                    </button>
+                                                                </td>
+                                                            )}
+                                                            <td className="p-2 px-5 text-left whitespace-nowrap">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setSelectedProduct(item); // `item` is your current product row
+                                                                        setShowVariantPopup(true);
+                                                                    }}
+                                                                    className="py-2 px-4 text-white rounded-md text-sm bg-[#3965FF]"
+                                                                >
+                                                                    View Variants
+                                                                </button>
+                                                            </td>
+                                                            <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
+
+                                                                <div className="flex justify-center gap-2"> {isTrashed ? (
+                                                                    <>
+                                                                        {canRestore && <RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-2xl text-green-500" />}
+                                                                        {canDelete && <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl text-red-500" />}
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        {canEdit && <Pencil onClick={() => {
+                                                                            setActiveTab('product-details')
+                                                                            router.push(`/admin/products/update?id=${item.id}`)
+                                                                        }} className="cursor-pointer text-2xl" />}
+                                                                        {canSoftDelete && (
+                                                                            <div className="relative group inline-block">
+                                                                                <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-2xl " />
+                                                                                <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                                    Soft Delete
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
+
+                                                                        {canDelete && (
+                                                                            <div className="relative group inline-block">
+
+                                                                                <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl text-red-500" />
+                                                                                <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                                    Permanent Delete
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
+                                                                    </>
+                                                                )}</div>
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                })}
+                                            </tbody>
+                                        </table>
 
 
-                                        <button
-                                            onClick={() => setShowVariantPopup(false)}
-                                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-                                        >
-                                            ×
-                                        </button>
                                     </div>
-                                </div>
-                            )}
+
+                                ) : (
+                                    <div className='text-center'>No Products available</div>
+
+                                )}
 
                         </div>
-                    ) : (
-                        // Render when no admins
-                        <div className='text-center'>No Products available</div>
                     )}
 
 
+
+                </div>
+            )}
+
+            {showVariantPopup && selectedProduct && (
+                <div className="fixed inset-0  p-4 bg-[#00000054] bg-opacity-40 flex items-center justify-center z-50">
+                    <div className="bg-white overflow-auto  h-[500px] p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
+                        <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {selectedProduct?.variants?.map((variant, idx) => {
+
+
+                                const varinatExists = selectedProduct?.isVarientExists ? 'yes' : 'no';
+                                const isExists = varinatExists === 'yes';
+
+                                return (
+                                    <div
+                                        key={variant.id || idx}
+                                        className="bg-white p-4 rounded-md  border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
+                                    >
+                                        <div className='flex gap-2 relative'>
+
+
+                                            <div className="w-full text-center bg-orange-500 p-2 text-white ">Suggested Price :{variant.suggested_price}</div>
+
+
+                                        </div>
+
+                                        <div className="overflow-x-auto">
+                                            <table className="text-sm text-gray-700 w-full  border-gray-200">
+                                                <tbody>
+                                                    <tr className='border border-gray-200'>
+                                                        <th className="text-left border-gray-200 border p-2 font-semibold ">Model:</th>
+                                                        <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.model || "NIL"}</td>
+                                                        <th className="text-left border-gray-200 border p-2 font-semibold ">Name:</th>
+                                                        <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.name || "NIL"}</td>
+
+
+                                                    </tr>
+
+                                                    {isExists && (
+                                                        <>
+                                                            <tr className='border border-gray-200'>
+
+
+                                                                <th className="text-left border-gray-200 border p-2 font-semibold ">SKU:</th>
+                                                                <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.sku || "NIL"}</td>
+
+                                                                <th className="text-left border-gray-200 border p-2 font-semibold ">Color:</th>
+                                                                <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.color || "NIL"}</td>
+                                                            </tr>
+                                                        </>
+                                                    )}
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+
+                                    </div>
+                                );
+
+                            })}
+                        </div>
+
+
+                        <button
+                            onClick={() => setShowVariantPopup(false)}
+                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
+                        >
+                            ×
+                        </button>
+                    </div>
                 </div>
             )}
             {description && (

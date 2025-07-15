@@ -41,7 +41,19 @@ export default function Sidebar() {
     { title: "Brand Management", module: "Brand", action: actions, icon: Tags, href: "/admin/brand/list" },
     { title: "Product Management", module: "Product", action: actions, icon: Package, href: "/admin/products/list" },
     { title: "Dropshipper Banners", module: "dropshiperBanners", action: actions, icon: LucideImage, href: "/admin/dropshipper/banner" },
-    { title: "Email Settings", module: "Mail", action: actions, icon: Mail, href: "/admin/email-settings" },
+
+     {
+      children: [
+        {
+          name: "Email Settings",
+          icon: Mail,
+          subMenu: [
+            { icon: Mail, name: "SMTP Configure", module: "Mail", action: actions, href: "/admin/email-settings/smtp-configure" },
+            { icon: Mail, name: "Mail Templates", module: "Mail", action: actions, href: "/admin/email-settings/template" },
+          ],
+        },
+      ],
+    },
     { title: "Tickets", module: "Tickets", action: actions, icon: Ticket, href: "/admin/ticket" },
 
     {

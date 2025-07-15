@@ -243,6 +243,7 @@ export default function UnverifiedSupplier() {
               setCountryFilter('');
               setStateFilter('');
               setCityFilter('');
+              setSelected([])
               setEmailVerificationFilter('');
               if ($.fn.DataTable.isDataTable('#unverifiedSupplierTable')) {
                 $('#unverifiedSupplierTable').DataTable().columns().search('').draw();

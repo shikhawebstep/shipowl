@@ -423,7 +423,7 @@ export default function List() {
         }
     };
 
-   
+
 
     const exportCsv = () => {
         const table = $('#citytable').DataTable();
@@ -525,7 +525,16 @@ export default function List() {
                             >
                                 Clear Filters
                             </button>
-                              {selected.length > 0 && (
+                            <button
+                                onClick={() => {
+                                    const allIds = cityData.map(data => data.id);
+                                    setSelected(allIds);
+                                }}
+                                className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                            >
+                                Select All
+                            </button>
+                            {selected.length > 0 && (
                                 <button
                                     onClick={async () => {
                                         await handleBulkDelete({
@@ -537,7 +546,7 @@ export default function List() {
                                         await fetchCity();
                                     }}
                                     className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
-                            )} 
+                            )}
                             <div className="md:flex hidden items-center justify-end gap-2">
 
                                 {canViewTrashed && (

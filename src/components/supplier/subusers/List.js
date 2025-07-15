@@ -1,9 +1,8 @@
 "use client";
 import { useEffect, useCallback, useState } from "react";
-import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
-import { MoreHorizontal } from "lucide-react";
+import { IoFilterSharp } from "react-icons/io5";
+import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { AiOutlineDelete } from "react-icons/ai";
 import HashLoader from "react-spinners/HashLoader";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
@@ -13,12 +12,40 @@ import { useImageURL } from "@/components/ImageURLContext";
 import Image from "next/image";
 export default function List() {
     const [isTrashed, setIsTrashed] = useState(false);
-    const { fetchImages } = useImageURL();
+    const { fetchImages, handleBulkDelete } = useImageURL();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const { verifySupplierAuth, hasPermission } = useSupplier();
     const router = useRouter();
+    const [nameFilter, setNameFilter] = useState('');
+    const [emailFilter, setEmailFilter] = useState('');
+    const [roleFilter, setRoleFilter] = useState('');
+    const [phoneFilter, setPhoneFilter] = useState('');
+    const [activeFilter, setActiveFilter] = useState(null);
+    const [selected, setSelected] = useState([]);
+    const handleCheckboxChange = (id) => {
+        setSelected((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        );
+    };
+
+    const handleClearAllFilters = () => {
+        setNameFilter('');
+        setEmailFilter('');
+        setRoleFilter('');
+        setPhoneFilter('');
+        setActiveFilter(null);
+        setSelected([])
+
+        if ($.fn.DataTable.isDataTable('#subuserAdmin')) {
+            const table = $('#subuserAdmin').DataTable();
+            table.columns().every(function () {
+                this.search('');
+            });
+            table.draw();
+        }
+    };
     const fetchUsers = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -461,6 +488,35 @@ export default function List() {
                                 </div>
                             )}
                         </button>
+                        <button
+                            onClick={handleClearAllFilters}
+                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+
+                        >
+                            Clear All Filters
+                        </button>
+                        <button
+                            onClick={() => {
+                                const allIds = data.map(data => data.id);
+                                setSelected(allIds);
+                            }}
+                            className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                        >
+                            Select All
+                        </button>
+                        {selected.length > 0 && (
+                            <button
+                                onClick={async () => {
+                                    await handleBulkDelete({
+                                        selected,
+                                        apiEndpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/staff/bulk`,
+                                        setSelected,
+                                        setLoading,
+                                    });
+                                    await fetchUsers();
+                                }}
+                                className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                        )}
                         <div className="md:flex hidden justify-start gap-5 items-end">
                             {canViewTrashed && <button
                                 className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
@@ -482,16 +538,189 @@ export default function List() {
                         </div>
                     </div>
                 </div>
+                {activeFilter && (
+                    <div
+                        className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                        style={{
+                            top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                            left: activeFilter.position.left + 'px',
+                        }}
+                    >
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="text-sm font-medium text-gray-700">{activeFilter.label}</label>
+                            <button
+                                onClick={() => {
+                                    switch (activeFilter.key) {
+                                        case 'name':
+                                            setNameFilter('');
+                                            break;
+                                        case 'email':
+                                            setEmailFilter('');
+                                            break;
+                                        case 'role':
+                                            setRoleFilter('');
+                                            break;
+                                        case 'phone':
+                                            setPhoneFilter('');
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    setActiveFilter(null);
+                                    if ($.fn.DataTable.isDataTable('#subuserAdmin')) {
+                                        $('#subuserAdmin')
+                                            .DataTable()
+                                            .column(activeFilter.columnIndex)
+                                            .search('')
+                                            .draw();
+                                    }
+                                }}
+                                className="text-red-500 text-xs hover:underline"
+                            >
+                                Reset
+                            </button>
+                        </div>
+
+                        <input
+                            type="text"
+                            value={
+                                activeFilter.key === 'name' ? nameFilter :
+                                    activeFilter.key === 'email' ? emailFilter :
+                                        activeFilter.key === 'role' ? roleFilter :
+                                            activeFilter.key === 'phone' ? phoneFilter :
+                                                ''
+                            }
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                switch (activeFilter.key) {
+                                    case 'name':
+                                        setNameFilter(val);
+                                        break;
+                                    case 'email':
+                                        setEmailFilter(val);
+                                        break;
+                                    case 'role':
+                                        setRoleFilter(val);
+                                        break;
+                                    case 'phone':
+                                        setPhoneFilter(val);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                            placeholder={`Enter ${activeFilter.label}`}
+                        />
+
+                        <div className="flex justify-between mt-4">
+                            <button onClick={() => setActiveFilter(null)} className="text-sm text-gray-500 hover:underline">
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    let value = '';
+                                    switch (activeFilter.key) {
+                                        case 'name':
+                                            value = nameFilter;
+                                            break;
+                                        case 'email':
+                                            value = emailFilter;
+                                            break;
+                                        case 'role':
+                                            value = roleFilter;
+                                            break;
+                                        case 'phone':
+                                            value = phoneFilter;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
+                                    if ($.fn.DataTable.isDataTable('#subuserAdmin')) {
+                                        $('#subuserAdmin').DataTable().column(activeFilter.columnIndex).search(value).draw();
+                                    }
+
+                                    setActiveFilter(null);
+                                }}
+                                className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                )}
                 {data.length > 0 ? (
                     <div className="overflow-x-auto relative main-outer-wrapper w-full">
                         <table className="md:w-full w-auto display main-tables" id="subuserTableSupplier">
                             <thead>
                                 <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                     <th className="p-2 whitespace-nowrap px-5 text-left uppercase">SR.</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Name</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Email</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Role</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Phone Number</th>
+
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                        <button
+                                            onClick={(e) =>
+                                                setActiveFilter({
+                                                    key: 'name',
+                                                    label: 'Name',
+                                                    columnIndex: 1,
+                                                    position: e.currentTarget.getBoundingClientRect(),
+                                                })
+                                            }
+                                            className="flex items-center gap-2 uppercase"
+                                        >
+                                            Name <IoFilterSharp />
+                                        </button>
+                                    </th>
+
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                        <button
+                                            onClick={(e) =>
+                                                setActiveFilter({
+                                                    key: 'email',
+                                                    label: 'Email',
+                                                    columnIndex: 2,
+                                                    position: e.currentTarget.getBoundingClientRect(),
+                                                })
+                                            }
+                                            className="flex items-center gap-2 uppercase"
+                                        >
+                                            Email <IoFilterSharp />
+                                        </button>
+                                    </th>
+
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                        <button
+                                            onClick={(e) =>
+                                                setActiveFilter({
+                                                    key: 'role',
+                                                    label: 'Role',
+                                                    columnIndex: 3,
+                                                    position: e.currentTarget.getBoundingClientRect(),
+                                                })
+                                            }
+                                            className="flex items-center gap-2 uppercase"
+                                        >
+                                            Role <IoFilterSharp />
+                                        </button>
+                                    </th>
+
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                                        <button
+                                            onClick={(e) =>
+                                                setActiveFilter({
+                                                    key: 'phone',
+                                                    label: 'Phone Number',
+                                                    columnIndex: 4,
+                                                    position: e.currentTarget.getBoundingClientRect(),
+                                                })
+                                            }
+                                            className="flex items-center gap-2 uppercase"
+                                        >
+                                            Phone Number <IoFilterSharp />
+                                        </button>
+                                    </th>
+
                                     <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Profile Picture</th>
                                     <th className="p-2 whitespace-nowrap px-5 text-end uppercase flex justify-end">Action</th>
                                 </tr>
@@ -515,16 +744,33 @@ export default function List() {
                                         <td className="p-2 px-5 text-[#8F9BBA] text-center">
 
                                             <div className="flex justify-end gap-2">{isTrashed ? (
-                                                <>
-                                                    {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
-                                                    {canDestory && <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    {canEdit && <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
-                                                    {canSoftDelete && <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />}
-                                                </>
-                                            )}</div>
+                                                                                           <>
+                                                                                               {canRestore && <RotateCcw onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
+                                                                                               {canDelete && <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
+                                                                                           </>
+                                                                                       ) : (
+                                                                                           <>
+                                                                                               {canEdit && <Pencil onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
+                                                                                               {canSoftDelete && (
+                                                                                                   <div className="relative group inline-block">
+                                                                                                       <Trash2 onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
+                                                                                                       <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                                                           Soft Delete
+                                                                                                       </span>
+                                                                                                   </div>
+                                                                                               )}
+                                           
+                                                                                               {canDelete && (
+                                                                                                   <div className="relative group inline-block">
+                                           
+                                                                                                       <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl text-red-500" />
+                                                                                                       <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                                                           Permanent Delete
+                                                                                                       </span>
+                                                                                                   </div>
+                                                                                               )}
+                                                                                           </>
+                                                                                       )}</div>
 
                                         </td>
                                     </tr>

@@ -550,7 +550,7 @@ const ProductTable = () => {
 
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
         if (dropshipperData?.project?.active_panel !== "supplier") {
-            localStorage.clear("shippingData");
+            localStorage.removeItem("shippingData");
             router.push("/supplier/auth/login");
             return;
         }
@@ -649,7 +649,7 @@ const ProductTable = () => {
                 <button className="bg-[#EE5D50] text-white px-4 py-2 rounded-lg text-sm">Details for approval</button>
                 <button className="bg-[#2B3674] text-white px-4 py-2 rounded-lg text-sm">Import Inventory</button>
                 <button className="bg-[#05CD99] text-white px-4 py-2 rounded-lg text-sm">Export</button>
-                <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm">Import</button>
+                <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap">Import</button>
                 <button className="bg-[#4285F4] text-white px-4 py-2 rounded-lg text-sm">Filters</button>
             </div>
 

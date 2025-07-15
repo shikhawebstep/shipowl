@@ -18,6 +18,7 @@ export default function Warehouse() {
   const [WarehouseData, setWarehouseData] = useState([]);
   const { verifyAdminAuth, fetchSupplier, suppliers, isAdminStaff, extractedPermissions } = useAdmin();
   const router = useRouter();
+  
   const [warehouseNameFilter, setWarehouseNameFilter] = useState('');
   const [contactNameFilter, setContactNameFilter] = useState('');
   const [addressFilter, setAddressFilter] = useState('');
@@ -544,6 +545,15 @@ export default function Warehouse() {
                     )}
                   </button>
                   <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => {
+                        const allIds = WarehouseData.map(data => data.id);
+                        setSelected(allIds);
+                      }}
+                      className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                    >
+                      Select All
+                    </button>
                     {selected.length > 0 && (
                       <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
                     )}
@@ -554,7 +564,8 @@ export default function Warehouse() {
                         setAddressFilter('');
                         setPickupAddressFilter('');
                         setRtoAddressFilter('');
-                        setActiveFilter(null)
+                        setActiveFilter(null);
+                        setSelected([])
                         if ($.fn.DataTable.isDataTable('#warehouseTable')) {
                           $('#warehouseTable').DataTable().columns().search('').draw();
                         }

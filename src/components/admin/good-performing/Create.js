@@ -49,7 +49,7 @@ export default function Create() {
     const token = dropshipperData?.security?.token;
 
     if (dropshipperData?.project?.active_panel !== "admin" || !token) {
-      localStorage.clear();
+      localStorage.removeItem("shippingData");;
       router.push("/admin/auth/login");
       return;
     }
@@ -100,7 +100,7 @@ const handleBulkSubmit = async (e) => {
   const token = dropshipperData?.security?.token;
 
   if (dropshipperData?.project?.active_panel !== "admin" || !token) {
-    localStorage.clear();
+    localStorage.removeItem("shippingData");;
     router.push("/admin/auth/login");
     return;
   }

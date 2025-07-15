@@ -167,7 +167,7 @@ export default function My() {
 
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
         if (supplierData?.project?.active_panel !== "supplier") {
-            localStorage.clear("shippingData");
+            localStorage.removeItem("shippingData");
             router.push("/supplier/auth/login");
             return;
         }

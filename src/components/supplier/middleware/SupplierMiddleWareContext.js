@@ -64,7 +64,7 @@ export default function SupplierMiddleWareProvider({ children }) {
         setLoading(true);
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
         if (!dropshipperData?.project?.active_panel == "supplier") {
-            localStorage.clear("shippingData");
+            localStorage.removeItem("shippingData");
             router.push("/supplier/auth/login");
         }
         const suppliertoken = dropshipperData?.security?.token;

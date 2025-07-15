@@ -75,7 +75,7 @@ export default function OtherDetails() {
 
     const adminData = JSON.parse(localStorage.getItem('shippingData'));
     if (adminData?.project?.active_panel !== 'admin') {
-      localStorage.clear();
+      localStorage.removeItem("shippingData");;
       router.push('/admin/auth/login');
       return;
     }

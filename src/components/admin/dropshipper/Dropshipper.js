@@ -114,7 +114,7 @@ const Dropshipper = () => {
 
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
         if (dropshipperData?.project?.active_panel !== "admin") {
-            localStorage.clear("shippingData");
+            localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
@@ -273,6 +273,7 @@ const Dropshipper = () => {
                             setEmailFilter('');
                             setAddressFilter('');
                             setActiveFilter(null);
+                            setSelected([])
 
                             if ($.fn.DataTable.isDataTable('#dropshipperTable')) {
                                 const table = $('#dropshipperTable').DataTable();
@@ -282,6 +283,15 @@ const Dropshipper = () => {
                         className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
                     >
                         Clear Filters
+                    </button>
+                    <button
+                        onClick={() => {
+                            const allIds = dropshippers.map(data => data.id);
+                            setSelected(allIds);
+                        }}
+                        className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                    >
+                        Select All
                     </button>
                     {selected.length > 0 && (
                         <button

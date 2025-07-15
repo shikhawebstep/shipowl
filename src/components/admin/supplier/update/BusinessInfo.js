@@ -222,7 +222,7 @@ const BusinessInfo = () => {
     setLoading(true);
     const adminData = JSON.parse(localStorage.getItem("shippingData"));
     if (!adminData?.project?.active_panel === "admin") {
-      localStorage.clear("shippingData");
+      localStorage.removeItem("shippingData");
       router.push("/admin/auth/login");
       return;
     }

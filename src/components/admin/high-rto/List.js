@@ -186,6 +186,7 @@ export default function List() {
                             setCityFilter('');
                             setPincodeFilter('');
                             setActiveFilter(null);
+                            setSelected([])
                             if (window.$.fn.DataTable.isDataTable('#highRto')) {
                                 window.$('#highRto').DataTable().columns().search('').draw();
                             }
@@ -194,6 +195,15 @@ export default function List() {
 
                     >
                         Clear All Filters
+                    </button>
+                     <button
+                        onClick={() => {
+                            const allIds = data.map(data => data.id);
+                            setSelected(allIds);
+                        }}
+                        className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                    >
+                        Select All
                     </button>
                     {selected.length > 0 && (
                         <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>

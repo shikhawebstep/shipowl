@@ -144,7 +144,7 @@ const SupplierList = () => {
 
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
         if (dropshipperData?.project?.active_panel !== "admin") {
-            localStorage.clear("shippingData");
+            localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
@@ -292,6 +292,7 @@ const SupplierList = () => {
         setPermanentAddressFilter('');
         setStatusFilter('');
         setActiveFilter(null);
+        setSelected([])
 
         // Clear DataTable filters
         if ($.fn.DataTable.isDataTable("#supplierTable")) {
@@ -340,6 +341,15 @@ const SupplierList = () => {
                                 </ul>
                             </div>
                         )}
+                    </button>
+                    <button
+                        onClick={() => {
+                            const allIds = suppliers.map(data => data.id);
+                            setSelected(allIds);
+                        }}
+                        className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                    >
+                        Select All
                     </button>
                     {selected.length > 0 && (
                         <button

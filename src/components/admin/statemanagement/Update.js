@@ -162,7 +162,7 @@ export default function Update() {
     const token = adminData?.security?.token;
 
     if (adminData?.project?.active_panel !== "admin" || !token) {
-      localStorage.clear();
+      localStorage.removeItem("shippingData");;
       router.push("/admin/auth/login");
       return;
     }

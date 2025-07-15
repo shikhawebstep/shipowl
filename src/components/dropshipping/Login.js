@@ -8,7 +8,6 @@ import logo from "@/app/images/logo.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import Swal from "sweetalert2";
 import { useDropshipper } from './middleware/DropshipperMiddleWareContext';
-
 export default function Login() {
     const router = useRouter();
     const [password, setPassword] = useState("");
@@ -20,13 +19,24 @@ export default function Login() {
     const handlePasswordChange = (e) => setPassword(e.target.value);
     const handleEmailChange = (e) => setEmail(e.target.value);
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
+    const [rememberMe, setRememberMe] = useState(false);
+    const handleRememberMeChange = () => {
+        setRememberMe((prev) => !prev);
+    };
 
     useEffect(() => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
         const token = supplierData?.security?.token;
+        const savedEmail = localStorage.getItem("DropshipperEmail");
+        const savedPassword = localStorage.getItem("DropshipperPassword");
 
+        if (savedEmail && savedPassword) {
+            setEmail(savedEmail);
+            setPassword(savedPassword);
+            setRememberMe(true);
+        }
         if (!supplierData?.project?.active_panel == "dropshipper") {
-            localStorage.clear("shippingData");
+            localStorage.removeItem("shippingData");
             router.push("/dropshipping/auth/login");
             return;
         }
@@ -41,7 +51,7 @@ export default function Login() {
         e.preventDefault();
         setError(null);
         setLoading(true);
-    
+
         // 🌀 Show loading Swal
         Swal.fire({
             title: "Logging in...",
@@ -51,14 +61,14 @@ export default function Login() {
                 Swal.showLoading();
             },
         });
-    
+
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
-    
+
             if (!response.ok) {
                 const errorMessage = await response.json();
                 Swal.fire({
@@ -68,15 +78,15 @@ export default function Login() {
                 });
                 throw new Error(errorMessage.message || errorMessage.error || "Login failed");
             }
-    
+
             const result = await response.json();
             const { token, admin } = result;
 
-            if (!token || ( !admin)) {
-            throw new Error("Invalid login response. Missing token or user data.");
+            if (!token || (!admin)) {
+                throw new Error("Invalid login response. Missing token or user data.");
             }
 
-    
+
             // ✅ Store session in localStorage
             const shippingData = {
                 project: {
@@ -94,12 +104,20 @@ export default function Login() {
                 },
             };
             localStorage.setItem("shippingData", JSON.stringify(shippingData));
-             if (admin.role === "dropshipper_staff" && Array.isArray(result.assignedPermissions)) {
-                    localStorage.setItem("dropshipperPermissions", JSON.stringify(result.assignedPermissions));
-                } else {
-                    localStorage.removeItem("dropshipperPermissions");
-                }
-    
+
+            if (rememberMe) {
+                localStorage.setItem("DropshipperEmail", email);
+                localStorage.setItem("DropshipperPassword", password);
+            } else {
+                localStorage.removeItem("DropshipperEmail");
+                localStorage.removeItem("DropshipperPassword");
+            }
+            if (admin.role === "dropshipper_staff" && Array.isArray(result.assignedPermissions)) {
+                localStorage.setItem("dropshipperPermissions", JSON.stringify(result.assignedPermissions));
+            } else {
+                localStorage.removeItem("dropshipperPermissions");
+            }
+
             // ✅ Show success alert
             await Swal.fire({
                 icon: "success",
@@ -108,10 +126,10 @@ export default function Login() {
                 timer: 1500,
                 showConfirmButton: true,
             });
-    
+
             // ✅ Redirect
             router.push("/dropshipping");
-    
+
         } catch (error) {
             console.error("Error:", error);
             if (!Swal.isVisible()) {
@@ -126,7 +144,7 @@ export default function Login() {
             setLoading(false);
         }
     };
-    
+
 
 
 
@@ -186,7 +204,11 @@ export default function Login() {
 
                         <div className="flex justify-between items-center">
                             <label className="flex items-center space-x-2">
-                                <input type="checkbox" className="form-checkbox text-[#2B3674]" />
+                                <input
+                                    type="checkbox"
+                                    checked={rememberMe}
+                                    onChange={handleRememberMeChange}
+                                    className="form-checkbox text-[#2B3674]" />
                                 <span className="text-sm text-[#2B3674]">Keep me logged in</span>
                             </label>
                             <Link href="/dropshipping/auth/password/forget" className="text-sm text-[#F98F5C] hover:underline">

@@ -164,7 +164,7 @@ export default function Create() {
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
     const token = dropshipperData?.security?.token;
     if (!token || dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.clear();
+      localStorage.removeItem("shippingData");;
       router.push("/dropshipping/auth/login");
       return;
     }

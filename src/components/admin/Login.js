@@ -17,18 +17,30 @@ export default function Login() {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const { verifyAdminAuth } = useAdmin();
-
+    const [rememberMe, setRememberMe] = useState(false);
     const handlePasswordChange = (e) => setPassword(e.target.value);
     const handleEmailChange = (e) => setEmail(e.target.value);
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
-
+    const handleRememberMeChange = () => {
+        setRememberMe((prev) => !prev);
+    };
 
     useEffect(() => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
         const token = adminData?.security?.token;
 
+        const savedEmail = localStorage.getItem("email");
+        const savedPassword = localStorage.getItem("password");
+
+        if (savedEmail && savedPassword) {
+            setEmail(savedEmail);
+            setPassword(savedPassword);
+            setRememberMe(true);
+        }
+
+
         if (!adminData?.project?.active_panel == "admin") {
-            localStorage.clear("shippingData");
+            localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
         }
 
@@ -102,6 +114,14 @@ export default function Login() {
             }
 
             localStorage.setItem("shippingData", JSON.stringify(shippingData));
+
+            if (rememberMe) {
+                localStorage.setItem("email", email);
+                localStorage.setItem("password", password);
+            } else {
+                localStorage.removeItem("email");
+                localStorage.removeItem("password");
+            }
 
             // ✅ Show success alert
             await Swal.fire({
@@ -187,7 +207,11 @@ export default function Login() {
 
                         <div className="flex justify-between items-center">
                             <label className="flex items-center space-x-2">
-                                <input type="checkbox" className="form-checkbox text-[#2B3674]" />
+                                <input
+                                    type="checkbox"
+                                    checked={rememberMe}
+                                    onChange={handleRememberMeChange}
+                                    className="form-checkbox text-[#2B3674]" />
                                 <span className="text-sm text-[#2B3674]">Keep me logged in</span>
                             </label>
                             <Link href="/admin/auth/password/forget" className="text-sm text-[#F98F5C] hover:underline">

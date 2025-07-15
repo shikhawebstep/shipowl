@@ -159,7 +159,7 @@ export default function Create() {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
     const token = supplierData?.security?.token;
     if (!token || supplierData?.project?.active_panel !== "supplier") {
-      localStorage.clear();
+      localStorage.removeItem("shippingData");;
       router.push("/supplier/auth/login");
       return;
     }

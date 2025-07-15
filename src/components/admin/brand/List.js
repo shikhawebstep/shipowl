@@ -65,6 +65,7 @@ export default function List() {
         setDescriptionFilter('');
         setStatusFilter('');
         setActiveFilter(null)
+        setSelected([])
         if ($.fn.DataTable.isDataTable("#brandTable")) {
             const table = $("#brandTable").DataTable();
             table.search('').columns().search('').draw();
@@ -147,6 +148,15 @@ export default function List() {
                             {isTrashed ? "Trashed Brand List" : "Brand List"}
                         </h2>
                         <div className="flex gap-2 items-center">
+                               <button
+                        onClick={() => {
+                            const allIds = brandData.map(data => data.id);
+                            setSelected(allIds);
+                        }}
+                        className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                    >
+                        Select All
+                    </button>
                             {selected.length > 0 && (
                                 <button
                                     onClick={async () => {
