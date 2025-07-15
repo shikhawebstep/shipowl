@@ -65,6 +65,15 @@ export async function POST(req: NextRequest) {
     const userCheck: UserCheckResult = await isUserExist(adminId, String(adminRole));
 
     if (!userCheck.status) {
+      await fetchLogInfo(
+        {
+          module: 'Brand',
+          action: 'Create',
+          data: userCheck,
+          response: { status: false, error: `User Not Found: ${userCheck.message}` },
+          status: false
+        }, req);
+
       return NextResponse.json(
         { status: false, error: `User Not Found: ${userCheck.message}` },
         { status: 404 }
@@ -86,6 +95,18 @@ export async function POST(req: NextRequest) {
       logMessage('info', 'Fetched staff permissions:', staffPermissionsResult);
 
       if (!staffPermissionsResult.status) {
+        await fetchLogInfo(
+          {
+            module: 'Brand',
+            action: 'Create',
+            data: staffPermissionsResult,
+            response: {
+              status: false,
+              message: staffPermissionsResult.message || "You do not have permission to perform this action."
+            },
+            status: false
+          }, req);
+
         return NextResponse.json(
           {
             status: false,
@@ -109,6 +130,15 @@ export async function POST(req: NextRequest) {
     });
 
     if (!validation.isValid) {
+      await fetchLogInfo(
+        {
+          module: 'Brand',
+          action: 'Create',
+          data: validation,
+          response: { status: false, error: validation.error, message: validation.message },
+          status: false
+        }, req);
+
       logMessage('warn', 'Form validation failed', validation.error);
       return NextResponse.json(
         { status: false, error: validation.error, message: validation.message },
@@ -151,29 +181,14 @@ export async function POST(req: NextRequest) {
     const brandCreateResult = await createBrand(adminId, String(adminRole), brandPayload);
 
     if (brandCreateResult?.status) {
-
-      // Generate a barcode based on brand name
-      const barcodeFileName = `barcode-${Date.now()}.png`;
-      const barcodePath = path.join(uploadDir, barcodeFileName);
-      const barcodePublicPath = `/uploads/brand/${barcodeFileName}`;
-
-      try {
-        const pngBuffer = await bwipjs.toBuffer({
-          bcid: 'code128',        // Barcode type
-          text: name,             // Brand name as barcode text
-          scale: 3,
-          height: 10,
-          includetext: true,
-          textxalign: 'center',
-        });
-
-        // Save the buffer as a PNG file
-        await fs.writeFile(barcodePath, pngBuffer);
-        logMessage('info', `Barcode image saved: ${barcodePublicPath}`);
-      } catch (barcodeErr) {
-        logMessage('error', 'Barcode generation failed:', barcodeErr);
-      }
-
+      await fetchLogInfo(
+        {
+          module: 'Brand',
+          action: 'Create',
+          data: brandCreateResult,
+          response: { status: true, brand: brandCreateResult.brand },
+          status: true
+        }, req);
       return NextResponse.json({ status: true, brand: brandCreateResult.brand }, { status: 200 });
     }
 
@@ -186,16 +201,35 @@ export async function POST(req: NextRequest) {
       await deleteFile(deletePath(fileData as UploadedFileInfo));
     }
 
+    await fetchLogInfo(
+      {
+        module: 'Brand',
+        action: 'Create',
+        data: brandCreateResult,
+        response: { status: false, error: brandCreateResult?.message || 'Brand creation failed' },
+        status: false
+      }, req);
+
     logMessage('error', 'Brand creation failed:', brandCreateResult?.message || 'Unknown error');
     return NextResponse.json(
       { status: false, error: brandCreateResult?.message || 'Brand creation failed' },
       { status: 500 }
     );
   } catch (error) {
+
+    await fetchLogInfo(
+      {
+        module: 'Brand',
+        action: 'Create',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, message: error || 'Internal Server Error' },
+        status: false
+      }, req);
+
     // Log and handle any unexpected errors
     logMessage('error', 'Brand Creation Error:', error);
     return NextResponse.json(
-      { status: false, error, message: 'Internal Server Error 5' },
+      { status: false, error, message: error || 'Internal Server Error' },
       { status: 500 }
     );
   }
@@ -204,9 +238,6 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     logMessage('debug', 'GET request received for fetching brands');
-
-    const fetchLogInfoResult = await fetchLogInfo('brand', 'view', req);
-    logMessage('debug', 'fetchLogInfoResult:', fetchLogInfoResult);
 
     // Fetch all brands
     const brandsResult = await getBrandsByStatus("notDeleted");

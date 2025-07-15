@@ -301,6 +301,7 @@ export const getSuppliersByStatus = async (
                 permanentCity: true,
                 permanentCountry: true,
                 permanentState: true,
+                warehouses: true,
             }
         });
 

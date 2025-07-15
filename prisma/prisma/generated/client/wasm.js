@@ -526,6 +526,7 @@ exports.Prisma.WarehouseScalarFieldEnum = {
   countryId: 'countryId',
   stateId: 'stateId',
   cityId: 'cityId',
+  supplierId: 'supplierId',
   status: 'status',
   createdAt: 'createdAt',
   createdBy: 'createdBy',

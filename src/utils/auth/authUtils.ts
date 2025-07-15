@@ -61,6 +61,7 @@ export async function isUserExist(adminId: number, adminRole: string) {
                     name: true,
                     email: true,
                     password: true,
+                    panel: true,
                     admin: true
                 }
             });

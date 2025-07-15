@@ -109,6 +109,7 @@ model admin {
   raiseTickets               raiseTicket[]               @relation("DropshipperToRaiseTicket")
   respondedTickets           raiseTicket[]               @relation("AdminResponderToRaiseTicket")
   roles                      role[]                      @relation("AdminRoles")
+  warehouses                 warehouse[]                 @relation("AdminToWarehouse")
 }
 
 model shopifyStore {
@@ -529,9 +530,9 @@ model city {
 }
 
 model warehouse {
-  id             Int       @id @default(autoincrement())
+  id             Int     @id @default(autoincrement())
   name           String
-  slug           String    @unique
+  slug           String  @unique
   gst_number     String
   contact_name   String
   contact_number String
@@ -541,23 +542,29 @@ model warehouse {
   countryId      BigInt?
   stateId        BigInt?
   cityId         BigInt?
-  country        country?  @relation(fields: [countryId], references: [id], onDelete: SetNull)
-  state          state?    @relation(fields: [stateId], references: [id], onDelete: SetNull)
-  city           city?     @relation(fields: [cityId], references: [id], onDelete: SetNull)
-  status         Boolean   @default(false)
-  createdAt      DateTime  @default(now())
-  createdBy      Int?
-  createdByRole  String?
-  updatedAt      DateTime  @updatedAt
-  updatedBy      Int?
-  updatedByRole  String?
-  deletedAt      DateTime?
-  deletedBy      Int?
-  deletedByRole  String?
+
+  supplierId Int
+  supplier   admin @relation("AdminToWarehouse", fields: [supplierId], references: [id], onDelete: Cascade)
+
+  country country? @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  state   state?   @relation(fields: [stateId], references: [id], onDelete: SetNull)
+  city    city?    @relation(fields: [cityId], references: [id], onDelete: SetNull)
+
+  status        Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  createdBy     Int?
+  createdByRole String?
+  updatedAt     DateTime  @updatedAt
+  updatedBy     Int?
+  updatedByRole String?
+  deletedAt     DateTime?
+  deletedBy     Int?
+  deletedByRole String?
 
   @@index([countryId])
   @@index([stateId])
   @@index([cityId])
+  @@index([supplierId])
   @@index([createdBy])
   @@index([updatedBy])
   @@index([deletedAt])

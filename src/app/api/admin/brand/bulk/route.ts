@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getBrandById, deleteBrand } from '@/app/models/admin/brand';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
+import { fetchLogInfo } from '@/utils/commonUtils';
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -17,7 +18,16 @@ export async function DELETE(req: NextRequest) {
 
     const userCheck = await isUserExist(adminId, String(adminRole));
     if (!userCheck.status) {
-      return NextResponse.json({ error: `Admin not found` }, { status: 404 });
+      await fetchLogInfo(
+        {
+          module: 'Brand',
+          action: 'Permanent Delete',
+          data: userCheck,
+          response: { status: false, message: `Admin not found` },
+          status: false
+        }, req);
+
+      return NextResponse.json({ status: false, message: `Admin not found` }, { status: 404 });
     }
 
     if (!['admin', 'supplier', 'dropshipper'].includes(String(adminRole))) {
@@ -26,6 +36,19 @@ export async function DELETE(req: NextRequest) {
         adminId
       );
       if (!permissionCheck.status) {
+
+        await fetchLogInfo(
+          {
+            module: 'Brand',
+            action: 'Permanent Delete',
+            data: permissionCheck,
+            response: {
+              status: false,
+              message: permissionCheck.message || "No permission"
+            },
+            status: false
+          }, req);
+
         return NextResponse.json({
           status: false,
           message: permissionCheck.message || "No permission"
@@ -53,6 +76,20 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
+    await fetchLogInfo(
+      {
+        module: 'Brand',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: 'Brand deletion completed' },
+        response: {
+          status: true,
+          message: 'Brand deletion completed',
+          deleted,
+          notDeleted
+        },
+        status: true
+      }, req);
+
     return NextResponse.json({
       status: true,
       message: 'Brand deletion completed',
@@ -60,7 +97,15 @@ export async function DELETE(req: NextRequest) {
       notDeleted
     }, { status: 200 });
 
-  } catch {
-    return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
+  } catch (error) {
+    await fetchLogInfo(
+      {
+        module: 'Brand',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Internal server error' },
+        status: false
+      }, req);
+    return NextResponse.json({ status: false, message: error || 'Internal server error' }, { status: 500 });
   }
 }
