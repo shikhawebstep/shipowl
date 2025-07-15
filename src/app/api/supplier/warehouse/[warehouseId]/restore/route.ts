@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
-import { getWarehouseById, restoreWarehouse } from '@/app/models/warehouse';
+import { getWarehouseById, restoreWarehouse } from '@/app/models/supplier/warehouse';
+import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
-interface MainAdmin {
+interface MainSupplier {
   id: number;
   name: string;
   email: string;
@@ -18,15 +19,14 @@ interface SupplierStaff {
   email: string;
   password: string;
   role?: string;
-  admin?: MainAdmin;
+  supplier?: MainSupplier;
 }
 
 interface UserCheckResult {
   status: boolean;
   message?: string;
-  admin?: SupplierStaff;
+  supplier?: SupplierStaff;
 }
-
 export async function PATCH(req: NextRequest) {
   try {
     const parts = req.nextUrl.pathname.split('/');
@@ -35,23 +35,51 @@ export async function PATCH(req: NextRequest) {
     logMessage('debug', 'Delete Warehouse Request:', { warehouseId });
 
     // Get headers
-    const adminIdHeader = req.headers.get("x-admin-id");
-    const adminRole = req.headers.get("x-admin-role");
+    const supplierIdHeader = req.headers.get("x-supplier-id");
+    const supplierRole = req.headers.get("x-supplier-role");
 
-    const adminId = Number(adminIdHeader);
-    if (!adminIdHeader || isNaN(adminId)) {
-      logMessage('warn', 'Invalid or missing admin ID header', { adminIdHeader, adminRole });
+    const supplierId = Number(supplierIdHeader);
+    if (!supplierIdHeader || isNaN(supplierId)) {
+      logMessage('warn', 'Invalid or missing supplier ID header', { supplierIdHeader, supplierRole });
       return NextResponse.json(
         { error: "User ID is missing or invalid in request" },
         { status: 400 }
       );
     }
 
-    // Check if admin exists
-    const userCheck: UserCheckResult = await isUserExist(adminId, String(adminRole));
+    // Check if the supplier user exists
+    let mainSupplierId = supplierId;
+    const userCheck: UserCheckResult = await isUserExist(supplierId, String(supplierRole));
     if (!userCheck.status) {
-      logMessage('warn', `User not found: ${userCheck.message}`, { adminId, adminRole });
-      return NextResponse.json({ error: `User Not Found: ${userCheck.message}` }, { status: 404 });
+      return NextResponse.json(
+        { status: false, error: `User Not Found: ${userCheck.message}` },
+        { status: 404 }
+      );
+    }
+
+    const isStaff = !['supplier', 'dropshipper', 'supplier'].includes(String(supplierRole));
+
+    if (isStaff) {
+      mainSupplierId = userCheck.supplier?.supplier?.id ?? supplierId;
+
+      const options = {
+        panel: 'Supplier',
+        module: 'Warehouse',
+        action: 'Restore',
+      };
+
+      const staffPermissionsResult = await checkStaffPermissionStatus(options, supplierId);
+      logMessage('info', 'Fetched staff permissions:', staffPermissionsResult);
+
+      if (!staffPermissionsResult.status) {
+        return NextResponse.json(
+          {
+            status: false,
+            message: staffPermissionsResult.message || "You do not have permission to perform this action."
+          },
+          { status: 403 }
+        );
+      }
     }
 
     const warehouseIdNum = Number(warehouseId);
@@ -68,7 +96,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Restore the warehouse (i.e., reset deletedAt, deletedBy, deletedByRole)
-    const restoreResult = await restoreWarehouse(adminId, String(adminRole), warehouseIdNum);
+    const restoreResult = await restoreWarehouse(supplierId, String(supplierRole), warehouseIdNum);
 
     if (restoreResult?.status) {
       logMessage('info', 'Warehouse restored successfully:', restoreResult.warehouse);

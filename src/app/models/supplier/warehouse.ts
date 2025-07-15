@@ -2,6 +2,9 @@ import prisma from "@/lib/prisma";
 import { logMessage } from "@/utils/commonUtils";
 
 interface Warehouse {
+    supplier: {
+        connect: { id: number };
+    };
     id?: number;
     slug?: string;
     name: string;
@@ -32,6 +35,29 @@ interface Warehouse {
     deletedByRole?: string | null;
 }
 
+const serializeBigInt = <T>(obj: T): T => {
+    if (typeof obj === "bigint") {
+        return obj.toString() as unknown as T;
+    }
+
+    if (obj instanceof Date) {
+        // Return Date object unchanged, no conversion
+        return obj;
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.map(serializeBigInt) as unknown as T;
+    }
+
+    if (obj && typeof obj === "object") {
+        return Object.fromEntries(
+            Object.entries(obj).map(([key, value]) => [key, serializeBigInt(value)])
+        ) as T;
+    }
+
+    return obj;
+};
+
 export async function generateWarehouseSlug(name: string) {
     let slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
     let isSlugTaken = true;
@@ -56,16 +82,17 @@ export async function generateWarehouseSlug(name: string) {
     return slug;
 }
 
-export async function createWarehouse(adminId: number, adminRole: string, warehouse: Warehouse) {
+export async function createWarehouse(supplierId: number, supplierRole: string, warehouse: Warehouse) {
 
     try {
-        const { name, gst_number, contact_name, contact_number, address_line_1, address_line_2, city, state, country, postal_code, status } = warehouse;
+        const { supplier, name, gst_number, contact_name, contact_number, address_line_1, address_line_2, city, state, country, postal_code, status } = warehouse;
 
         // Generate a unique slug for the warehouse
         const slug = await generateWarehouseSlug(name);
 
         const newWarehouse = await prisma.warehouse.create({
             data: {
+                supplier,
                 name,
                 slug,
                 gst_number,
@@ -79,20 +106,12 @@ export async function createWarehouse(adminId: number, adminRole: string, wareho
                 postal_code,
                 status,
                 createdAt: new Date(),
-                createdBy: adminId,
-                createdByRole: adminRole,
+                createdBy: supplierId,
+                createdByRole: supplierRole,
             },
         });
 
-        // Convert BigInt to string for serialization
-        const warehouseWithStringBigInts = {
-            ...newWarehouse,
-            cityId: newWarehouse.cityId !== null && newWarehouse.cityId !== undefined ? newWarehouse.cityId.toString() : null,
-            stateId: newWarehouse.stateId !== null && newWarehouse.stateId !== undefined ? newWarehouse.stateId.toString() : null,
-            countryId: newWarehouse.countryId !== null && newWarehouse.countryId !== undefined ? newWarehouse.countryId.toString() : null,
-        };
-
-        return { status: true, warehouse: warehouseWithStringBigInts };
+        return { status: true, warehouse: serializeBigInt(newWarehouse) };
     } catch (error) {
         console.error(`Error creating warehouse:`, error);
         return { status: false, message: "Internal Server Error" };
@@ -101,8 +120,8 @@ export async function createWarehouse(adminId: number, adminRole: string, wareho
 
 // 🟡 UPDATE
 export const updateWarehouse = async (
-    adminId: number,
-    adminRole: string,
+    supplierId: number,
+    supplierRole: string,
     warehouseId: number,
     data: Warehouse
 ) => {
@@ -124,20 +143,12 @@ export const updateWarehouse = async (
                 postal_code,
                 status,
                 updatedAt: new Date(),
-                updatedBy: adminId,
-                updatedByRole: adminRole,
+                updatedBy: supplierId,
+                updatedByRole: supplierRole,
             },
         });
 
-        // Convert BigInt to string for serialization
-        const warehouseWithStringBigInts = {
-            ...warehouse,
-            cityId: warehouse.cityId !== null && warehouse.cityId !== undefined ? warehouse.cityId.toString() : null,
-            stateId: warehouse.stateId !== null && warehouse.stateId !== undefined ? warehouse.stateId.toString() : null,
-            countryId: warehouse.countryId !== null && warehouse.countryId !== undefined ? warehouse.countryId.toString() : null,
-        };
-
-        return { status: true, warehouse: warehouseWithStringBigInts };
+        return { status: true, warehouse: serializeBigInt(warehouse) };
     } catch (error) {
         console.error("❌ updateWarehouse Error:", error);
         return { status: false, message: "Error updating warehouse" };
@@ -153,14 +164,7 @@ export const getWarehouseById = async (id: number) => {
 
         if (!warehouse) return { status: false, message: "Warehouse not found" };
 
-        // Convert BigInt to string for serialization
-        const warehouseWithStringBigInts = {
-            ...warehouse,
-            cityId: warehouse.cityId !== null && warehouse.cityId !== undefined ? warehouse.cityId.toString() : null,
-            stateId: warehouse.stateId !== null && warehouse.stateId !== undefined ? warehouse.stateId.toString() : null,
-            countryId: warehouse.countryId !== null && warehouse.countryId !== undefined ? warehouse.countryId.toString() : null,
-        };
-        return { status: true, warehouse: warehouseWithStringBigInts };
+        return { status: true, warehouse: serializeBigInt(warehouse) };
     } catch (error) {
         console.error("❌ getWarehouseById Error:", error);
         return { status: false, message: "Error fetching warehouse" };
@@ -174,37 +178,29 @@ export const getAllWarehouses = async () => {
             orderBy: { id: 'desc' },
         });
 
-        // Convert BigInt to string for serialization
-        const warehousesWithStringBigInts = warehouses.map(warehouse => ({
-            ...warehouse,
-            cityId: warehouse.cityId !== null && warehouse.cityId !== undefined ? warehouse.cityId.toString() : null,
-            stateId: warehouse.stateId !== null && warehouse.stateId !== undefined ? warehouse.stateId.toString() : null,
-            countryId: warehouse.countryId !== null && warehouse.countryId !== undefined ? warehouse.countryId.toString() : null,
-        }));
-
-        return { status: true, warehouses: warehousesWithStringBigInts };
+        return { status: true, warehouses: serializeBigInt(warehouses) };
     } catch (error) {
         console.error("❌ getAllWarehouses Error:", error);
         return { status: false, message: "Error fetching warehouses" };
     }
 };
 
-export const getWarehousesByStatus = async (status: "active" | "inactive" | "deleted" | "notDeleted") => {
+export const getWarehousesByStatus = async (supplierId: number, status: "active" | "inactive" | "deleted" | "notDeleted") => {
     try {
         let whereCondition = {};
 
         switch (status) {
             case "active":
-                whereCondition = { status: true, deletedAt: null };
+                whereCondition = { supplierId, status: true, deletedAt: null };
                 break;
             case "inactive":
-                whereCondition = { status: false, deletedAt: null };
+                whereCondition = { supplierId, status: false, deletedAt: null };
                 break;
             case "deleted":
-                whereCondition = { deletedAt: { not: null } };
+                whereCondition = { supplierId, deletedAt: { not: null } };
                 break;
             case "notDeleted":
-                whereCondition = { deletedAt: null };
+                whereCondition = { supplierId, deletedAt: null };
                 break;
             default:
                 throw new Error("Invalid status");
@@ -217,15 +213,7 @@ export const getWarehousesByStatus = async (status: "active" | "inactive" | "del
 
         logMessage("debug", `Warehouses fetched with status ${status}:`, warehouses);
 
-        // Convert BigInt to string for serialization
-        const warehousesWithStringBigInts = warehouses.map(warehouse => ({
-            ...warehouse,
-            cityId: warehouse.cityId !== null && warehouse.cityId !== undefined ? warehouse.cityId.toString() : null,
-            stateId: warehouse.stateId !== null && warehouse.stateId !== undefined ? warehouse.stateId.toString() : null,
-            countryId: warehouse.countryId !== null && warehouse.countryId !== undefined ? warehouse.countryId.toString() : null,
-        }));
-
-        return { status: true, warehouses: warehousesWithStringBigInts };
+        return { status: true, warehouses: serializeBigInt(warehouses) };
     } catch (error) {
         console.error(`Error fetching warehouses by status (${status}):`, error);
         return { status: false, message: "Error fetching warehouses" };
@@ -233,17 +221,17 @@ export const getWarehousesByStatus = async (status: "active" | "inactive" | "del
 };
 
 // 🔴 Soft DELETE (marks as deleted by setting deletedAt field)
-export const softDeleteWarehouse = async (adminId: number, adminRole: string, id: number) => {
+export const softDeleteWarehouse = async (supplierId: number, supplierRole: string, id: number) => {
     try {
         const updatedWarehouse = await prisma.warehouse.update({
             where: { id },
             data: {
-                deletedBy: adminId,
+                deletedBy: supplierId,
                 deletedAt: new Date(),
-                deletedByRole: adminRole,
+                deletedByRole: supplierRole,
             },
         });
-        return { status: true, message: "Warehouse soft deleted successfully", updatedWarehouse };
+        return { status: true, message: "Warehouse soft deleted successfully", warehouse: serializeBigInt(updatedWarehouse) };
     } catch (error) {
         console.error("❌ softDeleteWarehouse Error:", error);
         return { status: false, message: "Error soft deleting warehouse" };
@@ -251,7 +239,7 @@ export const softDeleteWarehouse = async (adminId: number, adminRole: string, id
 };
 
 // 🟢 RESTORE (Restores a soft-deleted warehouse by setting deletedAt to null)
-export const restoreWarehouse = async (adminId: number, adminRole: string, id: number) => {
+export const restoreWarehouse = async (supplierId: number, supplierRole: string, id: number) => {
     try {
         const restoredWarehouse = await prisma.warehouse.update({
             where: { id },
@@ -259,21 +247,13 @@ export const restoreWarehouse = async (adminId: number, adminRole: string, id: n
                 deletedBy: null,      // Reset the deletedBy field
                 deletedAt: null,      // Set deletedAt to null
                 deletedByRole: null,  // Reset the deletedByRole field
-                updatedBy: adminId,   // Record the user restoring the warehouse
-                updatedByRole: adminRole, // Record the role of the user
+                updatedBy: supplierId,   // Record the user restoring the warehouse
+                updatedByRole: supplierRole, // Record the role of the user
                 updatedAt: new Date(), // Update the updatedAt field
             },
         });
 
-        // Convert BigInt to string for serialization
-        const warehouseWithStringBigInts = {
-            ...restoredWarehouse,
-            cityId: restoredWarehouse.cityId !== null && restoredWarehouse.cityId !== undefined ? restoredWarehouse.cityId.toString() : null,
-            stateId: restoredWarehouse.stateId !== null && restoredWarehouse.stateId !== undefined ? restoredWarehouse.stateId.toString() : null,
-            countryId: restoredWarehouse.countryId !== null && restoredWarehouse.countryId !== undefined ? restoredWarehouse.countryId.toString() : null,
-        };
-
-        return { status: true, message: "Warehouse restored successfully", warehouse: warehouseWithStringBigInts };
+        return { status: true, message: "Warehouse restored successfully", warehouse: serializeBigInt(restoredWarehouse) };
     } catch (error) {
         console.error("❌ restoreWarehouse Error:", error);
         return { status: false, message: "Error restoring warehouse" };
