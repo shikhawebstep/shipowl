@@ -129,7 +129,6 @@ exports.Prisma.AppConfigScalarFieldEnum = {
 exports.Prisma.EmailConfigScalarFieldEnum = {
   id: 'id',
   panel: 'panel',
-  panel1: 'panel1',
   module: 'module',
   subject: 'subject',
   action: 'action',
@@ -991,9 +990,10 @@ exports.Prisma.TicketOrderScalarFieldEnum = {
   deletedByRole: 'deletedByRole'
 };
 
-exports.Prisma.SupplierBannerScalarFieldEnum = {
+exports.Prisma.DropshipperBannerScalarFieldEnum = {
   id: 'id',
   image: 'image',
+  url: 'url',
   status: 'status',
   createdAt: 'createdAt',
   createdBy: 'createdBy',
@@ -1034,7 +1034,6 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.emailConfigOrderByRelevanceFieldEnum = {
   panel: 'panel',
-  panel1: 'panel1',
   module: 'module',
   subject: 'subject',
   action: 'action',
@@ -1461,8 +1460,9 @@ exports.Prisma.ticketOrderOrderByRelevanceFieldEnum = {
   deletedByRole: 'deletedByRole'
 };
 
-exports.Prisma.supplierBannerOrderByRelevanceFieldEnum = {
+exports.Prisma.dropshipperBannerOrderByRelevanceFieldEnum = {
   image: 'image',
+  url: 'url',
   createdByRole: 'createdByRole',
   updatedByRole: 'updatedByRole',
   deletedByRole: 'deletedByRole'
@@ -1509,7 +1509,7 @@ exports.Prisma.ModelName = {
   supplierOrderPermission: 'supplierOrderPermission',
   raiseTicket: 'raiseTicket',
   ticketOrder: 'ticketOrder',
-  supplierBanner: 'supplierBanner'
+  dropshipperBanner: 'dropshipperBanner'
 };
 
 /**

@@ -23,7 +23,6 @@ model appConfig {
 model emailConfig {
   id            BigInt   @id @default(autoincrement())
   panel         String
-  panel1        String
   module        String
   subject       String
   action        String
@@ -1196,9 +1195,10 @@ model ticketOrder {
   @@index([deletedAt])
 }
 
-model supplierBanner {
+model dropshipperBanner {
   id            Int       @id @default(autoincrement())
   image         String    @db.LongText
+  url           String?   @db.LongText
   status        Boolean   @default(false)
   createdAt     DateTime  @default(now())
   createdBy     Int?

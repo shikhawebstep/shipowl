@@ -81,6 +81,7 @@ export function middleware(req: NextRequest) {
                 "/api/dropshipper/auth/password/forget",
                 "/api/dropshipper/auth/password/reset",
                 "/api/dropshipper/auth/registration",
+                "/api/dropshipper/banner",
                 { route: "/api/location/country", methods: ["GET"] },
                 { route: "/api/location/country/[countryId]/states", methods: ["GET"] },
                 { route: "/api/location/state", methods: ["GET"] },
