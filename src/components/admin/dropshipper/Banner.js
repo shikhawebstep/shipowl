@@ -14,7 +14,8 @@ export default function Banner() {
     const { verifyAdminAuth } = useAdmin();
     const [formData, setFormData] = useState({
         productUrl: '',
-        image: ""
+        image: "",
+        status: '',
     });
 
 
@@ -51,13 +52,16 @@ export default function Banner() {
         setFiles(selectedFiles);
     };
 
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+
         if (dropshipperData?.project?.active_panel !== "admin") {
-            localStorage.clear("shippingData");
+            localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
@@ -82,23 +86,23 @@ export default function Banner() {
                 title: 'Creating Banner...',
                 text: 'Please wait while we save your Banner.',
                 allowOutsideClick: false,
+                showConfirmButton: false,
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
 
             const form = new FormData();
-            form.append('productUrl', formData.productUrl);
+            form.append('url', formData.productUrl);
+            form.append('status', String(formData.status));
 
             if (files.length > 0) {
                 files.forEach((file) => {
-                    form.append('image', file); // use 'images[]' if backend expects an array
+                    form.append('image', file);
                 });
             }
 
-            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/Banner`;
-
-            const response = await fetch(url, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/dropshipper/Banner`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -106,66 +110,68 @@ export default function Banner() {
                 body: form,
             });
 
-            const result = await response.json(); // Parse the result here
+            const contentType = response.headers.get("content-type");
+            const result = contentType?.includes("application/json")
+                ? await response.json()
+                : await response.text();
 
             if (!response.ok) {
-                Swal.close();
-                Swal.fire({
-                    icon: "error",
-                    title: "Creation Failed",
-                    text: result.message || result.error || "An error occurred",
-                });
-
-                if (result.error && typeof result.error === 'object') {
-                    const entries = Object.entries(result.error);
-                    let focused = false;
-
-                    entries.forEach(([key, message]) => {
-                        setValidationErrors((prev) => ({
-                            ...prev,
-                            [key]: message,
-                        }));
-
-                        if (!focused) {
-                            setTimeout(() => {
-                                const input = document.querySelector(`[name="${key}"]`);
-                                if (input) input.focus();
-                            }, 300);
-
-                            focused = true;
-                        }
-                    });
-                }
-            } else {
-                Swal.close();
-
-                Swal.fire({
-                    icon: "success",
-                    title: "Banner Created",
-                    text: `The Banner has been created successfully!`,
-                    showConfirmButton: true,
-                }).then((res) => {
-                    if (res.isConfirmed) {
-                        setFormData({ productUrl: '', image: '' });
-                        setFiles([]); // Reset file input state
-                        router.push("/admin/Banner/list");
-                    }
-                });
+                throw new Error(result?.message || result?.error || "Upload failed.");
             }
+
+            Swal.close();
+            Swal.fire({
+                icon: "success",
+                title: "Banner Created",
+                text: `The Banner has been created successfully!`,
+                showConfirmButton: true,
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    setFormData({ productUrl: '', image: '', status: false });
+                    setFiles([]);
+                    router.push("/admin/Banner/list");
+                }
+            });
 
         } catch (error) {
             console.error("Error:", error);
             Swal.close();
+
+            // Show error message
             Swal.fire({
                 icon: "error",
                 title: "Submission Error",
                 text: error.message || "Something went wrong. Please try again.",
             });
+
+            // Handle field-specific errors if available
+            if (error?.response?.error && typeof error.response.error === 'object') {
+                const entries = Object.entries(error.response.error);
+                let focused = false;
+
+                entries.forEach(([key, message]) => {
+                    setValidationErrors((prev) => ({
+                        ...prev,
+                        [key]: message,
+                    }));
+
+                    if (!focused) {
+                        setTimeout(() => {
+                            const input = document.querySelector(`[name="${key}"]`);
+                            if (input) input.focus();
+                        }, 300);
+                        focused = true;
+                    }
+                });
+            }
+
             setError(error.message || "Submission failed.");
         } finally {
             setLoading(false);
         }
     };
+
+
 
 
     return (
@@ -208,6 +214,25 @@ export default function Banner() {
                                 <p className="text-red-500 text-sm mt-1">{validationErrors.productUrl}</p>
                             )}
                         </div>
+                        <div className="mt-2 col-span-2">
+                            <label htmlFor="status" className="font-bold block text-[#232323]">
+                                Status
+                            </label>
+                            <div className="flex items-center gap-2 mt-2">
+                                <input
+                                    type="checkbox"
+                                    name="status"
+                                    id="status"
+                                    checked={formData.status}
+                                    onChange={handleChange}
+                                    className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                                />
+                                <label htmlFor="status" className="text-sm text-[#718EBF]">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+
                     </div>
                     <div className="flex flex-wrap gap-3 mt-5">
                         <button type="submit" className="bg-orange-500 text-white md:px-15 rounded-md p-3 px-4">

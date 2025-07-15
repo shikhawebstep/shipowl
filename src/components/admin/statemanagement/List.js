@@ -8,8 +8,10 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { FaCheck } from "react-icons/fa";
-
 import { IoFilterSharp } from "react-icons/io5";
+import { useImageURL } from "@/components/ImageURLContext";
+
+
 export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isTrashed, setIsTrashed] = useState(false);
@@ -22,10 +24,10 @@ export default function List() {
     const [isoFilter, setIsoFilter] = useState('');
     const [countryFilter, setCountryFilter] = useState('');
     const [typeFilter, setTypeFilter] = useState('');
-
+    const { handleBulkDelete } = useImageURL();
     const [activeFilter, setActiveFilter] = useState(null);
 
-   const handleCheckboxChange = (id) => {
+    const handleCheckboxChange = (id) => {
         setSelected((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
@@ -309,54 +311,6 @@ export default function List() {
         }
     };
 
-    const handleBulkDelete = async () => {
-        if (selected.length === 0) {
-            Swal.fire("No items selected", "", "info");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: `You will delete ${selected.length} state!`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete them!",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        const admintoken = adminData?.security?.token;
-
-        try {
-            Swal.fire({ title: "Deleting...", didOpen: () => Swal.showLoading() });
-            setLoading(true);
-
-            const results = await Promise.all(
-                selected.map(id =>
-                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/${id}`, {
-                        method: "DELETE",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${admintoken}`,
-                        },
-                    })
-                )
-            );
-
-            Swal.close();
-            await fetchState();
-            setSelected([]);
-            Swal.fire("Deleted!", `${results.length} state were deleted.`, "success");
-        } catch (error) {
-            Swal.close();
-            Swal.fire("Error", error.message || "Failed to delete", "error");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const exportCsv = () => {
         const table = $('#statetable').DataTable();
@@ -583,7 +537,17 @@ export default function List() {
                                 Clear All Filters
                             </button>
                             {selected.length > 0 && (
-                                <button onClick={handleBulkDelete} className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                                <button
+                                    onClick={async () => {
+                                        await handleBulkDelete({
+                                            selected,
+                                            apiEndpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/state/bulk`,
+                                            setSelected,
+                                            setLoading,
+                                        });
+                                        await fetchState();
+                                    }}
+                                    className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
                             )}
                             <div className="md:flex hidden justify-end gap-2">
 

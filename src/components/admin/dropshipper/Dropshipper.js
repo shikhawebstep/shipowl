@@ -11,6 +11,7 @@ import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import { useAdminActions } from '@/components/commonfunctions/MainContext';
 import { DropshipperProfileContext } from './DropshipperProfileContext';
 import { IoFilterSharp } from "react-icons/io5";
+import { useImageURL } from '@/components/ImageURLContext';
 
 const Dropshipper = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -24,7 +25,7 @@ const Dropshipper = () => {
     const [expandPassModal, setExpandPassModal] = useState(null);
     const [selected, setSelected] = useState([]);
     const { setActiveTab } = useContext(DropshipperProfileContext);
-
+    const { handleBulkDelete } = useImageURL();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/dropshipper", "dropshippers");
 
     const handleCheckboxChange = (id) => {
@@ -283,9 +284,18 @@ const Dropshipper = () => {
                         Clear Filters
                     </button>
                     {selected.length > 0 && (
-                        <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                        <button
+                            onClick={async () => {
+                                await handleBulkDelete({
+                                    selected,
+                                    apiEndpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/dropshipper/bulk`,
+                                    setSelected,
+                                    setLoading,
+                                });
+                                await fetchAll(setDropshippers, setLoading);
+                            }}
+                            className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
                     )}
-
 
                     <div className="md:flex hidden justify-end gap-2">
 

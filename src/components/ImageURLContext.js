@@ -27,52 +27,112 @@ export const ImageURLProvider = ({ children }) => {
     return `${process.env.NEXT_PUBLIC_API_BASE_URL}api/images/tmp/${imagePath}`;
   }
   const getProductDescription = async (productId, setDescription) => {
-  try {
-    Swal.fire({
-    
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+    try {
+      Swal.fire({
 
-    const myHeaders = new Headers();
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/product/${productId}/description`,
-      {
-        method: "GET",
-        headers: myHeaders,
-        redirect: "follow",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const myHeaders = new Headers();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}api/product/${productId}/description`,
+        {
+          method: "GET",
+          headers: myHeaders,
+          redirect: "follow",
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to fetch description");
       }
-    );
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Failed to fetch description");
+      const result = await response.json(); // ✅ FIXED
+
+      setDescription(result.product?.description); // ✅ Now works
+
+      Swal.close();
+
+    } catch (error) {
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Something went wrong",
+      });
+      console.error("Fetch Error:", error);
+    }
+  };
+
+  const handleBulkDelete = async ({
+    selected,
+    apiEndpoint,
+    setSelected,
+    setLoading,
+  }) => {
+    if (!selected || selected.length === 0) {
+      Swal.fire("No Product selected", "Please select at least one item.", "info");
+      return;
     }
 
-    const result = await response.json(); // ✅ FIXED
+    try {
+      Swal.fire({
+        title: "Deleting selected items...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
 
-    setDescription(result.product?.description); // ✅ Now works
+      const raw = JSON.stringify({
+        ids: selected.join(","),
+      });
 
-    Swal.close();
+      const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+      if (dropshipperData?.project?.active_panel !== "admin") {
+        localStorage.removeItem("shippingData");
+        router.push("/admin/auth/login");
+        return;
+      }
 
-  } catch (error) {
-    Swal.close();
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: error.message || "Something went wrong",
-    });
-    console.error("Fetch Error:", error);
-  }
-};
+      const token = dropshipperData?.security?.token;
+      const response = await fetch(apiEndpoint, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: raw,
+      });
 
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        Swal.close();
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: errorMessage.message || "An error occurred",
+        });
+        return;
+      }
 
+      Swal.close();
+      Swal.fire("Deleted!", "Selected items deleted successfully.", "success");
+
+      setSelected?.([]);
+      setLoading?.(false);
+
+    } catch (error) {
+      Swal.close();
+      Swal.fire("Error", error.message || "Something went wrong.", "error");
+    }
+  };
 
 
   return (
-    <ImageURLContext.Provider value={{ fetchImages, getProductDescription }}>
+    <ImageURLContext.Provider value={{ fetchImages, getProductDescription, handleBulkDelete }}>
       {children}
     </ImageURLContext.Provider>
   );

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useCallback, useState } from "react";
-  import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
-  import Link from "next/link";
+import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
 import HashLoader from "react-spinners/HashLoader";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
@@ -40,7 +40,7 @@ export default function List() {
         }
     };
 
-    const { fetchImages } = useImageURL();
+    const { fetchImages, handleBulkDelete } = useImageURL();
     const [isTrashed, setIsTrashed] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -513,7 +513,17 @@ export default function List() {
                             Clear All Filters
                         </button>
                         {selected.length > 0 && (
-                            <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                            <button
+                                onClick={async () => {
+                                    await handleBulkDelete({
+                                        selected,
+                                        apiEndpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/staff/bulk`,
+                                        setSelected,
+                                        setLoading,
+                                    });
+                                    await fetchUsers();
+                                }}
+                                className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
                         )}
                         <div className="md:flex hidden justify-start gap-5 items-end">
 

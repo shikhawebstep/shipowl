@@ -369,7 +369,7 @@ const BusinessInfo = () => {
         <input
           type="text"
           name="companyName"
-          value={formData.companyName}
+          value={formData.companyName | ''}
           onChange={handleChange}
           className={inputClasses('companyName')}
         />

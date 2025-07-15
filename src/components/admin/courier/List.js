@@ -9,12 +9,14 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useAdminActions } from "@/components/commonfunctions/MainContext";
 import { IoFilterSharp } from "react-icons/io5";
+import { useImageURL } from "@/components/ImageURLContext";
 export default function List() {
     const [isTrashed, setIsTrashed] = useState(false);
     const [selected, setSelected] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
+    const { handleBulkDelete } = useImageURL();
 
     // States for each filter
     const [courierNameFilter, setCourierNameFilter] = useState('');
@@ -163,7 +165,17 @@ export default function List() {
                             Clear All Filters
                         </button>
                         {selected.length > 0 && (
-                            <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                            <button
+                                onClick={async () => {
+                                    await handleBulkDelete({
+                                        selected,
+                                        apiEndpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}api/courier-company/bulk`,
+                                        setSelected,
+                                        setLoading,
+                                    });
+                                    await fetchAll(setData, setLoading);
+                                }}
+                                className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
                         )}
                         <div className="md:flex hidden justify-start gap-5 items-end">
 

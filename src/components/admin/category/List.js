@@ -26,7 +26,7 @@ export default function List() {
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/category", "categories");
-    const { fetchImages } = useImageURL();
+    const { fetchImages, handleBulkDelete } = useImageURL();
 
     const [categoryName, setCategoryName] = useState('');
     const [showFilter, setShowFilter] = useState(null);
@@ -165,7 +165,17 @@ export default function List() {
 
                         <div className="flex gap-3  items-center">
                             {selected.length > 0 && (
-                                <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                                <button
+                                    onClick={async () => {
+                                        await handleBulkDelete({
+                                            selected,
+                                            apiEndpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/category/bulk`,
+                                            setSelected,
+                                            setLoading,
+                                        });
+                                        await fetchAll(setCategoryData, setLoading);
+                                    }}
+                                    className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
                             )}
                             <div className="md:flex w-full justify-end gap-2">
                                 <button

@@ -151,7 +151,6 @@ export default function Create() {
               flatShippingRate:"",
               status: "active",
             });
-            setFiles([]);
           }
         });
       }

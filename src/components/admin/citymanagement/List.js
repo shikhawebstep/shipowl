@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useCallback, useState } from "react";
-   import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";import Link from "next/link";
+import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react"; import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
 import HashLoader from "react-spinners/HashLoader";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { IoFilterSharp } from "react-icons/io5";
+import { useImageURL } from "@/components/ImageURLContext";
 
 export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -22,7 +23,7 @@ export default function List() {
     const [stateFilter, setStateFilter] = useState('');
     const [countryFilter, setCountryFilter] = useState('');
     const [activeFilter, setActiveFilter] = useState(null);
-
+    const { handleBulkDelete } = useImageURL();
 
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const router = useRouter();
@@ -422,54 +423,7 @@ export default function List() {
         }
     };
 
-    const handleBulkDelete = async () => {
-        if (selected.length === 0) {
-            Swal.fire("No items selected", "", "info");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: `You will delete ${selected.length} city!`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete them!",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        const admintoken = adminData?.security?.token;
-
-        try {
-            Swal.fire({ title: "Deleting...", didOpen: () => Swal.showLoading() });
-            setLoading(true);
-
-            const results = await Promise.all(
-                selected.map(id =>
-                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/city/${id}`, {
-                        method: "DELETE",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${admintoken}`,
-                        },
-                    })
-                )
-            );
-
-            Swal.close();
-            await fetchCity();
-            setSelected([]);
-            Swal.fire("Deleted!", `${results.length} city were deleted.`, "success");
-        } catch (error) {
-            Swal.close();
-            Swal.fire("Error", error.message || "Failed to delete", "error");
-        } finally {
-            setLoading(false);
-        }
-    };
+   
 
     const exportCsv = () => {
         const table = $('#citytable').DataTable();
@@ -571,9 +525,19 @@ export default function List() {
                             >
                                 Clear Filters
                             </button>
-                            {selected.length > 0 && (
-                                <button onClick={handleBulkDelete} className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
-                            )}
+                              {selected.length > 0 && (
+                                <button
+                                    onClick={async () => {
+                                        await handleBulkDelete({
+                                            selected,
+                                            apiEndpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}api/location/city/bulk`,
+                                            setSelected,
+                                            setLoading,
+                                        });
+                                        await fetchCity();
+                                    }}
+                                    className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                            )} 
                             <div className="md:flex hidden items-center justify-end gap-2">
 
                                 {canViewTrashed && (

@@ -3,18 +3,19 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useRouter } from "next/navigation";
 import HashLoader from "react-spinners/HashLoader";
 import React, { useState, useCallback, useEffect, useContext } from "react";
- import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
- import Link from "next/link";
+import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import { useAdminActions } from '@/components/commonfunctions/MainContext';
 import { ProfileContext } from './ProfileContext';
 import Swal from 'sweetalert2';
 import { IoFilterSharp } from "react-icons/io5";
+import { useImageURL } from '@/components/ImageURLContext';
 
 const SupplierList = () => {
     const [currentTab, setCurrentTab] = useState('active');
-
+    const { handleBulkDelete } = useImageURL();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [suppliers, setSuppliers] = useState([]);
     const [isTrashed, setIsTrashed] = useState(false);
@@ -340,17 +341,27 @@ const SupplierList = () => {
                             </div>
                         )}
                     </button>
-                                        {selected.length > 0 && (
-                                <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
-                            )}
-                              <button
-                            onClick={handleClearFilters}
-                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
-                        >
-                            Clear Filters
-                        </button>
+                    {selected.length > 0 && (
+                        <button
+                            onClick={async () => {
+                                await handleBulkDelete({
+                                    selected,
+                                    apiEndpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/supplier/bulk`,
+                                    setSelected,
+                                    setLoading,
+                                });
+                                await fetchAll(setSuppliers, setLoading);
+                            }}
+                            className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                    )}
+                    <button
+                        onClick={handleClearFilters}
+                        className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                    >
+                        Clear Filters
+                    </button>
                     <div className="md:flex hidden justify-end gap-2">
-                      
+
                         {canAdd && <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
                             <Link href="/admin/supplier/create">Add New</Link>
                         </button>

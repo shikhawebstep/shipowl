@@ -17,20 +17,15 @@ import { BadgePlus, Trash2, RotateCcw, Pencil } from "lucide-react";
 import { useImageURL } from "@/components/ImageURLContext";
 
 export default function List() {
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isTrashed, setIsTrashed] = useState(false);
     const [loading, setLoading] = useState(false);
-
-
     const [brandData, setBrandData] = useState([]);
     const [brandName, setBrandName] = useState('');
     const [descriptionFilter, setDescriptionFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
-
     const [activeFilter, setActiveFilter] = useState(null);
     const [localInputValue, setLocalInputValue] = useState('');
-
-    const { fetchImages } = useImageURL();
+    const { fetchImages, handleBulkDelete } = useImageURL();
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/brand", "brands");
     const router = useRouter();
@@ -153,7 +148,17 @@ export default function List() {
                         </h2>
                         <div className="flex gap-2 items-center">
                             {selected.length > 0 && (
-                                <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                                <button
+                                    onClick={async () => {
+                                        await handleBulkDelete({
+                                            selected,
+                                            apiEndpoint: `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/brand/bulk`,
+                                            setSelected,
+                                            setLoading,
+                                        });
+                                        await fetchAll(setBrandData, setLoading);
+                                    }}
+                                    className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
                             )}
                             <button
                                 onClick={handleClearFilters}
