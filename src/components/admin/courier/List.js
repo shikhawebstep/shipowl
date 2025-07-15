@@ -1,10 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
-import { MoreHorizontal } from "lucide-react";
+import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
-import { AiOutlineDelete } from "react-icons/ai";
 import HashLoader from "react-spinners/HashLoader";
 import { useRouter } from "next/navigation";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
@@ -144,37 +142,40 @@ export default function List() {
                     <h2 className="md:text-2xl font-bold text-[#2B3674]">Courier Company List</h2>
                     <div className="flex gap-3  flex-wrap items-center">
 
-                        <div className="md:flex hidden justify-start gap-5 items-end">
-                            <button
-                                onClick={() => {
-                                    setCourierNameFilter('');
-                                    setCourierCodeFilter('');
-                                    setWebsiteFilter('');
-                                    setContactEmailFilter('');
-                                    setContactNumberFilter('');
-                                    setRtoChargesFilter('');
-                                    setFlatRateFilter('');
-                                    setStatusFilter('');
-                                    setActiveFilter(null);
+                        <button
+                            onClick={() => {
+                                setCourierNameFilter('');
+                                setCourierCodeFilter('');
+                                setWebsiteFilter('');
+                                setContactEmailFilter('');
+                                setContactNumberFilter('');
+                                setRtoChargesFilter('');
+                                setFlatRateFilter('');
+                                setStatusFilter('');
+                                setActiveFilter(null);
 
-                                    if ($.fn.DataTable.isDataTable('#courierCompanytable')) {
-                                        $('#courierCompanytable').DataTable().columns().search('').draw();
-                                    }
-                                }}
-                                className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
-                            >
-                                Clear All Filters
-                            </button>
+                                if ($.fn.DataTable.isDataTable('#courierCompanytable')) {
+                                    $('#courierCompanytable').DataTable().columns().search('').draw();
+                                }
+                            }}
+                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                        >
+                            Clear All Filters
+                        </button>
+                        {selected.length > 0 && (
+                            <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                        )}
+                        <div className="md:flex hidden justify-start gap-5 items-end">
 
                             {
                                 canViewTrashed && <button
-                                    className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                    className={`p-3 py-2 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                                     onClick={handleToggleTrash}
                                 >
                                     {isTrashed ? "Company Listing (Simple)" : "Trashed Company"}
                                 </button>
                             }
-                            {canAdd && (<button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/courier/create">Add New</Link></button>
+                            {canAdd && (<button className='bg-[#4285F4] text-white rounded-md p-3 py-2 px-8'><Link href="/admin/courier/create">Add New</Link></button>
                             )}
 
                         </div>
@@ -247,12 +248,12 @@ export default function List() {
                             value={
                                 activeFilter.key === 'courierName' ? courierNameFilter :
                                     activeFilter.key === 'courierCode' ? courierCodeFilter :
-                                    activeFilter.key === 'website' ? websiteFilter :
-                                    activeFilter.key === 'contactEmail' ? contactEmailFilter :
-                                    activeFilter.key === 'contactNumber' ? contactNumberFilter :
-                                    activeFilter.key === 'rtoCharges' ? rtoChargesFilter :
-                                    activeFilter.key === 'flatRate' ? flatRateFilter :
-                                    activeFilter.key === 'status' ? statusFilter : ''
+                                        activeFilter.key === 'website' ? websiteFilter :
+                                            activeFilter.key === 'contactEmail' ? contactEmailFilter :
+                                                activeFilter.key === 'contactNumber' ? contactNumberFilter :
+                                                    activeFilter.key === 'rtoCharges' ? rtoChargesFilter :
+                                                        activeFilter.key === 'flatRate' ? flatRateFilter :
+                                                            activeFilter.key === 'status' ? statusFilter : ''
                             }
                             onChange={(e) => activeFilter.setValue(e.target.value)}
                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
@@ -275,13 +276,13 @@ export default function List() {
                                             .column(activeFilter.columnIndex)
                                             .search(
                                                 activeFilter.key === 'courierName' ? courierNameFilter :
-                                                activeFilter.key === 'courierCode' ? courierCodeFilter :
-                                                activeFilter.key === 'website' ? websiteFilter :
-                                                activeFilter.key === 'contactEmail' ? contactEmailFilter :
-                                                activeFilter.key === 'contactNumber' ? contactNumberFilter :
-                                                activeFilter.key === 'rtoCharges' ? rtoChargesFilter :
-                                                activeFilter.key === 'flatRate' ? flatRateFilter :
-                                                activeFilter.key === 'status' ? statusFilter : ''
+                                                    activeFilter.key === 'courierCode' ? courierCodeFilter :
+                                                        activeFilter.key === 'website' ? websiteFilter :
+                                                            activeFilter.key === 'contactEmail' ? contactEmailFilter :
+                                                                activeFilter.key === 'contactNumber' ? contactNumberFilter :
+                                                                    activeFilter.key === 'rtoCharges' ? rtoChargesFilter :
+                                                                        activeFilter.key === 'flatRate' ? flatRateFilter :
+                                                                            activeFilter.key === 'status' ? statusFilter : ''
                                             )
                                             .draw();
                                     }
@@ -370,13 +371,30 @@ export default function List() {
 
                                             <div className="flex gap-2"> {isTrashed ? (
                                                 <>
-                                                    {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />}
-                                                    {canDelete && <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />}
+                                                    {canRestore && <RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />}
+                                                    {canDelete && <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />}
                                                 </>
                                             ) : (
                                                 <>
-                                                    {canEdit && <MdModeEdit onClick={() => router.push(`/admin/courier/update?id=${item.id}`)} className="cursor-pointer text-3xl" />}
-                                                    {canSoftDelete && <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />}
+                                                    {canEdit && <Pencil onClick={() => router.push(`/admin/courier/update?id=${item.id}`)} className="cursor-pointer text-3xl" />}
+                                                    {canSoftDelete && (
+                                                        <div className="relative group inline-block">
+                                                            <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />
+                                                            <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                Soft Delete
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    {canDelete && (
+                                                        <div className="relative group inline-block">
+
+                                                            <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl text-red-500" />
+                                                            <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                Permanent Delete
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                 </>
                                             )}</div>
 

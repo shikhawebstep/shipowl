@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
-import { AiOutlineDelete } from "react-icons/ai";
-import { MoreHorizontal } from "lucide-react";
+import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
+import { FaCheck } from "react-icons/fa";
 import Link from "next/link";
 import HashLoader from "react-spinners/HashLoader";
 import { useRouter } from "next/navigation";
@@ -15,12 +14,17 @@ export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
-
+    const [selected, setSelected] = useState([]);
+    const handleCheckboxChange = (id) => {
+        setSelected((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        );
+    };
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("good-pincode", "goodPincodes");
-const [pincodeFilter, setPincodeFilter] = useState('');
-const [activeFilter, setActiveFilter] = useState(null);
+    const [pincodeFilter, setPincodeFilter] = useState('');
+    const [activeFilter, setActiveFilter] = useState(null);
 
     // Initial Auth + fetch
     useEffect(() => {
@@ -141,10 +145,11 @@ const [activeFilter, setActiveFilter] = useState(null);
                                     }
 
                                     </li>
-                                    <li className="md:hidden block px-4 py-2 hover:bg-gray-100 cursor-pointer">   {canAdd && <button className="bg-[#4285F4] text-white rounded-md p-3 px-8">
-                                        <Link href="/admin/good-pincodes/create">Add New</Link>
-                                    </button>
-                                    }
+                                    <li className="md:hidden block px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                        {canAdd && <button className="bg-[#4285F4] text-white rounded-md p-3 px-8">
+                                            <Link href="/admin/good-pincodes/create">Add New</Link>
+                                        </button>
+                                        }
 
                                     </li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
@@ -154,18 +159,21 @@ const [activeFilter, setActiveFilter] = useState(null);
                             </div>
                         )}
                     </button>
+                    <button
+                        onClick={() => {
+                            setPincodeFilter('');
+                            if (window.$.fn.DataTable.isDataTable('#goodPincodes')) {
+                                window.$('#goodPincodes').DataTable().columns().search('').draw();
+                            }
+                        }}
+                        className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                    >
+                        Clear All Filters
+                    </button>
+                    {selected.length > 0 && (
+                        <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                    )}
                     <div className="md:flex hidden justify-start gap-5 items-end">
-                        <button
-                            onClick={() => {
-                                setPincodeFilter('');
-                                if (window.$.fn.DataTable.isDataTable('#goodPincodes')) {
-                                    window.$('#goodPincodes').DataTable().columns().search('').draw();
-                                }
-                            }}
-                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
-                        >
-                            Clear All Filters
-                        </button>
 
                         {canViewTrashed && <button
                             className={`p-3 py-2 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
@@ -255,6 +263,7 @@ const [activeFilter, setActiveFilter] = useState(null);
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                 <th className="p-2 px-5 text-left uppercase">SR.</th>
+                                <th className="p-2 px-5 text-left uppercase">Created At</th>
 
                                 <th className="p-2 px-5 text-left uppercase relative">
                                     <button
@@ -281,19 +290,62 @@ const [activeFilter, setActiveFilter] = useState(null);
                         <tbody>
                             {data.map((item, index) => (
                                 <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                    <td className="p-2 px-5 text-left">{index + 1}</td>
+                                    <td className="p-2 px-5 text-left">
+
+                                        <div className="flex items-center">
+                                            <label className="flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selected.includes(item.id)}
+                                                    onChange={() => handleCheckboxChange(item.id)}
+                                                    className="peer hidden"
+                                                />
+                                                <div className="w-4 me-2 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                                    <FaCheck className="peer-checked:block text-white w-3 h-3" />
+                                                </div>
+
+
+                                            </label>
+                                            {index + 1}
+                                        </div>
+                                    </td>
+                                    <td className="p-2 bg-transparent whitespace-nowrap border-0 pe-5">
+
+                                        {new Date(item.createdAt).toLocaleDateString("en-IN", {
+                                            year: "numeric",
+                                            month: "short",
+                                            day: "numeric"
+                                        })}
+                                    </td>
                                     <td className="p-2 px-5 text-left">{item.pincode}</td>
                                     <td className="p-2 px-5 text-right">
 
                                         <div className="flex justify-center gap-2">{isTrashed ? (
                                             <>
-                                                {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />}
-                                                {canDelete && <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />}
+                                                {canRestore && <RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />}
+                                                {canDelete && <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />}
                                             </>
                                         ) : (
                                             <>
-                                                {canEdit && <MdModeEdit onClick={() => router.push(`/admin/good-pincodes/update?id=${item.id}`)} className="cursor-pointer text-3xl" />}
-                                                {canSoftDelete && <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />}
+                                                {canEdit && <Pencil onClick={() => router.push(`/admin/good-pincodes/update?id=${item.id}`)} className="cursor-pointer text-3xl" />}
+                                                {canSoftDelete && (
+                                                    <div className="relative group inline-block">
+                                                        <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />
+                                                        <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                            Soft Delete
+                                                        </span>
+                                                    </div>
+                                                )}
+
+                                                {canDelete && (
+                                                    <div className="relative group inline-block">
+
+                                                        <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl text-red-500" />
+                                                        <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                            Permanent Delete
+                                                        </span>
+                                                    </div>
+                                                )}
                                             </>
                                         )}</div>
                                     </td>

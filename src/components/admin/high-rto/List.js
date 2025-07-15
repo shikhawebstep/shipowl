@@ -1,9 +1,8 @@
 "use client";
 import { useEffect, useCallback, useState } from "react";
-import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
-import { MoreHorizontal } from "lucide-react";
+import { FaCheck } from "react-icons/fa";
+import { MoreHorizontal, Trash2, RotateCcw, Pencil } from "lucide-react";
 import Link from "next/link";
-import { AiOutlineDelete } from "react-icons/ai";
 import HashLoader from "react-spinners/HashLoader";
 import { useRouter } from "next/navigation";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
@@ -25,7 +24,12 @@ export default function List() {
     const [cityFilter, setCityFilter] = useState('');
     const [pincodeFilter, setPincodeFilter] = useState('');
     const [activeFilter, setActiveFilter] = useState(null);
-
+    const [selected, setSelected] = useState([]);
+    const handleCheckboxChange = (id) => {
+        setSelected((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        );
+    };
 
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
 
@@ -175,23 +179,26 @@ export default function List() {
             <div className="flex flex-wrap justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#2B3674]">High Rto List</h2>
                 <div className="flex gap-3 flex-wrap items-center">
-                    <div className="md:flex hidden justify-start gap-5 items-end">
-                        <button
-                            onClick={() => {
-                                setCountryFilter('');
-                                setStateFilter('');
-                                setCityFilter('');
-                                setPincodeFilter('');
-                                setActiveFilter(null);
-                                if (window.$.fn.DataTable.isDataTable('#highRto')) {
-                                    window.$('#highRto').DataTable().columns().search('').draw();
-                                }
-                            }}
-                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                    <button
+                        onClick={() => {
+                            setCountryFilter('');
+                            setStateFilter('');
+                            setCityFilter('');
+                            setPincodeFilter('');
+                            setActiveFilter(null);
+                            if (window.$.fn.DataTable.isDataTable('#highRto')) {
+                                window.$('#highRto').DataTable().columns().search('').draw();
+                            }
+                        }}
+                        className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
 
-                        >
-                            Clear All Filters
-                        </button>
+                    >
+                        Clear All Filters
+                    </button>
+                    {selected.length > 0 && (
+                        <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                    )}
+                    <div className="md:flex hidden justify-start gap-5 items-end">
 
                         {canViewTrashed && <button
                             className={`p-3 py-2 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
@@ -406,7 +413,22 @@ export default function List() {
                             {data.map((item) => (
                                 <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
                                     <td className="px-6 py-4">
-                                        {countryData.find((c) => c.id === item.countryId)?.name || 'NIL'}
+                                        <div className="flex items-center">
+                                            <label className="flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selected.includes(item.id)}
+                                                    onChange={() => handleCheckboxChange(item.id)}
+                                                    className="peer hidden"
+                                                />
+                                                <div className="w-4 me-2 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                                    <FaCheck className="peer-checked:block text-white w-3 h-3" />
+                                                </div>
+                                                {countryData.find((c) => c.id === item.countryId)?.name || 'NIL'}
+
+                                            </label>
+                                        </div>
+
                                     </td>
                                     <td className="px-6 py-4">
                                         {stateData.find((s) => s.id === item.stateId)?.name || 'NIL'}
@@ -419,13 +441,30 @@ export default function List() {
                                         <div className="flex justify-end gap-2">
                                             {isTrashed ? (
                                                 <>
-                                                    {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />}
-                                                    {canDelete && <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />}
+                                                    {canRestore && <RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />}
+                                                    {canDelete && <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />}
                                                 </>
                                             ) : (
                                                 <>
-                                                    {canEdit && <MdModeEdit onClick={() => router.push(`/admin/high-rto/update?id=${item.id}`)} className="cursor-pointer text-3xl" />}
-                                                    {canSoftDelete && <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />}
+                                                    {canEdit && <Pencil onClick={() => router.push(`/admin/high-rto/update?id=${item.id}`)} className="cursor-pointer text-3xl" />}
+                                                    {canSoftDelete && (
+                                                        <div className="relative group inline-block">
+                                                            <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />
+                                                            <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                Soft Delete
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    {canDelete && (
+                                                        <div className="relative group inline-block">
+
+                                                            <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl text-red-500" />
+                                                            <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                Permanent Delete
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                 </>
                                             )}
                                         </div>

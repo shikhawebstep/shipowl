@@ -4,14 +4,23 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import { useRouter } from 'next/navigation';
 import HashLoader from "react-spinners/HashLoader";
+import { IoFilterSharp } from "react-icons/io5";
 export default function List() {
-    const { verifyAdminAuth ,isAdminStaff,extractedPermissions} = useAdmin();
+    const { verifyAdminAuth, isAdminStaff, extractedPermissions } = useAdmin();
     const router = useRouter();
     const [modalVisible, setModalVisible] = useState(false);
     const [emails, setEmails] = useState([]);
     const [selectedDescription, setSelectedDescription] = useState('');
     const [loading, setLoading] = useState(null);
-   const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+    const [panelFilter, setPanelFilter] = useState('');
+    const [moduleFilter, setModuleFilter] = useState('');
+    const [actionFilter, setActionFilter] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+    const [subjectFilter, setSubjectFilter] = useState('');
+    const [activeFilter, setActiveFilter] = useState(null);
+
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
 
     const hasPermission = (action) =>
         !shouldCheckPermissions ||
@@ -166,22 +175,124 @@ export default function List() {
 
     return (
         <>
-            <h2 className='text-center text-2xl font-bold py-4'>Email Settings</h2>
+
             {loading ? (
                 <div className="flex justify-center items-center h-96">
                     <HashLoader color="orange" />
                 </div>
             ) : (
                 <div className="overflow-x-auto p-4 bg-white main-outer-wrapper  rounded-xl shadow border border-gray-200">
+                    <div className="flex justify-between items-center">
+                        <h2 className='text-center text-2xl font-bold py-4'>Email Settings</h2>
+                        <button
+                            onClick={() => {
+                                setPanelFilter('');
+                                setModuleFilter('');
+                                setActionFilter('');
+                                setStatusFilter('');
+                                setSubjectFilter('');
+
+                                if (window.$.fn.DataTable.isDataTable('#emailTable')) {
+                                    const table = window.$('#emailTable').DataTable();
+                                    table.columns().search('').draw();
+                                }
+                            }}
+                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                        >
+                            Clear All Filters
+                        </button>
+
+                    </div>
+
                     <table className="w-full main-tables text-sm text-left text-gray-700" id="emailTable">
                         <thead className="text-xs uppercase text-gray-700">
                             <tr className="border-b border-gray-200">
                                 <th className="px-6 py-3 whitespace-nowrap">SR.</th>
-                                <th className="px-6 py-3 whitespace-nowrap">Panel</th>
-                                <th className="px-6 py-3 whitespace-nowrap">Module</th>
-                                <th className="px-6 py-3 whitespace-nowrap">Action</th>
-                                <th className="px-6 py-3 whitespace-nowrap">Status</th>
-                                <th className="px-6 py-3 whitespace-nowrap">Subject</th>
+                                <th className="px-6 py-3 whitespace-nowrap">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'panel',
+                                                label: 'Panel',
+                                                setValue: setPanelFilter,
+                                                getValue: () => panelFilter,
+                                                columnIndex: 1,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Panel <IoFilterSharp />
+                                    </button>
+                                </th>
+                                <th className="px-6 py-3 whitespace-nowrap">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'module',
+                                                label: 'Module',
+                                                setValue: setModuleFilter,
+                                                getValue: () => moduleFilter,
+                                                columnIndex: 2,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Module <IoFilterSharp />
+                                    </button>
+                                </th>
+                                <th className="px-6 py-3 whitespace-nowrap">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'action',
+                                                label: 'Action',
+                                                setValue: setActionFilter,
+                                                getValue: () => actionFilter,
+                                                columnIndex: 3,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Action <IoFilterSharp />
+                                    </button>
+                                </th>
+                                <th className="px-6 py-3 whitespace-nowrap">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'status',
+                                                label: 'Status',
+                                                setValue: setStatusFilter,
+                                                getValue: () => statusFilter,
+                                                columnIndex: 4,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Status <IoFilterSharp />
+                                    </button>
+                                </th>
+                                <th className="px-6 py-3 whitespace-nowrap">
+                                    <button
+                                        onClick={(e) =>
+                                            setActiveFilter({
+                                                key: 'subject',
+                                                label: 'Subject',
+                                                setValue: setSubjectFilter,
+                                                getValue: () => subjectFilter,
+                                                columnIndex: 5,
+                                                position: e.currentTarget.getBoundingClientRect(),
+                                            })
+                                        }
+                                        className="flex items-center gap-2 uppercase"
+                                    >
+                                        Subject <IoFilterSharp />
+                                    </button>
+                                </th>
                                 <th className="px-6 py-3 whitespace-nowrap">Body</th>
                                 <th className="px-6 py-3 whitespace-nowrap">To Mails</th>
                                 <th className="px-6 py-3 whitespace-nowrap">CC Mail</th>
@@ -225,14 +336,93 @@ export default function List() {
                                         {
                                             canEdit && <button className="text-indigo-600 hover:underline" onClick={() => handleEdit(item.id)}>Edit</button>
                                         }
-                                        
+
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
 
-                    {/* Model */}
+                    {activeFilter && (
+                        <div
+                            className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                            style={{
+                                top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                                left: activeFilter.position.left + 'px',
+                            }}
+                        >
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="text-sm font-medium text-gray-700">{activeFilter.label}</label>
+                                <button
+                                    onClick={() => {
+                                        activeFilter.setValue('');
+                                        setActiveFilter(null);
+                                        if (window.$.fn.DataTable.isDataTable('#emailTable')) {
+                                            window.$('#emailTable').DataTable().column(activeFilter.columnIndex).search('').draw();
+                                        }
+                                    }}
+                                    className="text-red-500 text-xs hover:underline"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+
+                            <input
+                                type="text"
+                                value={
+                                    activeFilter.key === 'panel' ? panelFilter :
+                                        activeFilter.key === 'module' ? moduleFilter :
+                                            activeFilter.key === 'action' ? actionFilter :
+                                                activeFilter.key === 'status' ? statusFilter :
+                                                    activeFilter.key === 'subject' ? subjectFilter :
+                                                        ''
+                                }
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (activeFilter.key === 'panel') setPanelFilter(val);
+                                    if (activeFilter.key === 'module') setModuleFilter(val);
+                                    if (activeFilter.key === 'action') setActionFilter(val);
+                                    if (activeFilter.key === 'status') setStatusFilter(val);
+                                    if (activeFilter.key === 'subject') setSubjectFilter(val);
+                                }}
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                                placeholder={`Enter ${activeFilter.label}`}
+                            />
+
+                            <div className="flex justify-between mt-4">
+                                <button
+                                    onClick={() => setActiveFilter(null)}
+                                    className="text-sm text-gray-500 hover:underline"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        const filterValue =
+                                            activeFilter.key === 'panel' ? panelFilter :
+                                                activeFilter.key === 'module' ? moduleFilter :
+                                                    activeFilter.key === 'action' ? actionFilter :
+                                                        activeFilter.key === 'status' ? statusFilter :
+                                                            activeFilter.key === 'subject' ? subjectFilter :
+                                                                '';
+
+                                        if (window.$.fn.DataTable.isDataTable('#emailTable')) {
+                                            window.$('#emailTable')
+                                                .DataTable()
+                                                .column(activeFilter.columnIndex)
+                                                .search(filterValue)
+                                                .draw();
+                                        }
+                                        setActiveFilter(null);
+                                    }}
+                                    className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                                >
+                                    Apply
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {modalVisible && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                             <div className="bg-white w-[90%] max-w-2xl rounded-lg shadow-lg overflow-y-auto max-h-[90vh] relative">

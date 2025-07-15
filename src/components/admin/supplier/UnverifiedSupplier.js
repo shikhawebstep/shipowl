@@ -4,13 +4,22 @@ import React, { useEffect, useCallback, useState } from 'react'
 import Swal from 'sweetalert2';
 import HashLoader from "react-spinners/HashLoader";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-
+import { IoFilterSharp } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa";
 export default function UnverifiedSupplier() {
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(null);
   const router = useRouter();
   const [selected, setSelected] = useState([]);
+  const [nameFilter, setNameFilter] = useState('');
+  const [emailFilter, setEmailFilter] = useState('');
+  const [currentAddressFilter, setCurrentAddressFilter] = useState('');
+  const [permanentAddressFilter, setPermanentAddressFilter] = useState('');
+  const [countryFilter, setCountryFilter] = useState('');
+  const [stateFilter, setStateFilter] = useState('');
+  const [cityFilter, setCityFilter] = useState('');
+  const [emailVerificationFilter, setEmailVerificationFilter] = useState('');
+  const [activeFilter, setActiveFilter] = useState(null);
 
   const handleCheckboxChange = (id) => {
     setSelected((prev) =>
@@ -223,24 +232,271 @@ export default function UnverifiedSupplier() {
   return (
     <>
       <div className='bg-white p-4 rounded-md'>
-        <h2 className='md:text-3xl text-center py-4 font-bold text-orange-500'>Unverified Suppliers List</h2>
+        <div className="flex justify-between items-center">
+          <h2 className='md:text-3xl text-center py-4 font-bold text-orange-500'>Unverified Suppliers List</h2>
+          <button
+            onClick={() => {
+              setNameFilter('');
+              setEmailFilter('');
+              setCurrentAddressFilter('');
+              setPermanentAddressFilter('');
+              setCountryFilter('');
+              setStateFilter('');
+              setCityFilter('');
+              setEmailVerificationFilter('');
+              if ($.fn.DataTable.isDataTable('#unverifiedSupplierTable')) {
+                $('#unverifiedSupplierTable').DataTable().columns().search('').draw();
+              }
+            }}
+            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+          >
+            Clear All Filters
+          </button>
+
+        </div>
+         {activeFilter && (
+              <div
+                className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+                style={{
+                  top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+                  left: activeFilter.position.left + 'px',
+                }}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-medium text-gray-700">{activeFilter.label}</label>
+                  <button
+                    onClick={() => {
+                      activeFilter.setValue('');
+                      setActiveFilter(null);
+                      if ($.fn.DataTable.isDataTable('#unverifiedSupplierTable')) {
+                        $('#unverifiedSupplierTable').DataTable().column(activeFilter.columnIndex).search('').draw();
+                      }
+                    }}
+                    className="text-red-500 text-xs hover:underline"
+                  >
+                    Reset
+                  </button>
+                </div>
+
+                <input
+                  type="text"
+                  value={
+                    activeFilter.key === 'name' ? nameFilter :
+                      activeFilter.key === 'email' ? emailFilter :
+                        activeFilter.key === 'currentAddress' ? currentAddressFilter :
+                          activeFilter.key === 'permanentAddress' ? permanentAddressFilter :
+                            activeFilter.key === 'country' ? countryFilter :
+                              activeFilter.key === 'state' ? stateFilter :
+                                activeFilter.key === 'city' ? cityFilter :
+                                  activeFilter.key === 'emailVerification' ? emailVerificationFilter : ''
+                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (activeFilter.key === 'name') setNameFilter(val);
+                    if (activeFilter.key === 'email') setEmailFilter(val);
+                    if (activeFilter.key === 'currentAddress') setCurrentAddressFilter(val);
+                    if (activeFilter.key === 'permanentAddress') setPermanentAddressFilter(val);
+                    if (activeFilter.key === 'country') setCountryFilter(val);
+                    if (activeFilter.key === 'state') setStateFilter(val);
+                    if (activeFilter.key === 'city') setCityFilter(val);
+                    if (activeFilter.key === 'emailVerification') setEmailVerificationFilter(val);
+                  }}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+                  placeholder={`Enter ${activeFilter.label}`}
+                />
+
+                <div className="flex justify-between mt-4">
+                  <button
+                    onClick={() => setActiveFilter(null)}
+                    className="text-sm text-gray-500 hover:underline"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      const filterValue =
+                        activeFilter.key === 'name' ? nameFilter :
+                        activeFilter.key === 'email' ? emailFilter :
+                        activeFilter.key === 'currentAddress' ? currentAddressFilter :
+                        activeFilter.key === 'permanentAddress' ? permanentAddressFilter :
+                        activeFilter.key === 'country' ? countryFilter :
+                        activeFilter.key === 'state' ? stateFilter :
+                        activeFilter.key === 'city' ? cityFilter :
+                        activeFilter.key === 'emailVerification' ? emailVerificationFilter : '';
+
+                      if ($.fn.DataTable.isDataTable('#unverifiedSupplierTable')) {
+                        $('#unverifiedSupplierTable').DataTable().column(activeFilter.columnIndex).search(filterValue).draw();
+                      }
+                      setActiveFilter(null);
+                    }}
+                    className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+            )}
+
         {suppliers.length > 0 ? (
           <div className="overflow-x-auto w-full relative main-outer-wrapper">
+
+           
+
             <table className="display main-tables w-full" id="unverifiedSupplierTable">
+
+
               <thead>
                 <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                   <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Sr.</th>
-                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Name</th>
-                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Email</th>
-                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Current Address</th>
-                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Permanent Address</th>
-                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Country</th>
-                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">State</th>
-                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">City</th>
-                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Email Verification</th>
+
+                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">
+                    <button
+                      onClick={(e) =>
+                        setActiveFilter({
+                          key: 'name',
+                          label: 'Name',
+                          setValue: setNameFilter,
+                          getValue: () => nameFilter,
+                          columnIndex: 1,
+                          position: e.currentTarget.getBoundingClientRect(),
+                        })
+                      }
+                      className="flex items-center gap-1"
+                    >
+                      Name <IoFilterSharp />
+                    </button>
+                  </th>
+
+                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">
+                    <button
+                      onClick={(e) =>
+                        setActiveFilter({
+                          key: 'email',
+                          label: 'Email',
+                          setValue: setEmailFilter,
+                          getValue: () => emailFilter,
+                          columnIndex: 2,
+                          position: e.currentTarget.getBoundingClientRect(),
+                        })
+                      }
+                      className="flex items-center gap-1"
+                    >
+                      Email <IoFilterSharp />
+                    </button>
+                  </th>
+
+                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">
+                    <button
+                      onClick={(e) =>
+                        setActiveFilter({
+                          key: 'currentAddress',
+                          label: 'Current Address',
+                          setValue: setCurrentAddressFilter,
+                          getValue: () => currentAddressFilter,
+                          columnIndex: 3,
+                          position: e.currentTarget.getBoundingClientRect(),
+                        })
+                      }
+                      className="flex items-center gap-1"
+                    >
+                      Current Address <IoFilterSharp />
+                    </button>
+                  </th>
+
+                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">
+                    <button
+                      onClick={(e) =>
+                        setActiveFilter({
+                          key: 'permanentAddress',
+                          label: 'Permanent Address',
+                          setValue: setPermanentAddressFilter,
+                          getValue: () => permanentAddressFilter,
+                          columnIndex: 4,
+                          position: e.currentTarget.getBoundingClientRect(),
+                        })
+                      }
+                      className="flex items-center gap-1"
+                    >
+                      Permanent Address <IoFilterSharp />
+                    </button>
+                  </th>
+
+                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">
+                    <button
+                      onClick={(e) =>
+                        setActiveFilter({
+                          key: 'country',
+                          label: 'Country',
+                          setValue: setCountryFilter,
+                          getValue: () => countryFilter,
+                          columnIndex: 5,
+                          position: e.currentTarget.getBoundingClientRect(),
+                        })
+                      }
+                      className="flex items-center gap-1"
+                    >
+                      Country <IoFilterSharp />
+                    </button>
+                  </th>
+
+                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">
+                    <button
+                      onClick={(e) =>
+                        setActiveFilter({
+                          key: 'state',
+                          label: 'State',
+                          setValue: setStateFilter,
+                          getValue: () => stateFilter,
+                          columnIndex: 6,
+                          position: e.currentTarget.getBoundingClientRect(),
+                        })
+                      }
+                      className="flex items-center gap-1"
+                    >
+                      State <IoFilterSharp />
+                    </button>
+                  </th>
+
+                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">
+                    <button
+                      onClick={(e) =>
+                        setActiveFilter({
+                          key: 'city',
+                          label: 'City',
+                          setValue: setCityFilter,
+                          getValue: () => cityFilter,
+                          columnIndex: 7,
+                          position: e.currentTarget.getBoundingClientRect(),
+                        })
+                      }
+                      className="flex items-center gap-1"
+                    >
+                      City <IoFilterSharp />
+                    </button>
+                  </th>
+
+                  <th className="p-3 px-4 text-left uppercase whitespace-nowrap">
+                    <button
+                      onClick={(e) =>
+                        setActiveFilter({
+                          key: 'emailVerification',
+                          label: 'Email Verification',
+                          setValue: setEmailVerificationFilter,
+                          getValue: () => emailVerificationFilter,
+                          columnIndex: 8,
+                          position: e.currentTarget.getBoundingClientRect(),
+                        })
+                      }
+                      className="flex items-center gap-1"
+                    >
+                      Email Verification <IoFilterSharp />
+                    </button>
+                  </th>
+
                   <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Action</th>
                 </tr>
               </thead>
+
               <tbody>
                 {suppliers.map((item, index) => {
                   return (

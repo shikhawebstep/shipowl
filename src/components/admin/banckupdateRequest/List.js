@@ -193,7 +193,13 @@ function List() {
         );
     }
 
-
+ if(requests.length== 0){
+         return (
+            <div className="flex items-center justify-center h-[80vh]">
+              <p className="font-bold">No Bank Requests Found</p>
+            </div>
+        );
+    }
     return (
         <div className="p-4">
             <div className="flex items-center justify-between my-4">

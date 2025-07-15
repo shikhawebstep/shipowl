@@ -158,11 +158,15 @@ export default function List() {
                 </div>
             ) : (
                 <div className="bg-white rounded-3xl p-5 main-outer-wrapper">
-                    <div className="grid grid-cols-2 border border-[#E9EDF7] rounded-md p-3 justify-between items-center mb-4">
+                    <div className="flex border border-[#E9EDF7] rounded-md p-3 justify-between items-center mb-4">
                         <h2 className="md:text-2xl font-bold text-[#2B3674]">
                             {isTrashed ? "Trashed Category List" : "Category List"}
                         </h2>
+
                         <div className="flex gap-3  items-center">
+                            {selected.length > 0 && (
+                                <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                            )}
                             <div className="md:flex w-full justify-end gap-2">
                                 <button
                                     onClick={handleClearFilters}
@@ -296,7 +300,7 @@ export default function List() {
                                         <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
                                             <button
                                                 onClick={() => setShowDescriptionFilter(!showDescriptionFilter)}
-                                                className="flex gap-2 items-center"
+                                                className="flex gap-2 items-center uppercase"
                                             >
                                                 Description <IoFilterSharp className="w-4 h-4" />
                                             </button>
@@ -365,7 +369,7 @@ export default function List() {
                                         <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
                                             <button
                                                 onClick={() => setShowStatusFilter(!showStatusFilter)}
-                                                className="flex gap-2 items-center"
+                                                className="flex gap-2 items-center uppercase"
                                             >
                                                 Status <IoFilterSharp className="w-4 h-4" />
                                             </button>
@@ -518,9 +522,16 @@ export default function List() {
                                                                 {canRestore && <RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-2xl text-green-500" />
                                                                 }
                                                                 {canDelete && (
-                                                                    <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl" />
-                                                                )
-                                                                }
+                                                                    <div className="relative group inline-block">
+                                                                        <Trash2
+                                                                            onClick={() => handleDestroy(item.id)}
+                                                                            className="cursor-pointer text-2xl text-red-600"
+                                                                        />
+                                                                        <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                            Permanent Delete
+                                                                        </span>
+                                                                    </div>
+                                                                )}
 
                                                             </>
                                                         ) : (
@@ -534,12 +545,32 @@ export default function List() {
                                                                     />
 
                                                                 )}
-                                                                {
-                                                                    canSoftDelete && <Trash2
-                                                                        onClick={() => handleSoftDelete(item.id)}
-                                                                        className="cursor-pointer text-2xl"
-                                                                    />
-                                                                }
+                                                                {canSoftDelete && (
+                                                                    <div className="relative group inline-block">
+                                                                        <Trash2
+                                                                            onClick={() => handleSoftDelete(item.id)}
+                                                                            className="cursor-pointer text-2xl"
+                                                                        />
+                                                                        <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                            Soft Delete
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+
+                                                                {canDelete && (
+                                                                    <div className="relative group inline-block">
+                                                                        <Trash2
+                                                                            onClick={() => handleDestroy(item.id)}
+                                                                            className="cursor-pointer text-2xl text-red-600"
+                                                                        />
+                                                                        <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                            Permanent Delete
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+
+
+
 
                                                             </>
                                                         )}

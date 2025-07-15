@@ -1,22 +1,18 @@
 "use client";
-import { useContext, useEffect, useCallback, useState } from "react";
-import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
-import { MoreHorizontal } from "lucide-react";
+import { useEffect, useCallback, useState } from "react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
-import { AiOutlineDelete } from "react-icons/ai";
 import HashLoader from "react-spinners/HashLoader";
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-
+import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
 import { IoFilterSharp } from "react-icons/io5";
 export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isTrashed, setIsTrashed] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [selected, setSelected] = useState([]);
     const [countryData, setCountryData] = useState([]);
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const router = useRouter();
@@ -27,7 +23,8 @@ export default function List() {
     const [currencyFilter, setCurrencyFilter] = useState('');
     const [nationalityFilter, setNationalityFilter] = useState('');
     const [activeFilter, setActiveFilter] = useState(null);
-
+    
+    const [selected, setSelected] = useState([]);
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -558,29 +555,32 @@ export default function List() {
                                     </div>
                                 )}
                             </button>
-                            <div className="md:flex hidden justify-end gap-2">
-                                <button
-                                    onClick={() => {
-                                        setNameFilter('');
-                                        setIso2Filter('');
-                                        setIso3Filter('');
-                                        setPhoneCodeFilter('');
-                                        setCurrencyFilter('');
-                                        setNationalityFilter('');
-                                        setActiveFilter(null);
+                            <button
+                                onClick={() => {
+                                    setNameFilter('');
+                                    setIso2Filter('');
+                                    setIso3Filter('');
+                                    setPhoneCodeFilter('');
+                                    setCurrencyFilter('');
+                                    setNationalityFilter('');
+                                    setActiveFilter(null);
 
-                                        if ($.fn.DataTable.isDataTable('#countryTable')) {
-                                            const table = $('#countryTable').DataTable();
-                                            table.search('').columns().search('').draw();
-                                        }
-                                    }}
-                                    className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
-                                >
-                                    Clear All Filters
-                                </button>
+                                    if ($.fn.DataTable.isDataTable('#countryTable')) {
+                                        const table = $('#countryTable').DataTable();
+                                        table.search('').columns().search('').draw();
+                                    }
+                                }}
+                                className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                            >
+                                Clear All Filters
+                            </button>
+                            {selected.length > 0 && (
+                                <button onClick={handleBulkDelete} className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                            )}
+                            <div className="md:flex hidden items-center justify-end gap-2">
 
                                 {canViewTrashed && <button
-                                    className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                                    className={`p-3 py-2 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                     onClick={async () => {
                                         if (isTrashed) {
                                             setIsTrashed(false);
@@ -871,7 +871,7 @@ export default function List() {
                                             </td>
                                             <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.iso2}</td>
                                             <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.iso3}</td>
-                                            <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.phonecode}</td>
+                                            <td className="p-2 bg-transparent text-left whitespace-nowrap px-5 border-0">{item.phonecode}</td>
                                             <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.currency}</td>
                                             <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.nationality}</td>
 
@@ -879,13 +879,30 @@ export default function List() {
                                                 <div className="flex justify-center gap-2">
                                                     {isTrashed ? (
                                                         <>
-                                                            {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
-                                                            {canDelete && <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
+                                                            {canRestore && <RotateCcw onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
+                                                            {canDelete && <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl text-red-500" />}
                                                         </>
                                                     ) : (
                                                         <>
-                                                            {canEdit && <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
-                                                            {canSoftDelete && <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />}
+                                                            {canEdit && <Pencil onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
+                                                            {canSoftDelete && (
+                                                                <div className="relative group inline-block">
+                                                                    <Trash2 onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
+                                                                    <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                        Soft Delete
+                                                                    </span>
+                                                                </div>
+                                                            )}
+
+                                                            {canDelete && (
+                                                                <div className="relative group inline-block">
+
+                                                                    <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl text-red-500" />
+                                                                    <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                        Permanent Delete
+                                                                    </span>
+                                                                </div>
+                                                            )}
                                                         </>
                                                     )}
                                                 </div>

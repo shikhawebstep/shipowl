@@ -1,10 +1,7 @@
 "use client";
-import { useContext, useEffect, useCallback, useState } from "react";
-import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
-import { MoreHorizontal } from "lucide-react";
-import Link from "next/link";
+import { useEffect, useCallback, useState } from "react";
+   import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
-import { AiOutlineDelete } from "react-icons/ai";
 import HashLoader from "react-spinners/HashLoader";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
@@ -484,6 +481,7 @@ export default function List() {
         setStateFilter('');
         setCountryFilter('');
         setActiveFilter(null);
+        setSelected('')
 
         if (typeof window !== 'undefined' && window.$ && window.$.fn.DataTable.isDataTable('#citytable')) {
             const table = window.$('#citytable').DataTable();
@@ -567,17 +565,20 @@ export default function List() {
                                     </div>
                                 )}
                             </button>
-                            <div className="md:flex hidden justify-end gap-2">
-                                <button
-                                    onClick={handleClearFilters}
-                                    className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
-                                >
-                                    Clear Filters
-                                </button>
+                            <button
+                                onClick={handleClearFilters}
+                                className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                            >
+                                Clear Filters
+                            </button>
+                            {selected.length > 0 && (
+                                <button onClick={handleBulkDelete} className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                            )}
+                            <div className="md:flex hidden items-center justify-end gap-2">
 
                                 {canViewTrashed && (
                                     <button
-                                        className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                                        className={`p-3 py-2 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                         onClick={async () => {
                                             if (isTrashed) {
                                                 setIsTrashed(false);
@@ -669,7 +670,7 @@ export default function List() {
                                 <button
                                     onClick={() => {
                                         const filterValue =
-                                        activeFilter.key === 'city'
+                                            activeFilter.key === 'city'
                                                 ? cityFilter
                                                 : activeFilter.key === 'state'
                                                     ? stateFilter
@@ -823,13 +824,30 @@ export default function List() {
                                                     <div className="flex justify-center gap-2">
                                                         {isTrashed ? (
                                                             <>
-                                                                {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
-                                                                {canDelete && <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
+                                                                {canRestore && <RotateCcw onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
+                                                                {canDelete && <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
                                                             </>
                                                         ) : (
                                                             <>
-                                                                {canEdit && <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
-                                                                {canSoftDelete && <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />}
+                                                                {canEdit && <Pencil onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
+                                                                {canSoftDelete && (
+                                                                    <div className="relative group inline-block">
+                                                                        <Trash2 onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
+                                                                        <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                            Soft Delete
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+
+                                                                {canDelete && (
+                                                                    <div className="relative group inline-block">
+
+                                                                        <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl text-red-700" />
+                                                                        <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                            Permanent Delete
+                                                                        </span>
+                                                                    </div>
+                                                                )}
                                                             </>
                                                         )}
                                                     </div>

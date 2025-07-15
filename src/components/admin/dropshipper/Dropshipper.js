@@ -4,11 +4,9 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
 import React, { useState, useEffect, useContext } from "react";
-import { MoreHorizontal } from "lucide-react";
+import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
-import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
-import { AiOutlineDelete } from "react-icons/ai";
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import { useAdminActions } from '@/components/commonfunctions/MainContext';
 import { DropshipperProfileContext } from './DropshipperProfileContext';
@@ -268,23 +266,28 @@ const Dropshipper = () => {
                             </div>
                         )}
                     </button>
-                    <div className="md:flex hidden justify-end gap-2">
-                        <button
-                            onClick={() => {
-                                setNameFilter('');
-                                setEmailFilter('');
-                                setAddressFilter('');
-                                setActiveFilter(null);
+                    <button
+                        onClick={() => {
+                            setNameFilter('');
+                            setEmailFilter('');
+                            setAddressFilter('');
+                            setActiveFilter(null);
 
-                                if ($.fn.DataTable.isDataTable('#dropshipperTable')) {
-                                    const table = $('#dropshipperTable').DataTable();
-                                    table.search('').columns().search('').draw();
-                                }
-                            }}
-                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
-                        >
-                            Clear Filters
-                        </button>
+                            if ($.fn.DataTable.isDataTable('#dropshipperTable')) {
+                                const table = $('#dropshipperTable').DataTable();
+                                table.search('').columns().search('').draw();
+                            }
+                        }}
+                        className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                    >
+                        Clear Filters
+                    </button>
+                    {selected.length > 0 && (
+                        <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                    )}
+
+
+                    <div className="md:flex hidden justify-end gap-2">
 
                         {canAdd && (
                             <button onClick={setActiveTab('account_details')} className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
@@ -508,17 +511,34 @@ const Dropshipper = () => {
                                             <td className="p-3 px-4 text-center">
                                                 <div className="flex gap-2"> {isTrashed ? (
                                                     <>
-                                                        {canRestore && (<MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />)}
-                                                        {canDelete && (<AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />)}
+                                                        {canRestore && (<RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />)}
+                                                        {canDelete && (<Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />)}
                                                     </>
                                                 ) : (
                                                     <>
-                                                        {canEdit && (<MdModeEdit onClick={() => {
+                                                        {canEdit && (<Pencil onClick={() => {
                                                             router.push(`/admin/dropshipper/update?id=${item.id}`);
                                                             setActiveTab('account_details');
                                                         }
                                                         } className="cursor-pointer text-3xl" />)}
-                                                        {canSoftDelete && (<AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />)}
+                                                        {canSoftDelete && (
+                                                            <div className="relative group inline-block">
+                                                                <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />
+                                                                <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                    Soft Delete
+                                                                </span>
+                                                            </div>
+                                                        )}
+
+                                                        {canDelete && (
+                                                            <div className="relative group inline-block">
+
+                                                                <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl text-red-500" />
+                                                                <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                    Permanent Delete
+                                                                </span>
+                                                            </div>
+                                                        )}
                                                     </>
                                                 )}</div>
                                             </td>

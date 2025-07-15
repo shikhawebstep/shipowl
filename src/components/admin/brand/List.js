@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { FaCheck } from "react-icons/fa";
 import Image from "next/image";
 import HashLoader from "react-spinners/HashLoader";
 import { useRouter } from "next/navigation";
@@ -14,6 +12,7 @@ import 'swiper/css/navigation';
 import { IoFilterSharp } from "react-icons/io5";
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useAdminActions } from "@/components/commonfunctions/MainContext";
+import { FaCheck } from "react-icons/fa";
 import { BadgePlus, Trash2, RotateCcw, Pencil } from "lucide-react";
 import { useImageURL } from "@/components/ImageURLContext";
 
@@ -21,7 +20,7 @@ export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isTrashed, setIsTrashed] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [selected, setSelected] = useState([]);
+
 
     const [brandData, setBrandData] = useState([]);
     const [brandName, setBrandName] = useState('');
@@ -46,7 +45,7 @@ export default function List() {
         };
         fetchInitialData();
     }, [fetchAll]);
-
+    const [selected, setSelected] = useState([]);
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -70,6 +69,7 @@ export default function List() {
         setBrandName('');
         setDescriptionFilter('');
         setStatusFilter('');
+        setActiveFilter(null)
         if ($.fn.DataTable.isDataTable("#brandTable")) {
             const table = $("#brandTable").DataTable();
             table.search('').columns().search('').draw();
@@ -152,6 +152,9 @@ export default function List() {
                             {isTrashed ? "Trashed Brand List" : "Brand List"}
                         </h2>
                         <div className="flex gap-2 items-center">
+                            {selected.length > 0 && (
+                                <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                            )}
                             <button
                                 onClick={handleClearFilters}
                                 className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
@@ -160,14 +163,14 @@ export default function List() {
                             </button>
                             {canViewTrashed && (
                                 <button
-                                    className={`text-sm px-4 py-2 flex items-center gap-2 uppercase rounded-md text-white ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                    className={`text-sm px-4 py-2 flex items-center gap-2  rounded-md text-white ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                                     onClick={handleToggleTrash}
                                 >
                                     <Trash2 size={16} /> {isTrashed ? "Brand Listing" : "Trashed Brand"}
                                 </button>
                             )}
                             {canAdd && (
-                                <Link href="/admin/brand/create" className="bg-[#4285F4] text-white px-4 py-2 rounded-md text-sm flex items-center gap-2 uppercase">
+                                <Link href="/admin/brand/create" className="bg-[#4285F4] text-white px-4 py-2 rounded-md text-sm flex items-center gap-2 ">
                                     <BadgePlus size={16} /> Add Brand
                                 </Link>
                             )}
@@ -375,7 +378,24 @@ export default function List() {
                                                 ) : (
                                                     <>
                                                         {canEdit && <Pencil onClick={() => router.push(`/admin/brand/update?id=${item.id}`)} className="cursor-pointer text-2xl" />}
-                                                        {canSoftDelete && <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-2xl" />}
+                                                        {canSoftDelete && (
+                                                            <div className="relative group inline-block">
+                                                                <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-2xl" />
+                                                                <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                    Soft Delete
+                                                                </span>
+                                                            </div>
+                                                        )}
+
+                                                        {canDelete && (
+                                                            <div className="relative group inline-block">
+
+                                                                <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-red-500 text-2xl" />
+                                                                <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                    Permanent Delete
+                                                                </span>
+                                                            </div>
+                                                        )}
                                                     </>
                                                 )}</div>
                                             </td>

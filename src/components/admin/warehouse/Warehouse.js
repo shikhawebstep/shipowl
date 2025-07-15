@@ -1,24 +1,29 @@
 
 "use client"
 import { useState, useCallback, useEffect } from 'react'
-import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
-import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import HashLoader from "react-spinners/HashLoader";
-import { AiOutlineDelete } from "react-icons/ai";
 import Swal from 'sweetalert2';
 import Link from 'next/link';
 import { FaCheck } from "react-icons/fa"; // FontAwesome Check icon
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
+import { IoFilterSharp } from "react-icons/io5";
+import { BadgePlus, Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
 export default function Warehouse() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isTrashed, setIsTrashed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState([]);
   const [WarehouseData, setWarehouseData] = useState([]);
-  const { verifyAdminAuth, fetchSupplier, suppliers ,isAdminStaff,extractedPermissions} = useAdmin();
+  const { verifyAdminAuth, fetchSupplier, suppliers, isAdminStaff, extractedPermissions } = useAdmin();
   const router = useRouter();
+  const [warehouseNameFilter, setWarehouseNameFilter] = useState('');
+  const [contactNameFilter, setContactNameFilter] = useState('');
+  const [addressFilter, setAddressFilter] = useState('');
+  const [pickupAddressFilter, setPickupAddressFilter] = useState('');
+  const [rtoAddressFilter, setRtoAddressFilter] = useState('');
+  const [activeFilter, setActiveFilter] = useState(null);
 
   const handleCheckboxChange = (id) => {
     setSelected((prev) =>
@@ -165,8 +170,16 @@ export default function Warehouse() {
           $('#warehouseTable').empty();
         }
 
-        // Reinitialize DataTable with new data
-        table = $('#warehouseTable').DataTable();
+        const isMobile = window.innerWidth <= 768;
+        const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+        table = $('#warehouseTable').DataTable({
+          pagingType,
+          language: {
+            paginate: { previous: "<", next: ">" }
+          }
+        });
+
 
         return () => {
           if (table) {
@@ -531,6 +544,26 @@ export default function Warehouse() {
                     )}
                   </button>
                   <div className="flex justify-end gap-2">
+                    {selected.length > 0 && (
+                      <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setWarehouseNameFilter('');
+                        setContactNameFilter('');
+                        setAddressFilter('');
+                        setPickupAddressFilter('');
+                        setRtoAddressFilter('');
+                        setActiveFilter(null)
+                        if ($.fn.DataTable.isDataTable('#warehouseTable')) {
+                          $('#warehouseTable').DataTable().columns().search('').draw();
+                        }
+                      }}
+                      className="text-sm bg-gray-200 hover:bg-gray-300 border px-4 py-2 rounded"
+                    >
+                      Clear All Filters
+                    </button>
+
                     {canViewTrashed && <button
                       className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                       onClick={async () => {
@@ -553,14 +586,100 @@ export default function Warehouse() {
                   <table className="md:w-full w-auto display main-tables" id="warehouseTable">
                     <thead>
                       <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Warehouse Name</th>
-                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Name</th>
-                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Address</th>
-                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Pickup Address</th>
-                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">RTO Address</th>
+                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                          <button
+                            onClick={(e) =>
+                              setActiveFilter({
+                                key: 'warehouse',
+                                label: 'Warehouse Name',
+                                setValue: setWarehouseNameFilter,
+                                getValue: () => warehouseNameFilter,
+                                columnIndex: 0,
+                                position: e.currentTarget.getBoundingClientRect(),
+                              })
+                            }
+                            className="flex items-center gap-2 uppercase"
+                          >
+                            Warehouse Name <IoFilterSharp />
+                          </button>
+                        </th>
+
+                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                          <button
+                            onClick={(e) =>
+                              setActiveFilter({
+                                key: 'contact',
+                                label: 'Contact Name',
+                                setValue: setContactNameFilter,
+                                getValue: () => contactNameFilter,
+                                columnIndex: 1,
+                                position: e.currentTarget.getBoundingClientRect(),
+                              })
+                            }
+                            className="flex items-center gap-2 uppercase"
+                          >
+                            Contact Name <IoFilterSharp />
+                          </button>
+                        </th>
+
+                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                          <button
+                            onClick={(e) =>
+                              setActiveFilter({
+                                key: 'address',
+                                label: 'Address',
+                                setValue: setAddressFilter,
+                                getValue: () => addressFilter,
+                                columnIndex: 2,
+                                position: e.currentTarget.getBoundingClientRect(),
+                              })
+                            }
+                            className="flex items-center gap-2 uppercase"
+                          >
+                            Address <IoFilterSharp />
+                          </button>
+                        </th>
+
+                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                          <button
+                            onClick={(e) =>
+                              setActiveFilter({
+                                key: 'pickup',
+                                label: 'Pickup Address',
+                                setValue: setPickupAddressFilter,
+                                getValue: () => pickupAddressFilter,
+                                columnIndex: 3,
+                                position: e.currentTarget.getBoundingClientRect(),
+                              })
+                            }
+                            className="flex items-center gap-2 uppercase"
+                          >
+                            Pickup Address <IoFilterSharp />
+                          </button>
+                        </th>
+
+                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase relative">
+                          <button
+                            onClick={(e) =>
+                              setActiveFilter({
+                                key: 'rto',
+                                label: 'RTO Address',
+                                setValue: setRtoAddressFilter,
+                                getValue: () => rtoAddressFilter,
+                                columnIndex: 4,
+                                position: e.currentTarget.getBoundingClientRect(),
+                              })
+                            }
+                            className="flex items-center gap-2 uppercase"
+                          >
+                            RTO Address <IoFilterSharp />
+                          </button>
+                        </th>
+
                         <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Action</th>
                       </tr>
                     </thead>
+
                     <tbody>
                       {WarehouseData.map((item) => (
                         <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
@@ -639,13 +758,30 @@ export default function Warehouse() {
                             <div className="flex justify-center gap-2">
                               {isTrashed ? (
                                 <>
-                                  {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
-                                  {canDelete && <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
+                                  {canRestore && <RotateCcw onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
+                                  {canDelete && <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
                                 </>
                               ) : (
                                 <>
-                                  {canEdit && <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
-                                  {canSoftDelete && <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />}
+                                  {canEdit && <Pencil onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
+                                  {canSoftDelete && (
+                                    <div className="relative group inline-block">
+                                      <Trash2 onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
+                                      <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                        Soft Delete
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  {canDelete && (
+                                    <div className="relative group inline-block">
+
+                                      <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl text-red-500" />
+                                      <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                        Permanent Delete
+                                      </span>
+                                    </div>
+                                  )}
                                 </>
                               )}
                             </div>
@@ -663,6 +799,85 @@ export default function Warehouse() {
           </>
         )}
       </div>
+      {activeFilter && (
+        <div
+          className="fixed z-50 bg-white border rounded-xl shadow-lg p-4 w-64"
+          style={{
+            top: activeFilter.position.bottom + window.scrollY + 5 + 'px',
+            left: activeFilter.position.left + 'px',
+          }}
+        >
+          <div className="flex justify-between items-center mb-2">
+            <label className="text-sm font-medium text-gray-700">{activeFilter.label}</label>
+            <button
+              onClick={() => {
+                activeFilter.setValue('');
+                setActiveFilter(null);
+                if ($.fn.DataTable.isDataTable('#warehouseTable')) {
+                  $('#warehouseTable').DataTable().column(activeFilter.columnIndex).search('').draw();
+                }
+              }}
+              className="text-red-500 text-xs hover:underline"
+            >
+              Reset
+            </button>
+          </div>
+
+          <input
+            type="text"
+            value={
+              activeFilter.key === 'warehouse' ? warehouseNameFilter :
+                activeFilter.key === 'contact' ? contactNameFilter :
+                  activeFilter.key === 'address' ? addressFilter :
+                    activeFilter.key === 'pickup' ? pickupAddressFilter :
+                      activeFilter.key === 'rto' ? rtoAddressFilter :
+                        ''
+            }
+            onChange={(e) => {
+              const val = e.target.value;
+              if (activeFilter.key === 'warehouse') setWarehouseNameFilter(val);
+              if (activeFilter.key === 'contact') setContactNameFilter(val);
+              if (activeFilter.key === 'address') setAddressFilter(val);
+              if (activeFilter.key === 'pickup') setPickupAddressFilter(val);
+              if (activeFilter.key === 'rto') setRtoAddressFilter(val);
+            }}
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
+            placeholder={`Enter ${activeFilter.label}`}
+          />
+
+          <div className="flex justify-between mt-4">
+            <button
+              onClick={() => setActiveFilter(null)}
+              className="text-sm text-gray-500 hover:underline"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                const filterValue =
+                  activeFilter.key === 'warehouse' ? warehouseNameFilter :
+                    activeFilter.key === 'contact' ? contactNameFilter :
+                      activeFilter.key === 'address' ? addressFilter :
+                        activeFilter.key === 'pickup' ? pickupAddressFilter :
+                          activeFilter.key === 'rto' ? rtoAddressFilter : '';
+
+                if ($.fn.DataTable.isDataTable('#warehouseTable')) {
+                  $('#warehouseTable')
+                    .DataTable()
+                    .column(activeFilter.columnIndex)
+                    .search(filterValue)
+                    .draw();
+                }
+                setActiveFilter(null);
+              }}
+              className="text-sm bg-[#F98F5C] text-white px-3 py-1 rounded hover:bg-[#e27c4d]"
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      )}
+
     </>
   )
 }

@@ -1,9 +1,7 @@
 "use client";
 import { useEffect, useCallback, useState } from "react";
-import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
-import { MoreHorizontal } from "lucide-react";
-import Link from "next/link";
-import { AiOutlineDelete } from "react-icons/ai";
+  import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
+  import Link from "next/link";
 import HashLoader from "react-spinners/HashLoader";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
@@ -20,7 +18,12 @@ export default function List() {
     const [phoneFilter, setPhoneFilter] = useState('');
     const [activeFilter, setActiveFilter] = useState(null);
 
-
+    const [selected, setSelected] = useState([]);
+    const handleCheckboxChange = (id) => {
+        setSelected((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        );
+    };
     const handleClearAllFilters = () => {
         setNameFilter('');
         setEmailFilter('');
@@ -502,14 +505,17 @@ export default function List() {
                                 </div>
                             )}
                         </button>
-                        <div className="md:flex hidden justify-start gap-5 items-end">
-                            <button
-                                onClick={handleClearAllFilters}
-                                className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
+                        <button
+                            onClick={handleClearAllFilters}
+                            className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md"
 
-                            >
-                                Clear All Filters
-                            </button>
+                        >
+                            Clear All Filters
+                        </button>
+                        {selected.length > 0 && (
+                            <button className="bg-red-500 text-white p-2 rounded-md w-auto whitespace-nowrap">Delete Selected</button>
+                        )}
+                        <div className="md:flex hidden justify-start gap-5 items-end">
 
                             {canViewTrashed && <button
                                 className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
@@ -723,7 +729,20 @@ export default function List() {
                                     <tr key={item.id} className="border-b capitalize border-[#E9EDF7] text-[#2B3674] font-semibold">
 
                                         <td className="p-2 whitespace-nowrap text-left px-5">{index + 1}</td>
-                                        <td className="p-2 whitespace-nowrap px-5">{item.name || 'NIL'}</td>
+                                        <td className="p-2 whitespace-nowrap px-5"><div className="flex items-center">
+                                            <label className="flex items-center cursor-pointer me-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selected.includes(item.id)}
+                                                    onChange={() => handleCheckboxChange(item.id)}
+                                                    className="peer hidden"
+                                                />
+                                                <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                                    <FaCheck className="peer-checked:block text-white w-3 h-3" />
+                                                </div>
+                                            </label>
+                                            {item.name}
+                                        </div></td>
                                         <td className="p-2 whitespace-nowrap px-5">{item.email || 'NIL'}</td>
                                         <td className="p-2 whitespace-nowrap px-5">  {item.role ? item.role.replace(/_/g, ' ') : 'NIL'}</td>
                                         <td className="p-2 whitespace-nowrap px-5">{item.phoneNumber || 'NIL'}</td>
@@ -732,13 +751,30 @@ export default function List() {
 
                                             <div className="flex justify-end gap-2">{isTrashed ? (
                                                 <>
-                                                    {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
-                                                    {canDelete && <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
+                                                    {canRestore && <RotateCcw onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
+                                                    {canDelete && <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
                                                 </>
                                             ) : (
                                                 <>
-                                                    {canEdit && <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
-                                                    {canSoftDelete && <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />}
+                                                    {canEdit && <Pencil onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
+                                                    {canSoftDelete && (
+                                                        <div className="relative group inline-block">
+                                                            <Trash2 onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
+                                                            <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                Soft Delete
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    {canDelete && (
+                                                        <div className="relative group inline-block">
+
+                                                            <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl text-red-500" />
+                                                            <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                Permanent Delete
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                 </>
                                             )}</div>
 

@@ -663,7 +663,7 @@ const ProductTable = () => {
                                                     <div className="flex justify-center gap-2"> {isTrashed ? (
                                                         <>
                                                             {canRestore && <RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-2xl text-green-500" />}
-                                                            {canDelete && <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl" />}
+                                                            {canDelete && <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl text-red-500" />}
                                                         </>
                                                     ) : (
                                                         <>
@@ -671,7 +671,24 @@ const ProductTable = () => {
                                                                 setActiveTab('product-details')
                                                                 router.push(`/admin/products/update?id=${item.id}`)
                                                             }} className="cursor-pointer text-2xl" />}
-                                                            {canSoftDelete && <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-2xl" />}
+                                                               {canSoftDelete && (
+                                                                    <div className="relative group inline-block">
+                                                                      <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-2xl " />
+                                                                        <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-gray-800 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                            Soft Delete
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+
+                                                                {canDelete && (
+                                                                    <div className="relative group inline-block">
+                                                                        
+                                                                            <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl text-red-500" />
+                                                                        <span className="absolute bottom-full right-0 mb-1 hidden group-hover:block text-xs bg-red-700 text-white rounded px-2 py-1 whitespace-nowrap z-10">
+                                                                            Permanent Delete
+                                                                        </span>
+                                                                    </div>
+                                                                )}
                                                         </>
                                                     )}</div>
                                                 </td>
