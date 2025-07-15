@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
-import { getAllEmailConfig } from '@/app/models/admin/emailConfig';
+import { getAllTemplate } from '@/app/models/admin/emailConfig/template';
 import { fetchLogInfo } from '@/utils/commonUtils';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
     }
     
     // Fetch all mails
-    const mailsResult = await getAllEmailConfig();
+    const mailsResult = await getAllTemplate();
 
     if (mailsResult?.status) {
       return NextResponse.json(

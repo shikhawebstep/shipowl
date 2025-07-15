@@ -7,13 +7,6 @@ interface Mail {
     subject: string;
     action?: string;
     html_template: string | null;
-    smtp_host: string;
-    smtp_secure: boolean;
-    smtp_port: number;
-    smtp_username: string;
-    smtp_password: string;
-    from_email: string;
-    from_name: string;
     to: string,
     cc: string,
     bcc: string,
@@ -61,7 +54,7 @@ const serializeBigInt = <T>(obj: T): T => {
  * @param status - The status of the email config (default is true, can be set to false to fetch inactive configs)
  * @returns A response object with status and data or an error message
  */
-export const getEmailConfig = async (
+export const getTemplate = async (
     panel: string,
     module: string,
     action: string,
@@ -134,24 +127,16 @@ export const getEmailConfig = async (
 };
 
 // 🟡 UPDATE
-export const updateEmailConfig = async (
+export const updateTemplate = async (
     adminId: number,
     adminRole: string,
     mailId: number,
     data: Mail
 ) => {
     try {
-
         const {
             subject,
             html_template,
-            smtp_host,
-            smtp_secure,
-            smtp_port,
-            smtp_username,
-            smtp_password,
-            from_email,
-            from_name,
             to,
             cc,
             bcc,
@@ -167,13 +152,6 @@ export const updateEmailConfig = async (
         const updatedData = {
             subject,
             html_template,
-            smtp_host,
-            smtp_secure,
-            smtp_port,
-            smtp_username,
-            smtp_password,
-            from_email,
-            from_name,
             to,
             cc,
             bcc,
@@ -199,7 +177,7 @@ export const updateEmailConfig = async (
 };
 
 // 🔵 GET BY ID
-export const getEmailConfigById = async (id: number) => {
+export const getTemplateById = async (id: number) => {
     try {
         const mail = await prisma.emailConfig.findUnique({
             where: { id },
@@ -214,7 +192,7 @@ export const getEmailConfigById = async (id: number) => {
 };
 
 // 🟣 GET ALL
-export const getAllEmailConfig = async () => {
+export const getAllTemplate = async () => {
     try {
         const mails = await prisma.emailConfig.findMany({
             orderBy: { id: 'desc' },

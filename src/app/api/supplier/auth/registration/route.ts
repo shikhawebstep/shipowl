@@ -10,7 +10,7 @@ import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
 import { isLocationHierarchyCorrect } from '@/app/models/location/city';
 import { checkEmailAvailability, checkUsernameAvailability, createSupplier } from '@/app/models/supplier/supplier';
-import { getEmailConfig } from '@/app/models/admin/emailConfig';
+import { getTemplate } from '@/app/models/admin/emailConfig/template';
 import { sendEmail } from "@/utils/email/sendEmail";
 import { generateRegistrationToken } from '@/utils/auth/authUtils';
 /*
@@ -442,7 +442,7 @@ export async function POST(req: NextRequest) {
     }
     */
 
-    const { status: emailStatus, message: emailMessage, emailConfig, htmlTemplate, subject: emailSubject } = await getEmailConfig('supplier', 'auth', 'registration', true);
+    const { status: emailStatus, message: emailMessage, emailConfig, htmlTemplate, subject: emailSubject } = await getTemplate('supplier', 'auth', 'registration', true);
     logMessage('debug', 'Email Config:', emailConfig);
 
     if (!emailStatus || !emailConfig) {

@@ -6,7 +6,7 @@ import { logMessage } from '@/utils/commonUtils';
 import { getSupplierById } from '@/app/models/supplier/supplier';
 import { isUserExist } from '@/utils/auth/authUtils';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
-import { getEmailConfig } from '@/app/models/admin/emailConfig';
+import { getTemplate } from '@/app/models/admin/emailConfig/template';
 
 interface MainAdmin {
     id: number;
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
             emailConfig,
             htmlTemplate,
             subject: emailSubject
-        } = await getEmailConfig('admin', 'supplier', 'password-change', true);
+        } = await getTemplate('admin', 'supplier', 'password-change', true);
 
         logMessage('debug', 'Email Config:', emailConfig);
 

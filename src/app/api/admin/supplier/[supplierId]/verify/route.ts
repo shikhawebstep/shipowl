@@ -5,7 +5,7 @@ import {
   getSupplierById,
   updateSupplierVerifyStatus,
 } from '@/app/models/supplier/supplier';
-import { getEmailConfig } from '@/app/models/admin/emailConfig';
+import { getTemplate } from '@/app/models/admin/emailConfig/template';
 import { sendEmail } from "@/utils/email/sendEmail";
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
@@ -105,7 +105,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ status: false, message: 'Failed to update supplier status' }, { status: 500 });
     }
 
-    const emailConfigResult = await getEmailConfig('supplier', 'auth', 'status-update', true);
+    const emailConfigResult = await getTemplate('supplier', 'auth', 'status-update', true);
     const { status: emailStatus, message: emailMessage, emailConfig, htmlTemplate, subject: emailSubject } = emailConfigResult;
 
     if (!emailStatus || !emailConfig) {

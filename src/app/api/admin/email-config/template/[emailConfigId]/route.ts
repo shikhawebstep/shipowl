@@ -5,7 +5,7 @@ import { logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
-import { getEmailConfigById, updateEmailConfig } from '@/app/models/admin/emailConfig';
+import { getTemplateById, updateTemplate } from '@/app/models/admin/emailConfig/template';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid emailConfig ID' }, { status: 400 });
     }
 
-    const emailConfigResult = await getEmailConfigById(emailConfigIdNum);
+    const emailConfigResult = await getTemplateById(emailConfigIdNum);
     if (emailConfigResult?.status) {
       logMessage('info', 'EmailConfig found:', emailConfigResult.mail);
       return NextResponse.json({ status: true, emailConfig: emailConfigResult.mail }, { status: 200 });
@@ -163,7 +163,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid emailConfig ID' }, { status: 400 });
     }
 
-    const emailConfigResult = await getEmailConfigById(emailConfigIdNum);
+    const emailConfigResult = await getTemplateById(emailConfigIdNum);
     logMessage('debug', 'EmailConfig fetch result:', emailConfigResult);
     if (!emailConfigResult?.status) {
       logMessage('warn', 'EmailConfig not found', { emailConfigIdNum });
@@ -174,17 +174,10 @@ export async function PUT(req: NextRequest) {
 
     // Validate input
     const validation = validateFormData(formData, {
-      requiredFields: ['subject', 'html_template', 'smtp_host', 'smtp_secure', 'smtp_port', 'smtp_username', 'smtp_password', 'from_email', 'from_name', 'status', 'to', 'cc', 'bcc'],
+      requiredFields: ['subject', 'html_template', 'status', 'to', 'cc', 'bcc'],
       patternValidations: {
         subject: 'string',
         html_template: 'string',
-        smtp_host: 'string',
-        smtp_secure: 'boolean',
-        smtp_port: 'number',
-        smtp_username: 'string',
-        smtp_password: 'string',
-        from_email: 'string',
-        from_name: 'string',
         status: 'boolean',
         to: 'string',
         cc: 'string',
@@ -235,13 +228,6 @@ export async function PUT(req: NextRequest) {
     const emailConfigPayload = {
       subject: extractString('subject') || '',
       html_template: extractString('html_template') || '',
-      smtp_host: extractString('smtp_host') || '',
-      smtp_secure: smtp_secure,
-      smtp_port: parseInt(extractString('smtp_port') || '0'), // optional: convert to number if needed
-      smtp_username: extractString('smtp_username') || '',
-      smtp_password: extractString('smtp_password') || '',
-      from_email: extractString('from_email') || '',
-      from_name: extractString('from_name') || '',
       to: JSON.stringify(parseJsonArray('to')),
       cc: JSON.stringify(parseJsonArray('cc')),
       bcc: JSON.stringify(parseJsonArray('bcc')),
@@ -253,7 +239,7 @@ export async function PUT(req: NextRequest) {
 
     logMessage('info', 'EmailConfig payload:', emailConfigPayload);
 
-    const emailConfigCreateResult = await updateEmailConfig(adminId, String(adminRole), emailConfigIdNum, emailConfigPayload);
+    const emailConfigCreateResult = await updateTemplate(adminId, String(adminRole), emailConfigIdNum, emailConfigPayload);
 
     if (emailConfigCreateResult?.status) {
       logMessage('info', 'EmailConfig updated successfully:', emailConfigCreateResult.mail);

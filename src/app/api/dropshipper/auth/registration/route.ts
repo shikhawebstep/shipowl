@@ -7,7 +7,7 @@ import { validateFormData } from '@/utils/validateFormData';
 import { isLocationHierarchyCorrect } from '@/app/models/location/city';
 import { checkEmailAvailability, createDropshipper } from '@/app/models/dropshipper/dropshipper';
 import { generateRegistrationToken } from '@/utils/auth/authUtils';
-import { getEmailConfig } from '@/app/models/admin/emailConfig';
+import { getTemplate } from '@/app/models/admin/emailConfig/template';
 import { sendEmail } from "@/utils/email/sendEmail";
 /*
 import { updateDropshipperCompany } from '@/app/models/dropshipper/company';
@@ -303,7 +303,7 @@ export async function POST(req: NextRequest) {
           
         */
 
-    const { status: emailStatus, message: emailMessage, emailConfig, htmlTemplate, subject: emailSubject } = await getEmailConfig('dropshipper', 'auth', 'registration', true);
+    const { status: emailStatus, message: emailMessage, emailConfig, htmlTemplate, subject: emailSubject } = await getTemplate('dropshipper', 'auth', 'registration', true);
     logMessage('debug', 'Email Config:', emailConfig);
 
     if (!emailStatus || !emailConfig) {

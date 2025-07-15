@@ -4,7 +4,7 @@ import { logMessage, formatDate } from '@/utils/commonUtils';
 import { isUserExist } from '@/utils/auth/authUtils';
 import { getOrderById } from '@/app/models/order/order';
 import { orderDisputeCaseOne } from '@/app/models/order/item';
-import { getEmailConfig } from '@/app/models/admin/emailConfig';
+import { getTemplate } from '@/app/models/admin/emailConfig/template';
 import { sendEmail } from '@/utils/email/sendEmail';
 
 export async function POST(req: NextRequest) {
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
             emailConfig,
             htmlTemplate,
             subject: emailSubject
-        } = await getEmailConfig("supplier", "need to raise", "dispute-1", true);
+        } = await getTemplate("supplier", "need to raise", "dispute-1", true);
 
         if (!emailStatus || !emailConfig) {
             return NextResponse.json(

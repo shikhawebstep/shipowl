@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { generateToken, generatePasswordResetToken } from '@/utils/auth/authUtils';
 import { comparePassword } from '@/utils/hashUtils';
 import { verifyToken } from '@/utils/auth/authUtils';
-import { getEmailConfig } from '@/app/models/admin/emailConfig';
+import { getTemplate } from '@/app/models/admin/emailConfig/template';
 import { sendEmail } from "@/utils/email/sendEmail";
 import bcrypt from 'bcryptjs';
 import { logMessage } from '@/utils/commonUtils';
@@ -220,7 +220,7 @@ export async function handleForgetPassword(
 
         // Optional: Send email
         // await sendPasswordResetEmail(admin.email, token);
-        const { status: emailStatus, message: emailMessage, emailConfig, htmlTemplate, subject: emailSubject } = await getEmailConfig("admin", "auth", "forget-password", true);
+        const { status: emailStatus, message: emailMessage, emailConfig, htmlTemplate, subject: emailSubject } = await getTemplate("admin", "auth", "forget-password", true);
         logMessage('debug', 'Email Config:', emailConfig);
 
         if (!emailStatus || !emailConfig) {
@@ -388,7 +388,7 @@ export async function handleResetPassword(
             });
         }
 
-        const { status: emailStatus, message: emailMessage, emailConfig, htmlTemplate, subject: emailSubject } = await getEmailConfig("admin", "auth", "reset-password", true);
+        const { status: emailStatus, message: emailMessage, emailConfig, htmlTemplate, subject: emailSubject } = await getTemplate("admin", "auth", "reset-password", true);
         logMessage('debug', 'Email Config:', emailConfig);
 
         if (!emailStatus || !emailConfig) {
@@ -578,7 +578,7 @@ export async function handleVerifyStatus(
             );
         }
 
-        const { status: emailStatus, message: emailMessage, emailConfig, htmlTemplate, subject: emailSubject } = await getEmailConfig(adminRole, 'auth', 'verify', true);
+        const { status: emailStatus, message: emailMessage, emailConfig, htmlTemplate, subject: emailSubject } = await getTemplate(adminRole, 'auth', 'verify', true);
         logMessage('debug', 'Email Config:', emailConfig);
 
         if (!emailStatus || !emailConfig) {
