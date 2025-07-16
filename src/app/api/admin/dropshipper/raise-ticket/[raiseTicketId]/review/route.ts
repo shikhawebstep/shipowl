@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 import { getRaiseTicketById, adminReviewRaiseTicket } from '@/app/models/admin/dropshipper/raiseTicket';
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       const permissionOptions = {
         panel: 'Admin',
         module: 'Dropshipper',
-        action: 'Bank Account Change Request Review',
+        action: 'Raise Ticket Review',
       };
 
       const permissionCheck = await checkStaffPermissionStatus(permissionOptions, adminId);
@@ -124,9 +124,33 @@ export async function POST(req: NextRequest) {
     const adminReviewRaiseTicketResult = await adminReviewRaiseTicket(raiseTicketId, adminReviewRaiseTicketPayload);
 
     if (!adminReviewRaiseTicketResult.status || !adminReviewRaiseTicketResult.raiseTicket) {
+
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Dropshipper',
+          action: 'Raise Ticket Review',
+          data: adminReviewRaiseTicketResult,
+          response: { status: false, error: 'Raise ticket not found' },
+          status: false
+        }, req);
       logMessage('warn', 'Raise ticket not found', { raiseTicketId });
       return NextResponse.json({ status: false, error: 'Raise ticket not found' }, { status: 404 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'Raise Ticket Review',
+        data: adminReviewRaiseTicketResult,
+        response: {
+          status: true,
+          message: `Raise ticket ${status ? 'approved' : 'rejected'} successfully.`,
+          data: raiseTicket
+        },
+        status: false
+      }, req);
 
     return NextResponse.json({
       status: true,
@@ -135,7 +159,16 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'Raise Ticket Review',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Internal Server Error' },
+        status: false
+      }, req);
     logMessage('error', '❌ Error in Bank Account Change Review API:', error);
-    return NextResponse.json({ status: false, error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ status: false, error: error || 'Internal Server Error' }, { status: 500 });
   }
 }

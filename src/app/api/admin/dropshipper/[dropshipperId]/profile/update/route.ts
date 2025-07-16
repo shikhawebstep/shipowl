@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -183,9 +183,9 @@ export async function PUT(req: NextRequest) {
 
     logMessage('info', 'Dropshipper payload updated:', dropshipperPayload);
 
-    const dropshipperCreateResult = await updateDropshipper(adminId, String(adminRole), dropshipperId, dropshipperPayload);
+    const dropshipperUpdateResult = await updateDropshipper(adminId, String(adminRole), dropshipperId, dropshipperPayload);
 
-    if (!dropshipperCreateResult || !dropshipperCreateResult.status || !dropshipperCreateResult.dropshipper) {
+    if (!dropshipperUpdateResult || !dropshipperUpdateResult.status || !dropshipperUpdateResult.dropshipper) {
       // Check if there are any uploaded files before attempting to delete
       if (Object.keys(dropshipperUploadedFiles).length > 0) {
         // Iterate over each field in dropshipperUploadedFiles
@@ -207,8 +207,19 @@ export async function PUT(req: NextRequest) {
       } else {
         logMessage('info', 'No uploaded files to delete.');
       }
-      logMessage('error', 'Dropshipper creation failed:', dropshipperCreateResult?.message || 'Unknown error');
-      return NextResponse.json({ status: false, error: dropshipperCreateResult?.message || 'Dropshipper creation failed' }, { status: 500 });
+
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Dropshipper',
+          action: 'Update',
+          data: dropshipperUpdateResult,
+          response: { status: false, error: dropshipperUpdateResult?.message || 'Dropshipper updation failed' },
+          status: false
+        }, req);
+
+      logMessage('error', 'Dropshipper updation failed:', dropshipperUpdateResult?.message || 'Unknown error');
+      return NextResponse.json({ status: false, error: dropshipperUpdateResult?.message || 'Dropshipper updation failed' }, { status: 500 });
     }
 
     const companyUploadDir = path.join(process.cwd(), 'tmp', 'uploads', 'dropshipper', `${dropshipperId}`, 'company');
@@ -253,8 +264,8 @@ export async function PUT(req: NextRequest) {
 
     logMessage('info', 'Dropshipper payload updated:', dropshipperCompanyPayload);
 
-    const dropshipperCompanyCreateResult = await updateDropshipperCompany(adminId, String(adminRole), dropshipperId, dropshipperCompanyPayload);
-    if (!dropshipperCompanyCreateResult || !dropshipperCompanyCreateResult.status || !dropshipperCompanyCreateResult.dropshipper) {
+    const dropshipperCompanyUpdateResult = await updateDropshipperCompany(adminId, String(adminRole), dropshipperId, dropshipperCompanyPayload);
+    if (!dropshipperCompanyUpdateResult || !dropshipperCompanyUpdateResult.status || !dropshipperCompanyUpdateResult.dropshipper) {
 
       // Check if there are any uploaded files before attempting to delete
       if (Object.keys(dropshipperCompanyUploadedFiles).length > 0) {
@@ -278,17 +289,47 @@ export async function PUT(req: NextRequest) {
         logMessage('info', 'No uploaded files to delete.');
       }
 
-      logMessage('error', 'Dropshipper company creation failed', dropshipperCompanyCreateResult?.message);
-      return NextResponse.json({ status: false, error: dropshipperCompanyCreateResult?.message || 'Dropshipper company creation failed' }, { status: 500 });
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Dropshipper',
+          action: 'Update',
+          data: dropshipperCompanyUpdateResult,
+          response: { status: false, error: dropshipperCompanyUpdateResult?.message || 'Dropshipper company updation failed' },
+          status: false
+        }, req);
+
+      logMessage('error', 'Dropshipper company updation failed', dropshipperCompanyUpdateResult?.message);
+      return NextResponse.json({ status: false, error: dropshipperCompanyUpdateResult?.message || 'Dropshipper company updation failed' }, { status: 500 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'Update',
+        data: dropshipperUpdateResult,
+        response: { status: true, error: dropshipperUpdateResult?.message || 'Dropshipper updated Successfuly' },
+        status: true
+      }, req);
+
     return NextResponse.json(
-      { status: true, error: dropshipperCreateResult?.message || 'Dropshipper updated Successfuly' },
+      { status: true, error: dropshipperUpdateResult?.message || 'Dropshipper updated Successfuly' },
       { status: 200 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
-    logMessage('error', 'Dropshipper Creation Error:', error);
+  } catch (error) {
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error },
+        status: false
+      }, req);
+
+    logMessage('error', 'Dropshipper Updation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }
 

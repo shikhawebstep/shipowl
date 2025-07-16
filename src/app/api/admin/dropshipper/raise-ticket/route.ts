@@ -58,8 +58,8 @@ export async function GET(req: NextRequest) {
 
       const permissionCheck = await checkStaffPermissionStatus({
         panel: 'Admin',
-        module: 'raise-ticket',
-        action: 'Read',
+        module: 'Dropshipper',
+        action: 'Raise Ticket View List',
       }, adminId);
 
       if (!permissionCheck.status) {

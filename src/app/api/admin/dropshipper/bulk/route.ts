@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getDropshipperById, deleteDropshipper } from '@/app/models/dropshipper/dropshipper';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
+import { ActivityLog } from '@/utils/commonUtils';
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -53,6 +54,22 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: 'Dropshipper deletion completed' },
+        response: {
+          status: true,
+          message: 'Dropshipper deletion completed',
+          deleted,
+          notDeleted
+        },
+        status: true
+      }, req);
+
     return NextResponse.json({
       status: true,
       message: 'Dropshipper deletion completed',
@@ -60,7 +77,17 @@ export async function DELETE(req: NextRequest) {
       notDeleted
     }, { status: 200 });
 
-  } catch {
-    return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: error || 'Internal server error' },
+        status: false
+      }, req);
+
+    return NextResponse.json({ status: false, error: error || 'Internal server error' }, { status: 500 });
   }
 }

@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import bwipjs from 'bwip-js';
 
-import { logMessage, fetchLogInfo } from "@/utils/commonUtils";
+import { logMessage, fetchLogInfo, ActivityLog } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
@@ -113,14 +113,43 @@ export async function POST(req: NextRequest) {
         await deleteFile(deletePath(fileData as UploadedFileInfo));
       }
 
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Dropshipper Banner',
+          action: 'Change',
+          data: bannerResult,
+          response: { status: false, error: bannerResult.message || "Failed to update banner" },
+          status: false
+        }, req);
+
       return NextResponse.json({ status: false, error: bannerResult.message || "Failed to update banner" }, { status: 500 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper Banner',
+        action: 'Change',
+        data: bannerResult,
+        response: { status: true, banner: bannerResult.dropshipperBanner },
+        status: true
+      }, req);
 
     return NextResponse.json({ status: true, banner: bannerResult.dropshipperBanner }, { status: 200 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper Banner',
+        action: 'Change',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error },
+        status: false
+      }, req);
     logMessage('error', 'Unexpected error during banner update:', error);
-    return NextResponse.json({ status: false, error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ status: false, error: error || 'Internal Server Error' }, { status: 500 });
   }
 }
 

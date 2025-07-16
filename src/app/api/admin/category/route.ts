@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -141,6 +141,16 @@ export async function POST(req: NextRequest) {
     const categoryCreateResult = await createCategory(adminId, String(adminRole), categoryPayload);
 
     if (categoryCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Category',
+          action: 'Create',
+          data: categoryCreateResult,
+          response: { status: true, category: categoryCreateResult.category },
+          status: true
+        }, req);
+
       return NextResponse.json({ status: true, category: categoryCreateResult.category }, { status: 200 });
     }
 
@@ -153,14 +163,34 @@ export async function POST(req: NextRequest) {
       await deleteFile(deletePath(fileData as UploadedFileInfo));
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'Create',
+        data: categoryCreateResult,
+        response: { status: false, error: categoryCreateResult?.message || 'Category creation failed' },
+        status: false
+      }, req);
+
     logMessage('error', 'Category creation failed:', categoryCreateResult?.message || 'Unknown error');
     return NextResponse.json(
       { status: false, error: categoryCreateResult?.message || 'Category creation failed' },
       { status: 500 }
     );
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'Create',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error, message: 'Internal server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Category Creation Error:', error);
-    return NextResponse.json({ status: false, error, message: 'Internal server error 9' }, { status: 500 });
+    return NextResponse.json({ status: false, error, message: 'Internal server error' }, { status: 500 });
   }
 }
 

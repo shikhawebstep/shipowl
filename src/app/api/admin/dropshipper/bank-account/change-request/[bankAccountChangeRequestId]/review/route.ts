@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getBankAccountChangeRequestById, reviewBankAccountChangeRequest } from '@/app/models/dropshipper/bankAccount';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -108,15 +108,45 @@ export async function POST(req: NextRequest) {
     const reviewResult = await reviewBankAccountChangeRequest(adminId, String(adminRole), finalStatus, bankAccountChangeRequestIdNum);
 
     if (reviewResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Dropshipper',
+          action: 'Bank Account Change Request Review',
+          data: reviewResult,
+          response: { status: false, error: 'Review operation failed' },
+          status: true
+        }, req);
+
       logMessage('info', 'Bank account change request review processed successfully:', reviewResult.message);
       return NextResponse.json({ status: true, message: reviewResult.message }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'Bank Account Change Request Review',
+        data: reviewResult,
+        response: { status: false, error: 'Review operation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Bank account change request review failed');
     return NextResponse.json({ status: false, error: 'Review operation failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'Bank Account Change Request Review',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error },
+        status: false
+      }, req);
+
     logMessage('error', '❌ Review API error:', error);
-    return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
+    return NextResponse.json({ status: false, error: error || 'Server error' }, { status: 500 });
   }
 }

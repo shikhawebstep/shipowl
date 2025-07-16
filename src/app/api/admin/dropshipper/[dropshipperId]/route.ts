@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -111,7 +111,6 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-
   try {
     logMessage('debug', 'POST request received for dropshipper updation');
 
@@ -290,6 +289,16 @@ export async function PUT(req: NextRequest) {
       } else {
         logMessage('info', 'No uploaded files to delete.');
       }
+
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Dropshipper',
+          action: 'Update',
+          data: dropshipperCreateResult,
+          response: { status: false, error: dropshipperCreateResult?.message || 'Dropshipper creation failed' },
+          status: false
+        }, req);
       logMessage('error', 'Dropshipper creation failed:', dropshipperCreateResult?.message || 'Unknown error');
       return NextResponse.json({ status: false, error: dropshipperCreateResult?.message || 'Dropshipper creation failed' }, { status: 500 });
     }
@@ -361,16 +370,45 @@ export async function PUT(req: NextRequest) {
         logMessage('info', 'No uploaded files to delete.');
       }
 
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Dropshipper',
+          action: 'Update',
+          data: dropshipperCompanyCreateResult,
+          response: { status: false, error: dropshipperCompanyCreateResult?.message || 'Dropshipper company creation failed' },
+          status: false
+        }, req);
+
       logMessage('error', 'Dropshipper company creation failed', dropshipperCompanyCreateResult?.message);
       return NextResponse.json({ status: false, error: dropshipperCompanyCreateResult?.message || 'Dropshipper company creation failed' }, { status: 500 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'Update',
+        data: dropshipperCreateResult,
+        response: { status: true, error: dropshipperCreateResult?.message || 'Dropshipper updated Successfuly' },
+        status: true
+      }, req);
 
     return NextResponse.json(
       { status: true, error: dropshipperCreateResult?.message || 'Dropshipper updated Successfuly' },
       { status: 200 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error },
+        status: false
+      }, req);
+
     logMessage('error', 'Dropshipper Creation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }
@@ -444,16 +482,45 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreDropshipper(adminId, String(adminRole), dropshipperIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Dropshipper',
+          action: 'restore',
+          data: restoreResult,
+          response: { status: true, dropshipper: restoreResult.restoredDropshipper },
+          status: true
+        }, req);
       logMessage('info', 'Dropshipper restored successfully:', restoreResult.restoredDropshipper);
       return NextResponse.json({ status: true, dropshipper: restoreResult.restoredDropshipper }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'restore',
+        data: restoreResult,
+        response: { status: false, error: 'Dropshipper restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Dropshipper restore failed');
     return NextResponse.json({ status: false, error: 'Dropshipper restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error },
+        status: false
+      }, req);
+
     logMessage('error', '❌ Dropshipper restore error:', error);
-    return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
+    return NextResponse.json({ status: false, error: error || 'Server error' }, { status: 500 });
   }
 }
 
@@ -521,15 +588,47 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for dropshipper: ${dropshipperIdNum}`, { adminId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Dropshipper',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `Dropshipper soft deleted successfully` },
+          status: true
+        }, req);
+
+
       logMessage('info', `Dropshipper soft deleted successfully: ${dropshipperIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `Dropshipper soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'Dropshipper not found or deletion failed' },
+        status: false
+      }, req);
+
+
     logMessage('info', `Dropshipper not found or could not be deleted: ${dropshipperIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'Dropshipper not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Dropshipper',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during dropshipper deletion', { error });
-    return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ status: false, error: error || 'Internal server error' }, { status: 500 });
   }
 }
 

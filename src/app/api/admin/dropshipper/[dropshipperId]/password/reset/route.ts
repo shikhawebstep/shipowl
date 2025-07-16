@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sendEmail } from '@/utils/email/sendEmail';
 import bcrypt from 'bcryptjs';
-import { logMessage } from '@/utils/commonUtils';
+import { ActivityLog, logMessage } from '@/utils/commonUtils';
 import { getDropshipperById } from '@/app/models/dropshipper/dropshipper';
 import { isUserExist } from '@/utils/auth/authUtils';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -180,6 +180,19 @@ export async function POST(req: NextRequest) {
         const emailResult = await sendEmail(emailConfig, mailData);
 
         if (!emailResult.status) {
+            await ActivityLog(
+                {
+                    panel: 'Admin',
+                    module: 'Dropshipper',
+                    action: 'Password Reset',
+                    data: emailResult,
+                    response: {
+                        status: true,
+                        message: 'Password changed successfully. A confirmation email has been sent.',
+                    },
+                    status: false
+                }, req);
+
             return NextResponse.json(
                 {
                     status: false,
@@ -190,6 +203,19 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        await ActivityLog(
+            {
+                panel: 'Admin',
+                module: 'Dropshipper',
+                action: 'Password Reset',
+                data: emailResult,
+                response: {
+                    status: true,
+                    message: 'Password changed successfully. A confirmation email has been sent.',
+                },
+                status: true
+            }, req);
+
         return NextResponse.json(
             {
                 status: true,
@@ -198,6 +224,20 @@ export async function POST(req: NextRequest) {
             { status: 200 }
         );
     } catch (error) {
+        await ActivityLog(
+            {
+                panel: 'Admin',
+                module: 'Dropshipper',
+                action: 'Password Reset',
+                data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+                response: {
+                    status: false,
+                    error,
+                    message: 'An unexpected error occurred while changing the password. Please try again later.',
+                },
+                status: false
+            }, req);
+
         logMessage(`error`, `Password change error:`, error);
         return NextResponse.json(
             {
