@@ -74,3 +74,49 @@ export const getDropshipperOrderById = async (
         };
     }
 };
+
+export const getDropshipperOrders = async (
+    dropshipperId: number
+) => {
+    try {
+        const whereCondition = {
+            items: {
+                some: {
+                    dropshipperProduct: {
+                        dropshipperId,
+                    },
+                },
+            },
+        };
+
+        const orders = await prisma.order.findMany({
+            where: whereCondition,
+            orderBy: { id: "desc" },
+            select: {
+                id: true,
+                awbNumber: true,
+            },
+        });
+
+        if (!orders || orders.length === 0) {
+            return {
+                status: false,
+                message: `No orders found for dropshipper ID ${dropshipperId}.`,
+            };
+        }
+
+        return {
+            status: true,
+            orders: serializeBigInt(orders),
+        };
+    } catch (error) {
+        console.error(
+            `❌ Error fetching orders for dropshipper (${dropshipperId}):`,
+            error
+        );
+        return {
+            status: false,
+            message: "An error occurred while fetching orders.",
+        };
+    }
+};
