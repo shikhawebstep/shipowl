@@ -10,13 +10,11 @@ import dynamic from 'next/dynamic';
 const Select = dynamic(() => import('react-select'), { ssr: false });
 export default function Create() {
   const router = useRouter();
-  const [permission, setPermission] = useState([]);
   const [loading, setLoading] = useState(false);
   const [countryData, setCountryData] = useState([]);
   const [stateData, setStateData] = useState([]);
   const [cityData, setCityData] = useState([]);
   const [errors, setErrors] = useState({});
-  const [loadingPermission, setLoadingPermission] = useState(false);
   const [loadingCountries, setLoadingCountries] = useState(false);
   const [loadingStates, setLoadingStates] = useState(false);
   const [loadingCities, setLoadingCities] = useState(false);
@@ -31,7 +29,6 @@ export default function Create() {
     permanentCity: "",
     permanentState: "",
     permanentCountry: "",
-    permissions: '',
   });
 
   const handleChange = (e) => {
@@ -48,23 +45,7 @@ export default function Create() {
     }
   };
 
-  const handlePermissionChange = (permId) => {
-    setFormData((prev) => {
-      const currentPermissions = Array.isArray(prev.permissions)
-        ? prev.permissions.map(String)
-        : (prev.permissions || '').split(',').filter(Boolean);
-
-      const updatedPermissions = currentPermissions.includes(permId.toString())
-        ? currentPermissions.filter((p) => p !== permId.toString())
-        : [...currentPermissions, permId.toString()];
-
-      return {
-        ...prev,
-        permissions: updatedPermissions.join(','),
-      };
-    });
-  };
-
+  
 
   const validate = () => {
     const newErrors = {};
@@ -76,7 +57,6 @@ export default function Create() {
       permanentCountry,
       permanentState,
       permanentCity,
-      permissions,
     } = formData;
 
     if (!name.trim()) newErrors.name = "Name is required";
@@ -90,7 +70,6 @@ export default function Create() {
     if (!permanentCountry) newErrors.permanentCountry = "Country is required";
     if (!permanentState) newErrors.permanentState = "State is required";
     if (!permanentCity) newErrors.permanentCity = "City is required";
-    if (permissions.length === 0) newErrors.permissions = "At least one permission is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -114,10 +93,7 @@ export default function Create() {
         if (value instanceof File || value instanceof Blob) {
           data.append(key, value);
         }
-        // Handle array or object (e.g., permissions)
-        else if (Array.isArray(value) || typeof value === 'object') {
-          data.append(key, JSON.stringify(value));
-        }
+       
         // Handle primitive values (string, number, boolean)
         else {
           data.append(key, value);
@@ -150,7 +126,6 @@ export default function Create() {
         permanentCity: "",
         permanentState: "",
         permanentCountry: "",
-        permissions: [],
       });
       router.push('/admin/sub-user/list')
     } catch (err) {
@@ -187,14 +162,7 @@ export default function Create() {
       if (setLoading) setLoading(false);
     }
   }, [router]);
-  const fetchPermission = useCallback(() => {
-    fetchProtected(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/staff/meta`,
-      setPermission,
-      "staffPermissions",
-      setLoadingPermission
-    );
-  }, [fetchProtected]);
+ 
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
@@ -230,16 +198,10 @@ export default function Create() {
     }));
 
   useEffect(() => {
-    fetchPermission();
     fetchCountryAndState();
-  }, [fetchPermission, fetchCountryAndState]);
+  }, [ fetchCountryAndState]);
 
-  const groupedPermissions = permission.reduce((acc, perm) => {
-    if (!acc[perm.panel]) acc[perm.panel] = {};
-    if (!acc[perm.panel][perm.module]) acc[perm.panel][perm.module] = [];
-    acc[perm.panel][perm.module].push(perm);
-    return acc;
-  }, {});
+ 
 
   const formFields = [
     { label: "Name", name: "name", type: "text", required: true },
@@ -248,7 +210,7 @@ export default function Create() {
     { label: "Phone Number", name: "phoneNumber", type: "text" },
     { label: "Permanent Address", name: "permanentAddress", type: "text" },
   ];
-  if (loading || loadingPermission) {
+  if (loading ) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <HashLoader size={60} color="#F97316" loading={true} />
@@ -362,46 +324,7 @@ export default function Create() {
         ))}
       </div>
 
-      <div>
-        <label className="block text-[#232323] font-bold mb-1 mt-2">Permissions <span className="text-red-500">*</span></label>
-        <div className="space-y-4">
-          {groupedPermissions?.Admin && (
-            <div className="space-y-4">
-              {Object.entries(groupedPermissions.Admin).map(([module, perms]) => (
-                <div key={module} className="space-y-2">
-                  {/* Module Name and Action List */}
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-semibold capitalize">{module}</h4>
-
-                  </div>
-
-                  {/* Permission Checkboxes */}
-                  <div className="grid border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 gap-2 md:grid-cols-3">
-                    {perms.map((perm) => (
-                      <label key={perm.id} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={
-                            Array.isArray(formData.permissions)
-                              ? formData.permissions.includes(String(perm.id))
-                              : String(formData.permissions || '')
-                                .split(',')
-                                .includes(String(perm.id))
-                          }
-                          onChange={() => handlePermissionChange(perm.id)}
-                        />
-
-                        <span className="capitalize text-[#232323] font-bold">{perm.action}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        {errors.permissions && <p className="text-red-500 text-sm">{errors.permissions}</p>}
-      </div>
+    
 
       <div className="flex space-x-4 mt-6">
         <button

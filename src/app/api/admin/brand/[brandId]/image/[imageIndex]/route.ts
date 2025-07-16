@@ -1,31 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from '@/utils/commonUtils';
+import { ActivityLog, logMessage } from '@/utils/commonUtils';
 import { isUserExist } from '@/utils/auth/authUtils';
 import { getBrandById, removeBrandImageByIndex } from '@/app/models/admin/brand';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    admin?: MainAdmin;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  admin?: MainAdmin;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    admin?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  admin?: SupplierStaff;
 }
 
 export async function DELETE(req: NextRequest) {
@@ -91,6 +91,19 @@ export async function DELETE(req: NextRequest) {
     const result = await removeBrandImageByIndex(brandId, imageIndex);
 
     if (result.status) {
+      await ActivityLog(
+        {
+          module: 'Brand',
+          action: 'Update',
+          data: result,
+          response: {
+            status: true,
+            message: 'Image removed successfully',
+            data: result.brand,
+          },
+          status: true
+        }, req);
+
       logMessage('info', `Image index ${imageIndex} removed from brand ${brandId} by admin ${adminId}`);
       return NextResponse.json({
         status: true,
@@ -99,6 +112,18 @@ export async function DELETE(req: NextRequest) {
       }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        module: 'Brand',
+        action: 'Update',
+        data: result,
+        response: {
+          status: false,
+          message: result.message || 'Image removal failed',
+        },
+        status: false
+      }, req);
+
     logMessage('warn', `Image removal failed: ${result.message}`, { brandId, imageIndex });
     return NextResponse.json({
       status: false,
@@ -106,6 +131,18 @@ export async function DELETE(req: NextRequest) {
     }, { status: 400 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        module: 'Brand',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: {
+          status: false,
+          error: 'Internal server error',
+        },
+        status: false
+      }, req);
+
     logMessage('error', 'Unexpected error during image deletion', { error });
     return NextResponse.json({
       status: false,

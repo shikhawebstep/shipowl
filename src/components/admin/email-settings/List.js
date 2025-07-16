@@ -50,7 +50,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/email-config`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/email-config/template`,
                 {
                     method: "GET",
                     headers: {
@@ -65,7 +65,7 @@ export default function List() {
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: errorMessage.message || "Network Error.",
+                    text: errorMessage.message || errorMessage.error || "Network Error.",
                 });
                 throw new Error(errorMessage.message);
             }
@@ -203,145 +203,151 @@ export default function List() {
                         </button>
 
                     </div>
-
-                    <table className="w-full main-tables text-sm text-left text-gray-700" id="emailTable">
-                        <thead className="text-xs uppercase text-gray-700">
-                            <tr className="border-b border-gray-200">
-                                <th className="px-6 py-3 whitespace-nowrap">SR.</th>
-                                <th className="px-6 py-3 whitespace-nowrap">
-                                    <button
-                                        onClick={(e) =>
-                                            setActiveFilter({
-                                                key: 'panel',
-                                                label: 'Panel',
-                                                setValue: setPanelFilter,
-                                                getValue: () => panelFilter,
-                                                columnIndex: 1,
-                                                position: e.currentTarget.getBoundingClientRect(),
-                                            })
-                                        }
-                                        className="flex items-center gap-2 uppercase"
-                                    >
-                                        Panel <IoFilterSharp />
-                                    </button>
-                                </th>
-                                <th className="px-6 py-3 whitespace-nowrap">
-                                    <button
-                                        onClick={(e) =>
-                                            setActiveFilter({
-                                                key: 'module',
-                                                label: 'Module',
-                                                setValue: setModuleFilter,
-                                                getValue: () => moduleFilter,
-                                                columnIndex: 2,
-                                                position: e.currentTarget.getBoundingClientRect(),
-                                            })
-                                        }
-                                        className="flex items-center gap-2 uppercase"
-                                    >
-                                        Module <IoFilterSharp />
-                                    </button>
-                                </th>
-                                <th className="px-6 py-3 whitespace-nowrap">
-                                    <button
-                                        onClick={(e) =>
-                                            setActiveFilter({
-                                                key: 'action',
-                                                label: 'Action',
-                                                setValue: setActionFilter,
-                                                getValue: () => actionFilter,
-                                                columnIndex: 3,
-                                                position: e.currentTarget.getBoundingClientRect(),
-                                            })
-                                        }
-                                        className="flex items-center gap-2 uppercase"
-                                    >
-                                        Action <IoFilterSharp />
-                                    </button>
-                                </th>
-                                <th className="px-6 py-3 whitespace-nowrap">
-                                    <button
-                                        onClick={(e) =>
-                                            setActiveFilter({
-                                                key: 'status',
-                                                label: 'Status',
-                                                setValue: setStatusFilter,
-                                                getValue: () => statusFilter,
-                                                columnIndex: 4,
-                                                position: e.currentTarget.getBoundingClientRect(),
-                                            })
-                                        }
-                                        className="flex items-center gap-2 uppercase"
-                                    >
-                                        Status <IoFilterSharp />
-                                    </button>
-                                </th>
-                                <th className="px-6 py-3 whitespace-nowrap">
-                                    <button
-                                        onClick={(e) =>
-                                            setActiveFilter({
-                                                key: 'subject',
-                                                label: 'Subject',
-                                                setValue: setSubjectFilter,
-                                                getValue: () => subjectFilter,
-                                                columnIndex: 5,
-                                                position: e.currentTarget.getBoundingClientRect(),
-                                            })
-                                        }
-                                        className="flex items-center gap-2 uppercase"
-                                    >
-                                        Subject <IoFilterSharp />
-                                    </button>
-                                </th>
-                                <th className="px-6 py-3 whitespace-nowrap">Body</th>
-                                <th className="px-6 py-3 whitespace-nowrap">To Mails</th>
-                                <th className="px-6 py-3 whitespace-nowrap">CC Mail</th>
-                                <th className="px-6 py-3 whitespace-nowrap">BCC Mails</th>
-                                <th className="px-6 py-3 whitespace-nowrap">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {emails.map((item, index) => (
-                                <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-left font-medium text-gray-900">{index + 1}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{item.panel}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{item.module}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{item.action}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-3 py-1 rounded text-white ${item.status === true ? 'bg-green-500' : 'bg-red-500'}`}>
-                                            {item.status ? "Active" : 'Inactive'}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{item.subject}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {item.html_template ? (
-                                            <button onClick={() => handleView(item.html_template)} className="text-blue-600 hover:underline">
-                                                View
+                    {
+                        emails.length > 0 ? (
+                            <table className="w-full main-tables text-sm text-left text-gray-700" id="emailTable">
+                                <thead className="text-xs uppercase text-gray-700">
+                                    <tr className="border-b border-gray-200">
+                                        <th className="px-6 py-3 whitespace-nowrap">SR.</th>
+                                        <th className="px-6 py-3 whitespace-nowrap">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'panel',
+                                                        label: 'Panel',
+                                                        setValue: setPanelFilter,
+                                                        getValue: () => panelFilter,
+                                                        columnIndex: 1,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                Panel <IoFilterSharp />
                                             </button>
-                                        ) : (
-                                            '-'
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {parseAndRenderEmails(item.to)}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {item.cc ? parseAndRenderEmails(item.cc) : "-"}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {item.bcc ? parseAndRenderEmails(item.bcc) : "-"}
-                                    </td>
+                                        </th>
+                                        <th className="px-6 py-3 whitespace-nowrap">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'module',
+                                                        label: 'Module',
+                                                        setValue: setModuleFilter,
+                                                        getValue: () => moduleFilter,
+                                                        columnIndex: 2,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                Module <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="px-6 py-3 whitespace-nowrap">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'action',
+                                                        label: 'Action',
+                                                        setValue: setActionFilter,
+                                                        getValue: () => actionFilter,
+                                                        columnIndex: 3,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                Action <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="px-6 py-3 whitespace-nowrap">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'status',
+                                                        label: 'Status',
+                                                        setValue: setStatusFilter,
+                                                        getValue: () => statusFilter,
+                                                        columnIndex: 4,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                Status <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="px-6 py-3 whitespace-nowrap">
+                                            <button
+                                                onClick={(e) =>
+                                                    setActiveFilter({
+                                                        key: 'subject',
+                                                        label: 'Subject',
+                                                        setValue: setSubjectFilter,
+                                                        getValue: () => subjectFilter,
+                                                        columnIndex: 5,
+                                                        position: e.currentTarget.getBoundingClientRect(),
+                                                    })
+                                                }
+                                                className="flex items-center gap-2 uppercase"
+                                            >
+                                                Subject <IoFilterSharp />
+                                            </button>
+                                        </th>
+                                        <th className="px-6 py-3 whitespace-nowrap">Body</th>
+                                        <th className="px-6 py-3 whitespace-nowrap">To Mails</th>
+                                        <th className="px-6 py-3 whitespace-nowrap">CC Mail</th>
+                                        <th className="px-6 py-3 whitespace-nowrap">BCC Mails</th>
+                                        <th className="px-6 py-3 whitespace-nowrap">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {emails.map((item, index) => (
+                                        <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-left font-medium text-gray-900">{index + 1}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{item.panel}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{item.module}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{item.action}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`px-3 py-1 rounded text-white ${item.status === true ? 'bg-green-500' : 'bg-red-500'}`}>
+                                                    {item.status ? "Active" : 'Inactive'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{item.subject}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {item.html_template ? (
+                                                    <button onClick={() => handleView(item.html_template)} className="text-blue-600 hover:underline">
+                                                        View
+                                                    </button>
+                                                ) : (
+                                                    '-'
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {parseAndRenderEmails(item.to)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {item.cc ? parseAndRenderEmails(item.cc) : "-"}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {item.bcc ? parseAndRenderEmails(item.bcc) : "-"}
+                                            </td>
 
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                                        {
-                                            canEdit && <button className="text-indigo-600 hover:underline" onClick={() => handleEdit(item.id)}>Edit</button>
-                                        }
+                                            <td className="px-6 py-4 whitespace-nowrap text-center">
+                                                {
+                                                    canEdit && <button className="text-indigo-600 hover:underline" onClick={() => handleEdit(item.id)}>Edit</button>
+                                                }
 
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        ) : (
+                            <p className='text-center font-bold'> No Data Found</p>
+                        )
+                    }
+
 
                     {activeFilter && (
                         <div

@@ -17,13 +17,11 @@ const Select = dynamic(() => import('react-select'), { ssr: false });
 export default function Update() {
   const { fetchImages } = useImageURL();
   const router = useRouter();
-  const [permission, setPermission] = useState([]);
   const [loading, setLoading] = useState(false);
   const [countryData, setCountryData] = useState([]);
   const [stateData, setStateData] = useState([]);
   const [cityData, setCityData] = useState([]);
   const [errors, setErrors] = useState({});
-  const [loadingPermission, setLoadingPermission] = useState(false);
   const [loadingCountries, setLoadingCountries] = useState(false);
   const [loadingStates, setLoadingStates] = useState(false);
   const [loadingCities, setLoadingCities] = useState(false);
@@ -38,7 +36,6 @@ export default function Update() {
     permanentCity: "",
     permanentState: "",
     permanentCountry: "",
-    permissions: '',
   });
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
@@ -83,7 +80,6 @@ export default function Update() {
 
       const result = await response.json();
       const users = result?.adminStaff || {};
-      setPermission(result?.staffPermissions)
       if (users?.permanentCityId) {
         fetchStateList(users?.permanentCountryId);
       }
@@ -101,9 +97,7 @@ export default function Update() {
         permanentCity: users?.permanentCityId || "",
         permanentState: users?.permanentStateId || "",
         permanentCountry: users?.permanentCountryId || "",
-        permissions: Array.isArray(users?.adminStaffPermissions)
-          ? users.adminStaffPermissions.map(p => p.adminStaffPermissionId).join(',')
-          : '', image: users?.profilePicture || '',
+       image: users?.profilePicture || '',
       });
 
     } catch (error) {
@@ -123,33 +117,7 @@ export default function Update() {
   };
 
 
-  const handlePermissionChange = (permId) => {
-    setFormData((prev) => {
-      const currentPermissions = Array.isArray(prev.permissions)
-        ? prev.permissions.map(String)
-        : (prev.permissions || '').split(',').filter(Boolean);
-
-      // Toggle permission
-      const toggledPermissions = currentPermissions.includes(String(permId))
-        ? currentPermissions.filter((p) => p !== String(permId))
-        : [...currentPermissions, String(permId)];
-
-      // Get allowed permissions from groupedPermissions["Admin"]
-      const allowedPermissionIds = Object.values(groupedPermissions?.["Admin"] || {})
-        .flat()
-        .map((p) => String(p.id));
-
-      // Only keep toggled permissions that are allowed
-      const filteredPermissions = toggledPermissions.filter((id) =>
-        allowedPermissionIds.includes(id)
-      );
-
-      return {
-        ...prev,
-        permissions: filteredPermissions.join(','),
-      };
-    });
-  };
+ 
 
 
   const validate = () => {
@@ -160,7 +128,6 @@ export default function Update() {
       permanentCountry,
       permanentState,
       permanentCity,
-      permissions,
     } = formData;
 
     if (!name.trim()) newErrors.name = "Name is required";
@@ -170,7 +137,6 @@ export default function Update() {
     if (!permanentCountry) newErrors.permanentCountry = "Country is required";
     if (!permanentState) newErrors.permanentState = "State is required";
     if (!permanentCity) newErrors.permanentCity = "City is required";
-    if (permissions.length === 0) newErrors.permissions = "At least one permission is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -187,22 +153,7 @@ const handleSubmit = async (e) => {
   // ✅ Step 1: Clean permissions (copying formData to avoid mutation)
   const cleanedFormData = { ...formData };
 
-  if (cleanedFormData.permissions) {
-    const allowedPermissionIds = Object.values(groupedPermissions?.["Admin"] || {})
-      .flat()
-      .map((p) => String(p.id));
-
-    const currentPermissions = Array.isArray(cleanedFormData.permissions)
-      ? cleanedFormData.permissions.map(String)
-      : String(cleanedFormData.permissions).split(',').filter(Boolean);
-
-    const filteredPermissions = currentPermissions.filter((id) =>
-      allowedPermissionIds.includes(id)
-    );
-
-    cleanedFormData.permissions = filteredPermissions.join(',');
-  }
-
+ 
   setLoading(true);
   const data = new FormData();
 
@@ -244,7 +195,6 @@ const handleSubmit = async (e) => {
       permanentCity: "",
       permanentState: "",
       permanentCountry: "",
-      permissions: [],
     });
 
     router.push('/admin/sub-user/list');
@@ -328,12 +278,7 @@ const handleSubmit = async (e) => {
       label: item.name,
     }));
 
-  const groupedPermissions = permission.reduce((acc, perm) => {
-    if (!acc[perm.panel]) acc[perm.panel] = {};
-    if (!acc[perm.panel][perm.module]) acc[perm.panel][perm.module] = [];
-    acc[perm.panel][perm.module].push(perm);
-    return acc;
-  }, {});
+ 
 
   const formFields = [
     { label: "Name", name: "name", type: "text", required: true },
@@ -341,7 +286,7 @@ const handleSubmit = async (e) => {
     { label: "Phone Number", name: "phoneNumber", type: "text" },
     { label: "Permanent Address", name: "permanentAddress", type: "text" },
   ];
-  if (loading || loadingPermission) {
+  if (loading ) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <HashLoader size={60} color="#F97316" loading={true} />
@@ -481,47 +426,7 @@ const handleSubmit = async (e) => {
         ))}
       </div>
 
-      <div>
-        <label className="block text-[#232323] font-bold mb-1 mt-2">Permissions <span className="text-red-500">*</span></label>
-        <div className="space-y-4">
-          {groupedPermissions?.Admin && (
-            <div className="space-y-4">
-              {Object.entries(groupedPermissions.Admin).map(([module, perms]) => (
-                <div key={module} className="space-y-2">
-                  {/* Module Name and Action List */}
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-semibold capitalize">{module}</h4>
-
-                  </div>
-
-                  {/* Permission Checkboxes */}
-                  <div className="md:grid flex flex-wrap border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 md:gap-2 gap-4 md:grid-cols-3">
-                    {perms.map((perm) => (
-                      <label key={perm.id} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={
-                            Array.isArray(formData.permissions)
-                              ? formData.permissions.includes(String(perm.id))
-                              : String(formData.permissions || '')
-                                .split(',')
-                                .includes(String(perm.id))
-                          }
-                          onChange={() => handlePermissionChange(perm.id)}
-                        />
-
-
-                        <span className="capitalize text-[#232323] font-bold">{perm.action}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        {errors.permissions && <p className="text-red-500 text-sm">{errors.permissions}</p>}
-      </div>
+     
 
       <div className="flex space-x-4 mt-6">
         <button

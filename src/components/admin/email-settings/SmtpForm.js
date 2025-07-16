@@ -18,72 +18,70 @@ export default function SmtpForm() {
     })
 
 
-    // const searchParams = useSearchParams();
-    // const id = searchParams.get('id');
 
-    // const fetchSubuser = useCallback(async () => {
-    //     const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    const fetchSubuser = useCallback(async () => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-    //     if (adminData?.project?.active_panel !== "admin") {
-    //         localStorage.removeItem("shippingData");
-    //         router.push("/admin/auth/login");
-    //         return;
-    //     }
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
 
-    //     const admintoken = adminData?.security?.token;
-    //     if (!admintoken) {
-    //         router.push("/admin/auth/login");
-    //         return;
-    //     }
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
 
-    //     try {
-    //         setLoading(true);
+        try {
+            setLoading(true);
 
-    //         const response = await fetch(
-    //             `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/email-config/${id}`,
-    //             {
-    //                 method: "GET",
-    //                 headers: {
-    //                     "Content-Type": "application/json",
-    //                     Authorization: `Bearer ${admintoken}`,
-    //                 },
-    //             }
-    //         );
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/email-config/smtp`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                }
+            );
 
-    //         if (!response.ok) {
-    //             const errorMessage = await response.json();
-    //             Swal.fire({
-    //                 icon: "error",
-    //                 title: "Something Wrong!",
-    //                 text:
-    //                     errorMessage.message || "Network Error.",
-    //             });
-    //             throw new Error(errorMessage.message);
-    //         }
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text:
+                        errorMessage.message ||errorMessage.error || "Network Error.",
+                });
+                throw new Error(errorMessage.message);
+            }
 
-    //         const result = await response.json();
-    //         const emails = result?.emailConfig || {};
+            const result = await response.json();
+            const emails = result?.emailConfig || {};
 
-    //         setFormData({
-    //             smtp_host: emails.smtp_host || "",
-    //             smtp_secure: emails.smtp_secure || "",
-    //             smtp_port: emails.smtp_port || "",
-    //             smtp_username: emails.smtp_username || "",
-    //             smtp_password: emails.smtp_password || "",
-    //             from_email: emails.from_email || "",
-    //             from_name: emails.from_name || "",
-    //         })
+            setFormData({
+                smtp_host: emails.smtp_host || "",
+                smtp_secure: emails.smtp_secure || "",
+                smtp_port: emails.smtp_port || "",
+                smtp_username: emails.smtp_username || "",
+                smtp_password: emails.smtp_password || "",
+                from_email: emails.from_email || "",
+                from_name: emails.from_name || "",
+            })
 
-    //     } catch (error) {
-    //         console.error("Error fetching subuser:", error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // }, [router, id]);
+        } catch (error) {
+            console.error("Error fetching subuser:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router]);
 
-    // useEffect(() => {
-    //     fetchSubuser();
-    // }, [])
+    useEffect(() => {
+        fetchSubuser();
+    }, [])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -101,7 +99,7 @@ export default function SmtpForm() {
         data.append("from_name", formData.from_name);         // e.g., Shipping OWL
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/email-config/${id}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/email-config/smtp`, {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${token}`,

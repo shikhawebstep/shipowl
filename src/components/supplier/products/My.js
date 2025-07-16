@@ -564,7 +564,6 @@ export default function My() {
     return (
         <>
             <div className="flex flex-wrap md:justify-end gap-3 justify-center mb-6">
-
                 <div className="flex justify-end gap-2">
                     {
                         canViewTrashed && (
@@ -599,25 +598,29 @@ export default function My() {
 
                     <div className="grid xl:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 gap-3 productsSection">
                         {products.map((product, index) => {
-                            const variantsImage = product?.variants || [];
-                            const imageString = product?.product?.gallery || "";
+                            // Ensure product and gallery are not undefined or null, and fallback properly.
+                            const imageString = (product?.product?.gallery && product.product.gallery.trim()) || "";
                             const productName = product?.product?.name || "NIL";
+
+                            // Initialize the imageSortingIndex as an empty object if it's invalid.
                             let imageSortingIndex = {};
                             try {
-                                imageSortingIndex = JSON.parse(product?.product?.imageSortingIndex || '{}');
+                                imageSortingIndex = product?.product?.imageSortingIndex ? JSON.parse(product.product.imageSortingIndex) : {};
                             } catch (err) {
                                 console.error('Failed to parse imageSortingIndex:', err);
                             }
-                            
-                            // Default to [] if no .gallery present
+
+                            // Default to an empty array if no gallery in imageSortingIndex.
                             const productImageSortingIndex = Array.isArray(imageSortingIndex.gallery)
-                            ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value) - parseInt(b.value))
-                            : [];
-                            
-                            
+                                ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value) - parseInt(b.value))
+                                : [];
+
+                            // Safely retrieve the first image index, defaulting to 0 if unavailable.
                             const firstImageIndex = productImageSortingIndex[0]?.index ?? 0;
-                            
+
+                            // Ensure imageUrl always returns a valid image path (fallback to default if invalid).
                             const imageUrl = imageString.split(",")[firstImageIndex]?.trim() || "/default-image.jpg";
+
 
                             const getPriceDisplay = (variants) => {
                                 if (!variants?.length) return <span>N/A</span>;

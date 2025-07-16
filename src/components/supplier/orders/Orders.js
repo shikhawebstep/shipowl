@@ -14,6 +14,13 @@ import { HashLoader } from 'react-spinners';
 import Swal from 'sweetalert2'; // ✅ added import
 import { FaCheck } from "react-icons/fa";
 import { IoFilterSharp } from "react-icons/io5";
+
+const STATUS_LIST = [
+  "Cancelled", "Damaged", "Delivered", "Progress", "In Transit", "Lost", "Not Serviceable",
+  "Order Placed", "Out for Delivery", "Picked Up", "Pickup Cancelled",
+  "Pickup Pending", "Pickup Scheduled", "RTO Delivered", "RTO Failed", "RTO In Transit"
+];
+
 import { RiFileEditFill } from 'react-icons/ri';
 import { IoCloudDownloadOutline } from 'react-icons/io5';
 import { RxCrossCircled } from 'react-icons/rx';
@@ -24,29 +31,9 @@ import barcode from '@/app/assets/barcode.png'
 import Image from 'next/image';
 import useScannerDetection from '../useScannerDetection';
 export default function Orders() {
-  const [activeFilter, setActiveFilter] = useState(null);
-  const [filterValues, setFilterValues] = useState({
-    orderId: '',
-    shipmentStatus: [],
-    customerInfo: '',
-    paymentTransaction: '',
-    paymentStatus: [],
-    awbNumber: '',
-  });
-  const statusList = ["Cancelled", "Damaged", "Delivered", "Progress", "In Transit", "Lost", "Not Serviceable",
-    "Order Placed", "Out for Delivery", "Picked Up", "Pickup Cancelled",
-    "Pickup Pending", "Pickup Scheduled", "RTO Delivered", "RTO Failed", "RTO In Transit"];
-  const filteredStatusList = statusList.filter(status =>
-    status.toLowerCase().includes(search.toLowerCase())
-  );
-  const toggleCheckbox = (key, value) => {
-    setFilterValues((prev) => {
-      const updated = prev[key].includes(value)
-        ? prev[key].filter(v => v !== value)
-        : [...prev[key], value];
-      return { ...prev, [key]: updated };
-    });
-  };
+  const [showShipmentDetailsFilter, setShowShipmentDetailsFilter] = useState(false);
+  const [showCustomerFilter, setShowCustomerFilter] = useState(false);
+  const [showPaymentFilter, setShowPaymentFilter] = useState(false);
   const [filter, setFilter] = useState("Actual Ratio");
   const [tracking, setTracking] = useState([]);
   const [filters, setFilters] = useState({
@@ -59,10 +46,27 @@ export default function Orders() {
     status: 'All',
     model: 'Warehouse Model',
   });
+  const [selectedPaymentStatuses, setSelectedPaymentStatuses] = useState([]);
+  const togglePaymentStatus = (status) => {
+    setSelectedPaymentStatuses((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
+    );
+  };
+  const [search, setSearch] = useState("");
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const filteredStatusList = STATUS_LIST.filter((status) =>
+    status.toLowerCase().includes(search.toLowerCase())
+  );
 
-
-
-
+  const toggleStatus = (status) => {
+    setSelectedStatuses((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
+    );
+  };
   const [showFilter, setShowFilter] = useState(false);
   const [showStatus, setShowStatus] = useState(false);
   const [orderId, setOrderId] = useState('');
@@ -209,7 +213,7 @@ export default function Orders() {
           text:
             errorMessage.error ||
             errorMessage.message ||
-            "Network Error.",
+            "Your session has expired. Please log in again.",
         });
         throw new Error(errorMessage.message || errorMessage.error);
       }
@@ -492,49 +496,13 @@ export default function Orders() {
                 </div>
 
               </div>
-
-              {/* <div> <label className='text-[#232323] font-medium block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-           <div> <label className='text-[#232323] font-medium block'>Product Name</label>  <input type="text" placeholder="Name" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-           <div> <label className='text-[#232323] font-medium block'>Product SKU</label>  <input type="text" placeholder="SKU" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-           <div> <label className='text-[#232323] font-medium block'>Tag:</label>  <input type="text" placeholder="ALL" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-           <div> <label className='text-[#232323] font-medium block'>Article Id:</label>  <input type="text" placeholder="ID" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-           <div> <label className='text-[#232323] font-medium block'>Search Query:</label>  <input type="text" placeholder="Query" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-           <div className="flex gap-2 items-end">
-             <button className="bg-blue-600 text-white px-6 py-2 rounded-md">Apply</button>
-             <button className="bg-red-500 text-white px-6 py-2 rounded-md">Reset</button>
-           </div> */}
             </div>
             <div className='flex justify-end' onClick={() => openBarCodeModal()}>
               <Image src={barcode} height={70} width={70} alt="Barcode Image" />
             </div>
 
           </div>
-          {/* <div className='lg:flex gap-4 mb-5 items-center justify-between'>
- 
- 
-           <div className="grid md:grid-cols-3 gap-3 lg:w-8/12 grid-cols-1 items-end justify-between">
-             <div>
-               <label className='text-[#232323] font-medium block'>Status:</label>
-               <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-2 rounded-xl">
-                 <option value="All">All</option>
-               </select>
-             </div>
-             <div > <label className='text-[#232323] font-medium block'>Select Model</label>
-               <select type="text" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl">
-                 <option value="Warehouse Model">Warehouse Model</option>
-               </select>
-             </div>
-             <div > <label className='text-[#232323] font-medium block'>Select Dropshipper</label>
-               <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-2 rounded-xl">
-                 <option value="John Doe (john@gmail.com)">John Doe (john@gmail.com)</option>
-               </select>
-             </div>
-           </div>
-           <div className='lg:w-4/12 mt-3 lg:mt-0 flex justify-end gap-3'>
-             <button className="bg-[#4C82FF] text-white font-medium px-6 py-2 rounded-md text-sm">Filter</button>
-             <button className="bg-[#F98F5C] text-white font-medium px-6 py-2 rounded-md text-sm">Export</button>
-           </div>
-         </div> */}
+        
 
         </div>
 
@@ -586,17 +554,26 @@ export default function Orders() {
                 if (window.$.fn.DataTable.isDataTable('#orderTable')) {
                   const table = window.$('#orderTable').DataTable();
 
-                  // Clear global and column searches, then redraw
-                  table.search('').columns().search('').draw();
-                }
-                setActiveFilter(null);
-                
+                  // Clear global search
+                  table.search('');
 
+                  // Clear column searches
+                  table.columns().search('');
+
+                  // Redraw the table
+                  table.draw();
+                }
+
+                // Reset filter states
+                setOrderId('');
+                setSelectedStatuses([]);
+                setSelectedPaymentStatuses([]);
+                setSearch('');
               }}
+
             >
               Clear Filters <IoMdRefresh className="text-xl" />
             </span>
-
 
             <span><IoSettingsOutline className="text-xl" /></span>
             <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
@@ -633,58 +610,6 @@ export default function Orders() {
 
           </div>
         </div>
-        {activeFilter?.key === 'shipmentStatus' && (
-          <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
-            <h3 className="font-medium text-gray-700 mb-2">Filter by Shipment Status:</h3>
-            <input
-              type="text"
-              placeholder="Search status..."
-              className="w-full mb-2 px-3 py-1 border border-gray-300 rounded text-sm"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-
-            <div className="h-60 overflow-y-auto border rounded p-2">
-              {filteredStatusList.map((status) => (
-                <label key={status} className="flex items-center gap-2 py-1 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={filterValues.shipmentStatus.includes(status)}
-                    onChange={() => toggleCheckbox('shipmentStatus', status)}
-                    className="h-4 w-4"
-                  />
-                  {status}
-                </label>
-              ))}
-            </div>
-
-            <div className="flex justify-between items-center mt-4 gap-2">
-              <button
-                className="text-green-600 text-sm hover:underline"
-                onClick={() => {
-                  setFilterValues((prev) => ({ ...prev, shipmentStatus: [] }));
-                  $('#orderTable').DataTable().column(2).search('').draw();
-                }}
-              >
-                Reset
-              </button>
-              <button
-                className={`px-4 py-1 rounded text-white text-sm ${filterValues.shipmentStatus.length
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-gray-300 cursor-not-allowed'
-                  }`}
-                onClick={() => {
-                  const regex = filterValues.shipmentStatus.join('|');
-                  $('#orderTable').DataTable().column(2).search(regex, true, false).draw();
-                  setActiveFilter(null);
-                }}
-                disabled={!filterValues.shipmentStatus.length}
-              >
-                Apply
-              </button>
-            </div>
-          </div>
-        )}
 
 
         {
@@ -696,122 +621,400 @@ export default function Orders() {
                   <tr className="text-[#A3AED0] uppercase border-b border-[#E9EDF7]">
                     <th className="p-3 px-5 whitespace-nowrap">SR.</th>
 
-                    {/* Order Details (Order ID) */}
-                    <th className="p-3 px-5 whitespace-nowrap relative">
-                      <button
-                        onClick={(e) =>
-                          setActiveFilter({
-                            key: "orderId",
-                            label: "Order ID",
-                            columnIndex: 1,
-                            position: e.currentTarget.getBoundingClientRect(),
-                          })
-                        }
-                        className="flex gap-2 uppercase items-center"
-                      >
-                        Order Details <IoFilterSharp className="w-4 h-4" />
-                      </button>
+                    <th className="p-3 px-5 whitespace-nowrap overflow-visible relative" >
+                      <button onClick={() => {
+                        setShowFilter(!showFilter);
+                        setShowStatus(false);
+                        setShowCustomerFilter(false);
+                        setShowPaymentFilter(false);
+                        setShowShipmentDetailsFilter(false)
+                      }} className='flex gap-2 uppercase items-center'> Order Details <IoFilterSharp className="w-4 h-4" /></button>
+                      {showFilter && (
+                        <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+                          {/* Header */}
+                          <div className="flex justify-between items-center mb-2">
+                            <label className="text-sm font-medium text-gray-700">Order ID:</label>
+                            <button
+                              onClick={() => {
+                                setOrderId('');
+                                if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                  window.$('#orderTable').DataTable().search('').draw();
+                                }
+                              }}
+                              className="text-green-600 text-xs hover:underline"
+                            >
+                              Reset All
+                            </button>
+                          </div>
+
+                          {/* Input Search */}
+                          <input
+                            type="text"
+                            value={orderId}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setOrderId(value);
+
+
+                            }}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring focus:ring-green-500"
+                            placeholder="Enter order ID"
+                          />
+
+                          {/* Optional Dropdown Filter */}
+                          <div className="mt-4">
+                            <label className="text-sm font-medium text-gray-700">Filter:</label>
+                            {filterOptions.length === 0 ? (
+                              <p className="text-xs text-gray-400 mt-1">No items found</p>
+                            ) : (
+                              <select className="w-full mt-1 px-2 py-2 text-sm border rounded-md">
+                                {filterOptions.map((opt) => (
+                                  <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
+                          </div>
+
+                          {/* Apply Button */}
+                          <button
+                            onClick={() => {
+                              if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                window.$('#orderTable').DataTable().search(orderId).draw();
+                              }
+                              setShowFilter(false);
+                              setShowStatus(false);
+                            }}
+                            className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
+                          >
+                            Apply
+                          </button>
+                        </div>
+                      )}
+
+                    </th>
+                    <th className="p-3 px-5 whitespace-nowrap relative uppercase">
+                      <button onClick={() => {
+                        setShowStatus(!showStatus);
+                        setShowFilter(false);
+                        setShowCustomerFilter(false);
+                        setShowPaymentFilter(false);
+                        setShowShipmentDetailsFilter(false)
+                      }} className='flex gap-2 uppercase items-center'> Shipment Status <IoFilterSharp className="w-4 h-4" /></button>
+
+                      {showStatus && (
+                        <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+                          <h3 className="font-medium text-gray-700 mb-2">Filter by Status:</h3>
+
+                          <input
+                            type="text"
+                            placeholder="Search"
+                            className="w-full mb-2 px-3 py-1 border border-gray-300 rounded text-sm"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                          />
+
+                          <div className="h-60 overflow-y-auto border border-gray-200 rounded p-2">
+                            {filteredStatusList.map((status) => (
+                              <label key={status} className="flex items-center gap-2 py-1 text-sm text-gray-700">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedStatuses.includes(status)}
+                                  onChange={() => toggleStatus(status)}
+                                  className="h-4 w-4"
+                                />
+                                {status}
+                              </label>
+                            ))}
+                            {filteredStatusList.length === 0 && (
+                              <p className="text-gray-400 text-sm mt-2">No items found</p>
+                            )}
+                          </div>
+
+                          <div className="mt-4 flex justify-between items-center gap-2">
+                            {/* Reset All */}
+                            <button
+                              onClick={() => {
+                                setSearch("");
+                                setSelectedStatuses([]);
+                                if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                  window.$('#orderTable').DataTable().column(2).search('').draw();
+                                }
+                              }}
+                              className="text-green-600 text-sm hover:underline"
+                            >
+                              Reset All
+                            </button>
+
+                            {/* Clear only checkboxes */}
+                            <button
+                              onClick={() => {
+                                setSelectedStatuses([]);
+                                if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                  window.$('#orderTable').DataTable().column(2).search('').draw();
+                                }
+                              }}
+                              className="text-gray-600 text-sm hover:underline"
+                            >
+                              Clear
+                            </button>
+
+                            {/* Apply */}
+                            <button
+                              className={`px-4 py-1 rounded text-white text-sm ${selectedStatuses.length
+                                  ? "bg-green-600 hover:bg-green-700"
+                                  : "bg-gray-300 cursor-not-allowed"
+                                }`}
+                              onClick={() => {
+                                if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                  const regex = selectedStatuses.join('|');
+                                  window.$('#orderTable').DataTable().column(2).search(regex, true, false).draw();
+                                }
+                                setShowStatus(false);
+                                setShowFilter(false);
+                              }}
+                              disabled={!selectedStatuses.length}
+                            >
+                              Apply
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+
                     </th>
 
-                    {/* Shipment Status */}
-                    <th className="p-3 px-5 whitespace-nowrap relative">
-                      <button
-                        onClick={(e) =>
-                          setActiveFilter({
-                            key: "shipmentStatus",
-                            label: "Shipment Status",
-                            columnIndex: 2,
-                            position: e.currentTarget.getBoundingClientRect(),
-                          })
-                        }
-                        className="flex gap-2 uppercase items-center"
-                      >
-                        Shipment Status <IoFilterSharp className="w-4 h-4" />
-                      </button>
-                    </th>
 
-                    {/* Customer Info */}
-                    {hasAnyPermission("shippingName", "shippingPhone", "shippingEmail") && (
-                      <th className="p-3 px-5 whitespace-nowrap relative">
+                    {hasAnyPermission(
+                      "shippingName",
+                      "shippingPhone",
+                      "shippingEmail"
+                    ) && <th className="p-3 px-5 whitespace-nowrap relative">
                         <button
-                          onClick={(e) =>
-                            setActiveFilter({
-                              key: "customerInfo",
-                              label: "Customer Info",
-                              columnIndex: 3,
-                              position: e.currentTarget.getBoundingClientRect(),
-                            })
-                          }
+                          onClick={() => {
+                            setShowCustomerFilter(!showCustomerFilter);
+                            setShowShipmentDetailsFilter(false);
+                            setShowStatus(false);
+                            setShowPaymentFilter(false);
+                            setShowFilter(false);
+                          }}
                           className="flex gap-2 uppercase items-center"
                         >
                           Customer Info <IoFilterSharp className="w-4 h-4" />
                         </button>
-                      </th>
-                    )}
+                      {showCustomerFilter && (
+  <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+    <h3 className="font-medium text-gray-700 mb-2">Filter by Customer:</h3>
 
-                    {/* Payment Details */}
-                    {hasAnyPermission("payment_mode", "transactionId", "amount", "status") && (
-                      <th className="p-3 px-5 whitespace-nowrap relative">
-                        <button
-                          onClick={(e) =>
-                            setActiveFilter({
-                              key: "paymentTransaction",
-                              label: "Payment Details",
-                              columnIndex: 4,
-                              position: e.currentTarget.getBoundingClientRect(),
-                            })
-                          }
-                          className="flex gap-2 uppercase items-center"
-                        >
-                          Payment Details <IoFilterSharp className="w-4 h-4" />
-                        </button>
-                      </th>
-                    )}
+    <input
+      type="text"
+      value={orderId}
+      onChange={(e) => setOrderId(e.target.value)}
+      placeholder="Name, Phone, or Email..."
+      className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
+    />
 
-                    {/* Shipment Details */}
-                    {hasAnyPermission("order_number", "shippingPhone", "shippingAddress", "awb_number") && (
-                      <th className="p-3 px-5 whitespace-nowrap relative">
+    <div className="flex justify-between items-center gap-2">
+      <button
+        className={`flex-1 px-4 py-1 rounded text-white text-sm ${
+          orderId ? "bg-green-600 hover:bg-green-700" : "bg-gray-300 cursor-not-allowed"
+        }`}
+        onClick={() => {
+          if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+            window.$('#orderTable').DataTable().search(orderId).draw();
+          }
+          setShowCustomerFilter(false);
+          setOrderId('');
+        }}
+        disabled={!orderId}
+      >
+        Apply
+      </button>
+
+      <button
+        className="flex-1 px-4 py-1 rounded border border-gray-300 text-gray-700 text-sm hover:bg-gray-100"
+        onClick={() => {
+          setOrderId('');
+          if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+            window.$('#orderTable').DataTable().search('').draw();
+          }
+        }}
+      >
+        Reset
+      </button>
+    </div>
+  </div>
+)}
+
+
+                      </th>
+                    }
+
+                    {hasAnyPermission(
+                      "payment_mode",
+                      "transactionId",
+                      "amount",
+                      "status"
+                    ) && (
+                        <th className="p-3 px-5 whitespace-nowrap relative">
+                          <button
+                            onClick={() => {
+                              setShowPaymentFilter(!showPaymentFilter);
+                              setShowCustomerFilter(false);
+                              setShowShipmentDetailsFilter(false);
+                              setShowStatus(false);
+                              setShowFilter(false);
+                            }}
+                            className="flex gap-2 uppercase items-center"
+                          >
+                            Payment Details <IoFilterSharp className="w-4 h-4" />
+                          </button>
+                          {showPaymentFilter && (
+                            <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+                              <h3 className="font-medium text-gray-700 mb-2">Filter by Payment:</h3>
+
+                              {/* Transaction ID input */}
+                              <input
+                                type="text"
+                                value={orderId}
+                                onChange={(e) => setOrderId(e.target.value)}
+                                placeholder="Transaction ID..."
+                                className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
+                              />
+
+                              {/* Payment Status checkboxes */}
+                              <div className="mt-3">
+                                <label className="block text-sm font-medium text-gray-700">Payment Status</label>
+                                <div className="grid grid-cols-3 gap-2 mt-2 text-xs text-gray-700">
+                                  {["failed", "success", "pending"].map((status) => (
+                                    <label key={status} className="flex items-center gap-1">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedPaymentStatuses.includes(status)}
+                                        onChange={() => togglePaymentStatus(status)}
+                                        className="h-4 w-4"
+                                      />
+                                      {status}
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Buttons */}
+                              <div className="flex justify-between items-center mt-4 gap-2">
+                                <button
+                                  className={`flex-1 px-4 py-1 rounded text-white text-sm ${orderId || selectedPaymentStatuses.length
+                                    ? "bg-green-600 hover:bg-green-700"
+                                    : "bg-gray-300 cursor-not-allowed"
+                                    }`}
+                                  onClick={() => {
+                                    if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                      window.$('#orderTable').DataTable().search(orderId).draw();
+                                      const regex = selectedPaymentStatuses.join('|');
+                                      window.$('#orderTable').DataTable().column(4).search(regex, true, false).draw();
+                                    }
+                                    setShowPaymentFilter(false);
+                                    setShowFilter(false);
+                                  }}
+                                  disabled={!orderId && selectedPaymentStatuses.length === 0}
+                                >
+                                  Apply
+                                </button>
+
+                                <button
+                                  className="flex-1 px-4 py-1 rounded border border-gray-300 text-gray-700 text-sm hover:bg-gray-100"
+                                  onClick={() => {
+                                    setOrderId('');
+                                    setSelectedPaymentStatuses([]);
+                                    if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                      window.$('#orderTable').DataTable().search('').draw();
+                                      window.$('#orderTable').DataTable().column(4).search('').draw();
+                                    }
+                                  }}
+                                >
+                                  Reset
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </th>
+
+                      )}
+                    {hasAnyPermission(
+                      "order_number",
+                      "shippingPhone",
+                      "shippingAddress",
+                      "awb_number",
+                    ) && <th className="p-3 px-5 whitespace-nowrap relative">
                         <button
-                          onClick={(e) =>
-                            setActiveFilter({
-                              key: "awbNumber",
-                              label: "Shipment Details",
-                              columnIndex: 5,
-                              position: e.currentTarget.getBoundingClientRect(),
-                            })
-                          }
+                          onClick={() => {
+                            setShowShipmentDetailsFilter(!showShipmentDetailsFilter);
+                            setShowCustomerFilter(false);
+                            setShowPaymentFilter(false);
+                            setShowStatus(false);
+                            setShowFilter(false);
+                          }}
                           className="flex gap-2 uppercase items-center"
                         >
                           Shipment Details <IoFilterSharp className="w-4 h-4" />
                         </button>
-                      </th>
-                    )}
+                        {showShipmentDetailsFilter && (
+                          <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+                            <h3 className="font-medium text-gray-700 mb-2">Filter by Shipment:</h3>
+                            <input
+                              type="text"
+                              placeholder="AWB number..."
+                              value={orderId}
+                              onChange={(e) => {
+                                setOrderId(e.target.value);
 
-                    {/* Return Tracking Number */}
-                    {hasAnyPermission("trackingNumber") && (
+                              }}
+                              className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
+                            />
+                            <button
+                              className="mt-2 block px-4 w-full bg-green-600 text-white py-1 rounded hover:bg-green-700"
+                              onClick={() => {
+                                if (window.$.fn.DataTable.isDataTable('#orderTable')) {
+                                  window.$('#orderTable').DataTable().search(orderId).draw();
+                                }
+                                setOrderId('');
+                                setShowShipmentDetailsFilter(false);
+                              }}
+                            >
+                              Apply
+                            </button>
+                          </div>
+                        )}
+
+                      </th>
+                    }
+
+
+                    {hasAnyPermission("trackingNumber ") && (
                       <th className="p-3 px-5 whitespace-nowrap">Return Tracking #</th>
                     )}
 
-                    {/* Delivered Status */}
                     {hasAnyPermission("rtoDelivered", "delivered") && (
-                      <th className="p-3 px-5 whitespace-nowrap">Delivered Status</th>
+                      <>
+                        <th className="p-3 px-5 whitespace-nowrap">delivered Status</th>
+                      </>
                     )}
-
-                    {/* Delivered Date */}
                     {hasAnyPermission("rtoDeliveredDate", "deliveredDate") && (
-                      <th className="p-3 px-5 whitespace-nowrap">Delivered Date</th>
+                      <>
+                        <th className="p-3 px-5 whitespace-nowrap">delivered Date</th>
+                      </>
                     )}
 
-                    {/* Total */}
+
+
                     {hasAnyPermission("totalAmount") && (
                       <th className="p-3 px-5 whitespace-nowrap">Total</th>
                     )}
-
                     <th className="p-2 px-5 text-left whitespace-nowrap">Download Invoice</th>
                     <th className="p-2 px-5 text-center">Action</th>
                   </tr>
                 </thead>
-
                 <tbody>
 
                   {orders.map((order, index) => {

@@ -419,25 +419,29 @@ const NewlyLaunched = () => {
               </div>
 
               {products.map((product, index) => {
-                const productName = product?.product?.name || "NIL";
-                const variants = product?.variants || [];
-                const firstVariantImageString = product?.product?.gallery;
+                const productName = product?.product?.name || "NIL"; // Fallback to "NIL" if product name is missing
+                const variants = product?.variants || []; // Default to empty array if variants are missing
+                const firstVariantImageString = product?.product?.gallery || ""; // Default to empty string if gallery is missing
+
                 let imageSortingIndex = {};
                 try {
-                  imageSortingIndex = JSON.parse(product.imageSortingIndex || product?.product?.imageSortingIndex || '{}');
+                  // Safely parse imageSortingIndex, falling back to '{}' if undefined or malformed
+                  imageSortingIndex = JSON.parse(product?.imageSortingIndex || product?.product?.imageSortingIndex || '{}');
                 } catch (err) {
                   console.error('Failed to parse imageSortingIndex:', err);
                 }
 
-                // Default to [] if no .gallery present
+                // Default to [] if no .gallery present in imageSortingIndex
                 const productImageSortingIndex = Array.isArray(imageSortingIndex.gallery)
-                  ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value) - parseInt(b.value))
+                  ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value, 10) - parseInt(b.value, 10)) // Sort by value
                   : [];
 
-
+                // Safely get the first image index, default to 0 if unavailable
                 const firstImageIndex = productImageSortingIndex[0]?.index ?? 0;
 
+                // Default to "/default-image.jpg" if no valid image URL is found
                 const imageUrl = firstVariantImageString.split(",")[firstImageIndex]?.trim() || "/default-image.jpg";
+
 
                 return (
                   <div

@@ -26,6 +26,8 @@ const SupplierList = () => {
     const [expandPassModal, setExpandPassModal] = useState(null);
     const [selected, setSelected] = useState([]);
     const { setActiveSubTab } = useContext(ProfileContext);
+    const [showWarehouseModal, setShowWarehouseModal] = useState(false);
+    const [selectedWarehouses, setSelectedWarehouses] = useState([]);
 
     const [activeFilter, setActiveFilter] = useState(null);
     const [nameFilter, setNameFilter] = useState('');
@@ -496,6 +498,59 @@ const SupplierList = () => {
                 </div>
             )}
 
+            {showWarehouseModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                    <div className="bg-white rounded-xl p-6 w-[90%] max-w-3xl relative shadow-lg overflow-y-auto max-h-[80vh]">
+                        <button
+                            className="absolute top-2 right-2 text-xl text-gray-500 hover:text-red-600"
+                            onClick={() => setShowWarehouseModal(false)}
+                        >
+                            &times;
+                        </button>
+
+                        <h2 className="text-xl font-bold mb-4 text-[#2B3674]">Warehouse Details</h2>
+
+                        {selectedWarehouses.length > 0 ? (
+                            <table className="w-full text-sm border border-collapse border-gray-200">
+                                <thead>
+                                    <tr className="bg-gray-100">
+                                        <th className="p-2 border">Name</th>
+                                        <th className="p-2 border">GST</th>
+                                        <th className="p-2 border">Contact</th>
+                                        <th className="p-2 border">Phone</th>
+                                        <th className="p-2 border">Address</th>
+                                        <th className="p-2 border">Pincode</th>
+                                        <th className="p-2 border">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {selectedWarehouses.map((wh) => (
+                                        <tr key={wh.id} className="text-left border-t">
+                                            <td className="p-2 border">{wh.name}</td>
+                                            <td className="p-2 border">{wh.gst_number}</td>
+                                            <td className="p-2 border">{wh.contact_name}</td>
+                                            <td className="p-2 border">{wh.contact_number}</td>
+                                            <td className="p-2 border">
+                                                {wh.address_line_1}, {wh.address_line_2}
+                                            </td>
+                                            <td className="p-2 border">{wh.postal_code}</td>
+                                            <td className="p-2 border">
+                                                <span className={`px-2 py-1 rounded text-white text-xs ${wh.status ? "bg-green-500" : "bg-gray-400"}`}>
+                                                    {wh.status ? "Active" : "Inactive"}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        ) : (
+                            <p className="text-gray-500">No warehouses available for this supplier.</p>
+                        )}
+                    </div>
+                </div>
+            )}
+
+
             {filteredSuppliers.length > 0 ? (
                 <div className="overflow-x-auto w-full relative main-outer-wrapper">
                     <table className="display main-tables w-full" id="supplierTable">
@@ -580,7 +635,7 @@ const SupplierList = () => {
                                     </button>
                                 </th>
 
-                                <th className="p-3 text-left uppercase whitespace-nowrap">Check Reporting</th>
+                                <th className="p-3 text-left uppercase whitespace-nowrap">Check Reporting/WareHouse</th>
                                 <th className="p-3 text-left uppercase whitespace-nowrap">Update Password</th>
                                 <th className="p-3 text-left uppercase whitespace-nowrap">Actions</th>
                             </tr>
@@ -651,12 +706,22 @@ const SupplierList = () => {
                                                 </button>
                                             </td>
                                             <td className="p-3 text-left whitespace-nowrap">
-                                                <button
+                                                <div className='flex gap-2'><button
                                                     className='bg-orange-500 text-sm rounded-md text-white p-2'
                                                     onClick={() => checkReporting(item.id)}
                                                 >
                                                     View Reporting
                                                 </button>
+                                                    <button
+                                                        className='bg-green-500 text-sm rounded-md text-white p-2'
+                                                        onClick={() => {
+                                                            setSelectedWarehouses(item.warehouses || []);
+                                                            setShowWarehouseModal(true);
+                                                        }}
+                                                    >
+                                                        View WareHouse
+                                                    </button></div>
+
                                             </td>
                                             <td className="p-3 text-left whitespace-nowrap">
                                                 <button

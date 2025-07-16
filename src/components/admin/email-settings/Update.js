@@ -64,7 +64,7 @@ export default function Update() {
             setLoading(true);
 
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/email-config/${id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/email-config/template/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -175,7 +175,7 @@ export default function Update() {
         data.append("bcc", safeStringify(bccMails.filter(({ name, email }) => name || email)));
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/email-config/${id}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/email-config/template/${id}`, {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${token}`,

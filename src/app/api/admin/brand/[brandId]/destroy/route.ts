@@ -1,31 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getBrandById, deleteBrand } from '@/app/models/admin/brand';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    admin?: MainAdmin;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  admin?: MainAdmin;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    admin?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  admin?: SupplierStaff;
 }
 
 export async function DELETE(req: NextRequest) {
@@ -99,15 +99,41 @@ export async function DELETE(req: NextRequest) {
 
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          module: 'Brand',
+          action: 'Permanent Delete',
+          data: result,
+          response: { status: true, message: `Brand permanently deleted successfully` },
+          status: true
+        }, req);
       logMessage('info', `Brand permanently deleted successfully: ${brandIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `Brand permanently deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        module: 'Brand',
+        action: 'Permanent Delete',
+        data: result,
+        response: { status: false, message: 'Brand not found or deletion failed' },
+        status: false
+      }, req);
+
     logMessage('info', `Brand not found or could not be deleted: ${brandIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'Brand not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        module: 'Brand',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error, message: 'Internal server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during brand deletion', { error });
-    return NextResponse.json({ status: false, error, message: 'Internal server error 8' }, { status: 500 });
+    return NextResponse.json({ status: false, error, message: 'Internal server error' }, { status: 500 });
   }
 }
 

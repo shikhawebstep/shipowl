@@ -174,7 +174,7 @@ export default function NewProducts() {
       if (!response.ok) {
         Swal.fire({
           icon: "error",
-          title: isEdit ? "Updation Failed" : "Creation Failed",
+          title: "Creation Failed",
           text: result.message || result.error || "An error occurred",
         });
         Swal.close();

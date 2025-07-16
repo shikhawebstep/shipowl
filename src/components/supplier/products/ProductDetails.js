@@ -70,43 +70,54 @@ const ProductDetails = () => {
   useEffect(() => {
     let imageSortingIndex = {};
     try {
-      imageSortingIndex = JSON.parse(productDetails.imageSortingIndex || '{}');
+      // Safely parse the imageSortingIndex, falling back to '{}' if undefined or empty
+      imageSortingIndex = productDetails?.imageSortingIndex
+        ? JSON.parse(productDetails.imageSortingIndex)
+        : {};
     } catch (err) {
       console.error('Failed to parse imageSortingIndex:', err);
     }
 
+    // Get the gallery from either productDetails or selectedVariant, defaulting to an empty string
     const images = (
       productDetails?.gallery ||
       selectedVariant?.gallery ||
       ''
-    ).split(',').map((img) => img.trim()).filter(Boolean);
+    )
+      .split(',') // Split the string into individual images
+      .map((img) => img.trim()) // Remove leading/trailing spaces from each image URL
+      .filter(Boolean); // Remove any empty strings from the array
 
-
+    // Ensure imageSortingIndex.gallery is an array or default to an empty array
     const sortingList = Array.isArray(imageSortingIndex.gallery)
       ? [...imageSortingIndex.gallery]
       : [];
 
-    // Create a map for fast lookup
+    // Create a map for fast lookup of the sorting index values
     const indexMap = new Map();
     sortingList.forEach(item => {
       if (typeof item.index === 'number') {
-        indexMap.set(item.index, parseInt(item.value));
+        indexMap.set(item.index, parseInt(item.value, 10)); // Ensure the value is parsed as an integer
       }
     });
 
-    // Sort images according to sorting index
+    // Sort the images according to the sorting index
     const sortedImages = [...images]
       .map((img, idx) => ({
         img,
-        sortOrder: indexMap.has(idx) ? indexMap.get(idx) : Number.MAX_SAFE_INTEGER
+        sortOrder: indexMap.has(idx)
+          ? indexMap.get(idx)
+          : Number.MAX_SAFE_INTEGER, // If no index found, set to the highest safe integer
       }))
-      .sort((a, b) => a.sortOrder - b.sortOrder)
-      .map(obj => obj.img);
+      .sort((a, b) => a.sortOrder - b.sortOrder) // Sort based on the sortOrder
+      .map(obj => obj.img); // Extract the image URLs after sorting
 
+    // Update the state with the sorted images
     setImages(sortedImages);
+
+    // Set the first image as selected, default to empty string if no images available
     setSelectedImage(sortedImages[0] ?? '');
   }, [selectedVariant, productDetails]);
-
 
   const [categoryId, setCategoryId] = useState('');
   const [variantDetails, setVariantDetails] = useState([]);
@@ -1075,19 +1086,22 @@ const ProductDetails = () => {
             {relatedProducts.map((item, index) => {
               const product = type == "notmy" ? item : item || {};
               let imageSortingIndex = {};
+
               try {
-                imageSortingIndex = JSON.parse(product.imageSortingIndex || '{}');
+                // Safely parse the imageSortingIndex from product, defaulting to '{}' if it's missing or invalid
+                imageSortingIndex = product?.imageSortingIndex ? JSON.parse(product.imageSortingIndex) : {};
               } catch (err) {
                 console.error('Failed to parse imageSortingIndex:', err);
               }
 
-              // Default to [] if no .gallery present
-              const productImageSortingIndex = Array.isArray(imageSortingIndex.gallery)
-                ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value) - parseInt(b.value))
+              // Default to an empty array if no valid 'gallery' exists in imageSortingIndex
+              const productImageSortingIndex = Array.isArray(imageSortingIndex?.gallery)
+                ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value, 10) - parseInt(b.value, 10))
                 : [];
 
-
+              // Safely retrieve the first image index, defaulting to 0 if unavailable
               const firstImageIndex = productImageSortingIndex[0]?.index ?? 0;
+
 
               const getPriceDisplay = (variants) => {
                 if (!variants?.length) return <span>N/A</span>;

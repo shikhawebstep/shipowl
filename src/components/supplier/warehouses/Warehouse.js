@@ -1,8 +1,8 @@
 
 "use client"
 import { useState, useCallback, useEffect } from 'react'
-import { BadgePlus, Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
-
+import { Trash2, RotateCcw, Pencil, MoreHorizontal } from "lucide-react";
+import { IoFilterSharp } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 import { useSupplier } from '../middleware/SupplierMiddleWareContext'
 import 'datatables.net-dt/css/dataTables.dataTables.css';
@@ -56,7 +56,7 @@ export default function Warehouse() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/${id}`, {
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/warehouse/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export default function Warehouse() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/warehouse`,
                 {
                     method: "GET",
                     headers: {
@@ -150,7 +150,7 @@ export default function Warehouse() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/trashed`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/warehouse/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -285,7 +285,7 @@ export default function Warehouse() {
             setLoading(true);
 
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/${item.id}`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/warehouse/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -352,7 +352,7 @@ export default function Warehouse() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/${item?.id}/restore`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/warehouse/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -432,7 +432,7 @@ export default function Warehouse() {
             setLoading(true);
 
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/warehouse/${item.id}/destroy`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/supplier/warehouse/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -490,23 +490,6 @@ export default function Warehouse() {
                     </div>
                 ) : (
                     <>
-                        <div className="flex justify-start gap-5 items-end mb-5">
-                            <div className="md:w-4/12">
-                                <select name='supplier' className={`text-[#718EBF] border w-full rounded-md p-3 mt-2 font-bold border-[#DFEAF2]'
-                    }`}>
-                                    <option>Select Supplier</option>
-                                    {suppliers?.map((item, index) => {
-                                        return (
-                                            <option key={index} value={item.id}>{item.name}</option>
-                                        )
-                                    })}
-                                </select>
-                            </div>
-                            {canAdd && (
-                                <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/supplier/warehouse/create">Add New</Link></button>
-                            )}
-
-                        </div>
                         <div className="bg-white rounded-3xl p-5">
                             <div className="flex flex-wrap justify-between items-center mb-4">
                                 <div className='flex items-baseline-last gap-3'>
@@ -529,6 +512,27 @@ export default function Warehouse() {
                                         )}
                                     </button>
                                     <div className="flex justify-end gap-2">
+                                         <div className="md:flex hidden justify-end gap-2">
+                                        {canViewTrashed && <button
+                                            className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                                            onClick={async () => {
+                                                if (isTrashed) {
+                                                    setIsTrashed(false);
+                                                    await fetchWarehouse();
+                                                } else {
+                                                    setIsTrashed(true);
+                                                    await trashwarehouse();
+                                                }
+                                            }}
+                                        >
+                                            {isTrashed ? "Warehouse Listing (Simple)" : "Trashed Warehouse"}
+                                        </button>}
+
+                                        {canCreate && <button className="bg-[#4285F4] text-white rounded-md p-2 px-4">
+                                            <Link href="/supplier/warehouse/create">Add Warehouse</Link>
+                                        </button>}
+
+                                    </div>
                                         <button
                                             onClick={() => {
                                                 const allIds = WarehouseData.map(data => data.id);
@@ -754,7 +758,7 @@ export default function Warehouse() {
                                                             {isTrashed ? (
                                                                 <>
                                                                     {canRestore && <RotateCcw onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
-                                                                    {canDelete && <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
+                                                                    {canDestory && <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
                                                                 </>
                                                             ) : (
                                                                 <>
@@ -768,7 +772,7 @@ export default function Warehouse() {
                                                                         </div>
                                                                     )}
 
-                                                                    {canDelete && (
+                                                                    {canDestory && (
                                                                         <div className="relative group inline-block">
 
                                                                             <Trash2 onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl text-red-500" />

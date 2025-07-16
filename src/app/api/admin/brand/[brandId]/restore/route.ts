@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getBrandById, restoreBrand } from '@/app/models/admin/brand';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -99,14 +99,42 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreBrand(adminId, String(adminRole), brandIdNum);
 
     if (restoreResult?.status) {
+
+      await ActivityLog(
+        {
+          module: 'Brand',
+          action: 'Update',
+          data: restoreResult,
+          response: { status: true, brand: restoreResult.restoredBrand },
+          status: true
+        }, req);
+
       logMessage('info', 'Brand restored successfully:', restoreResult.restoredBrand);
       return NextResponse.json({ status: true, brand: restoreResult.restoredBrand }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        module: 'Brand',
+        action: 'Update',
+        data: restoreResult,
+        response: { status: false, error: 'Brand restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Brand restore failed');
     return NextResponse.json({ status: false, error: 'Brand restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        module: 'Brand',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ Brand restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }

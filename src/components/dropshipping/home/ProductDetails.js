@@ -67,40 +67,46 @@ export default function ProductDetails() {
 
   useEffect(() => {
     let imageSortingIndex = {};
+
     try {
-      imageSortingIndex = JSON.parse(productDetails.imageSortingIndex || '{}');
+      // Safely parse the imageSortingIndex, falling back to '{}' if it's missing or invalid
+      imageSortingIndex = productDetails?.imageSortingIndex
+        ? JSON.parse(productDetails.imageSortingIndex)
+        : {};
     } catch (err) {
       console.error('Failed to parse imageSortingIndex:', err);
     }
 
-    const images =
-      productDetails?.gallery?.split(",") ||
-      productDetails?.gallery?.split(",") ||
-      [];
+    // Safely split gallery into images; default to an empty array if gallery is missing
+    const images = productDetails?.gallery
+      ? productDetails.gallery.split(",").map(img => img.trim()).filter(Boolean)
+      : [];
 
+    // Default to an empty array if imageSortingIndex.gallery is missing or invalid
     const sortingList = Array.isArray(imageSortingIndex.gallery)
       ? [...imageSortingIndex.gallery]
       : [];
 
-    // Create a map for fast lookup
+    // Create a map for fast lookup based on the sorting index
     const indexMap = new Map();
     sortingList.forEach(item => {
       if (typeof item.index === 'number') {
-        indexMap.set(item.index, parseInt(item.value));
+        indexMap.set(item.index, parseInt(item.value, 10)); // Ensure parsing with base 10
       }
     });
 
-    // Sort images according to sorting index
+    // Sort images based on the sorting index
     const sortedImages = [...images]
       .map((img, idx) => ({
         img,
-        sortOrder: indexMap.has(idx) ? indexMap.get(idx) : Number.MAX_SAFE_INTEGER
+        sortOrder: indexMap.has(idx) ? indexMap.get(idx) : Number.MAX_SAFE_INTEGER, // Default to the largest possible number if no index
       }))
-      .sort((a, b) => a.sortOrder - b.sortOrder)
-      .map(obj => obj.img);
+      .sort((a, b) => a.sortOrder - b.sortOrder) // Sort based on the sortOrder
+      .map(obj => obj.img); // Extract the image URLs after sorting
 
+    // Set the images and the first selected image
     setImages(sortedImages);
-    setSelectedImage(sortedImages[0] ?? '');
+    setSelectedImage(sortedImages[0] ?? ''); // Default to empty string if no images available
   }, [selectedVariant, productDetails]);
 
 
@@ -1395,11 +1401,26 @@ export default function ProductDetails() {
 
               const firstVariantImageString =
                 product?.gallery || // case 1
-                product?.gallery ||                         // case 2
+                product?.gallery ||
                 "";
+              let imageSortingIndex = {};
+              try {
+                // Safely parse imageSortingIndex, falling back to '{}' if undefined or malformed
+                imageSortingIndex = JSON.parse(product?.imageSortingIndex || product?.product?.imageSortingIndex || '{}');
+              } catch (err) {
+                console.error('Failed to parse imageSortingIndex:', err);
+              }
 
-              const imageUrl = firstVariantImageString.split(",")[0]?.trim() || "/default-image.jpg";
+              // Default to [] if no .gallery present in imageSortingIndex
+              const productImageSortingIndex = Array.isArray(imageSortingIndex.gallery)
+                ? [...imageSortingIndex.gallery].sort((a, b) => parseInt(a.value, 10) - parseInt(b.value, 10)) // Sort by value
+                : [];
 
+              // Safely get the first image index, default to 0 if unavailable
+              const firstImageIndex = productImageSortingIndex[0]?.index ?? 0;
+
+              const imageUrl = firstVariantImageString.split(",")[firstImageIndex]?.trim() || "/default-image.jpg";
+              
               const prices = variants.map(v => v.price).filter(p => typeof p === "number");
               const lowestPrice = prices.length > 0 ? Math.min(...prices) : "-";
 
