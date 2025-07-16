@@ -11,7 +11,6 @@ import { useImageURL } from "@/components/ImageURLContext";
 import Image from "next/image";
 import { IoFilterSharp } from "react-icons/io5";
 import { FaCheck } from 'react-icons/fa';
-
 export default function List() {
     const [nameFilter, setNameFilter] = useState('');
     const [emailFilter, setEmailFilter] = useState('');
@@ -514,15 +513,15 @@ export default function List() {
                         >
                             Clear All Filters
                         </button>
-                         <button
-                        onClick={() => {
-                            const allIds = data.map(data => data.id);
-                            setSelected(allIds);
-                        }}
-                        className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
-                    >
-                        Select All
-                    </button>
+                        <button
+                            onClick={() => {
+                                const allIds = data.map(data => data.id);
+                                setSelected(allIds);
+                            }}
+                            className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                        >
+                            Select All
+                        </button>
                         {selected.length > 0 && (
                             <button
                                 onClick={async () => {

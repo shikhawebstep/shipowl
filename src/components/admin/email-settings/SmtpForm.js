@@ -54,13 +54,13 @@ export default function SmtpForm() {
                     icon: "error",
                     title: "Something Wrong!",
                     text:
-                        errorMessage.message ||errorMessage.error || "Network Error.",
+                        errorMessage.message || errorMessage.error || "Network Error.",
                 });
                 throw new Error(errorMessage.message);
             }
 
             const result = await response.json();
-            const emails = result?.emailConfig || {};
+            const emails = result?.smtp || {};
 
             setFormData({
                 smtp_host: emails.smtp_host || "",
@@ -112,10 +112,8 @@ export default function SmtpForm() {
             const result = await res.json();
             if (!res.ok) throw new Error(result.message || "Failed to Update admin");
 
-            Swal.fire("Success", "admin Updated Successfuly!", "success");
+            Swal.fire("Success", "SMTP Updated Successfuly!", "success");
 
-
-            router.push('/admin/email-settings')
         } catch (err) {
             Swal.fire("Error", err.message, "error");
         } finally {

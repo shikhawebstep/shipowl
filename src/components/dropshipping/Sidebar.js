@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { IoMdAnalytics } from "react-icons/io";
 import {
   Home, ShoppingCart, Package, Gift, BarChart, CreditCard,
-  FileText, Settings, Link, Volume2, MapPin, ChevronDown, X,Ticket
+  FileText, Settings, Link, Volume2, MapPin, ChevronDown, X, Ticket
 } from "lucide-react";
 import { HiBars3CenterLeft } from "react-icons/hi2";
 import { FaShopify } from "react-icons/fa";
@@ -18,7 +18,7 @@ const actions = [
   "View Listing", "Update", "Create", "Listing", "View",
   "Soft Delete", "Permanent Delete", "Restore", "Trash Listing",
   "Bank Account Change Request", "Bank Account Change Request Review",
-  "RTO", "Need to Raise", "Warehouse Collected", "report","Push to Shopify"
+  "RTO", "Need to Raise", "Warehouse Collected", "report", "Push to Shopify"
 ];
 
 const Sidebar = () => {
@@ -31,14 +31,14 @@ const Sidebar = () => {
     checkDropshipperRole();
   }, []);
 
-const hasPermission = (module, actionList) => {
-  return extractedPermissions.some(
-    (perm) =>
-      perm.module === module &&
-      actionList.includes(perm.action) &&
-      perm.status === true
-  );
-};
+  const hasPermission = (module, actionList) => {
+    return extractedPermissions.some(
+      (perm) =>
+        perm.module === module &&
+        actionList.includes(perm.action) &&
+        perm.status === true
+    );
+  };
 
   const menuItems = useMemo(() => [
 
@@ -65,13 +65,13 @@ const hasPermission = (module, actionList) => {
     { name: "Profile", icon: Package, module: "My Profile", href: "/dropshipping/profile", section: "MENU" },
     { name: "Source a Product", icon: Gift, module: "Source a Product", href: "/dropshipping/product/source", section: "MENU" },
     { name: "Reports (In progress)", icon: BarChart, module: "Reports (In progress)", href: "/dropshipping/report", section: "MENU" },
-    { name: "Payments", icon: CreditCard, module: "Payment", href: "/dropshipping/payments", section: "MENU" },
-    { name: "Manage NDR (In progress)", icon: FileText, module: "Manage NDR (In progress)", href: "/dropshipping/manage-ndr", section: "MENU" },
-    { name: "High RTO Pincode (In progress)", icon: MapPin, module: "High RTO Pincode (In progress)", href: "/dropshipping/high-rto-pincode", section: "OTHERS" },
-    { name: "Boosters (In progress)", icon: Volume2, module: "Boosters (In progress)", href: "/dropshipping/boosters", section: "OTHERS" },
-    { name: "Integrations (In progress)", icon: Link, module: "Integrations (In progress)", href: "/dropshipping/Integration", section: "OTHERS" },
+    // { name: "Payments", icon: CreditCard, module: "Payment", href: "/dropshipping/payments", section: "MENU" },
+    // { name: "Manage NDR (In progress)", icon: FileText, module: "Manage NDR (In progress)", href: "/dropshipping/manage-ndr", section: "MENU" },
+    // { name: "High RTO Pincode (In progress)", icon: MapPin, module: "High RTO Pincode (In progress)", href: "/dropshipping/high-rto-pincode", section: "OTHERS" },
+    // { name: "Boosters (In progress)", icon: Volume2, module: "Boosters (In progress)", href: "/dropshipping/boosters", section: "OTHERS" },
+    // { name: "Integrations (In progress)", icon: Link, module: "Integrations (In progress)", href: "/dropshipping/Integration", section: "OTHERS" },
     { name: "Settings (In progress)", icon: Settings, module: "Settings (In progress)", href: "/dropshipping/settings", section: "OTHERS" },
-    { name: "Terms & Conditions (In progress)", icon: FileText, module: "Terms & Conditions (In progress)", href: "/dropshipping/term-and-condition", section: "OTHERS" }
+    // { name: "Terms & Conditions (In progress)", icon: FileText, module: "Terms & Conditions (In progress)", href: "/dropshipping/term-and-condition", section: "OTHERS" }
   ].filter((item) => {
     if (!isDropshipperStaff) return true;
     if (item.children) return true;

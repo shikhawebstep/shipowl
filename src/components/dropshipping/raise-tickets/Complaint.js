@@ -1,20 +1,17 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Select from 'react-select';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { FileWarning } from "lucide-react";
 import Swal from 'sweetalert2';
+import { HashLoader } from 'react-spinners';
 const Editor = dynamic(() => import('@tinymce/tinymce-react').then(mod => mod.Editor), {
     ssr: false,
 });
 
-const awbOptions = [
-    { value: 'AWB123456', label: 'AWB123456' },
-    { value: 'AWB654321', label: 'AWB654321' },
-    { value: 'AWB111222', label: 'AWB111222' },
-];
+
 
 export default function Complaint() {
     const [formData, setFormData] = useState({
@@ -49,7 +46,7 @@ export default function Complaint() {
         try {
             setLoading(true);
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/awb`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/order`,
                 {
                     method: "GET",
                     headers: {
@@ -70,7 +67,7 @@ export default function Complaint() {
                 throw new Error(result.message || result.error || "Something Wrong!");
             }
 
-            setAwbNumbers(result?.awbs || []);
+            setAwbNumbers(result?.orders || []);
         } catch (error) {
             console.error("Error fetching cities:", error);
         } finally {
@@ -78,13 +75,25 @@ export default function Complaint() {
         }
     }, [router]);
 
-    const handleAWBChange = (selectedOptions) => {
-        setFormData((prev) => ({
+    const awbOptions = awbNumbers.map(item => ({
+        value: item.id,           // send `id` on change
+        label: item.awbNumber     // show `awbNumber` in UI
+    }));
+
+    useEffect(() => {
+        fetchAwbNumbers();
+    }, [])
+
+    const handleAWBChange = selectedOptions => {
+        // selectedOptions = array of {value, label}
+        const selectedIds = selectedOptions ? selectedOptions.map(opt => opt.value) : [];
+        setFormData(prev => ({
             ...prev,
-            awbs: selectedOptions,
+            awbs: selectedOptions,    // keep full option object for UI
+            awbIds: selectedIds       // optional: keep just ids separately
         }));
-        setErrors((prev) => ({ ...prev, awbs: '' }));
     };
+
 
     const handleFileChange = (e) => {
         setFormData((prev) => ({
@@ -161,7 +170,12 @@ export default function Complaint() {
             const awbValues = formData.awbs.map(item => item.value).join(',');
             formdata.append("orders", awbValues);
             formdata.append("description", formData.description);
-            formdata.append("gallery", file); // If multiple files, loop and append individually.
+
+            // Correct file appending
+            formData.proofFiles.forEach((file) => {
+                formdata.append("gallery", file);
+            });
+
 
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/raise-ticket`, {
                 method: "POST",
@@ -177,7 +191,11 @@ export default function Complaint() {
 
             if (response.ok) {
                 Swal.fire('Success', 'Your ticket has been raised successfully.', 'success');
-                // Optionally reset the form here
+                setFormData({
+                    awbs: [],
+                    proofFiles: [],
+                    description: '',
+                })
             } else {
                 Swal.fire('Error', result?.message || result?.error || 'Something went wrong.', 'error');
             }
@@ -188,6 +206,14 @@ export default function Complaint() {
             console.error(error);
         }
     };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <HashLoader size={60} color="#F97316" loading={true} />
+            </div>
+        );
+    }
 
     return (
         <>
@@ -208,7 +234,7 @@ export default function Complaint() {
                     <label className="block text-gray-800 font-semibold mb-2 border-l-4 border-blue-500 pl-2">
                         Select AWB Numbers <span className="text-red-500">*</span>
                     </label>
-                    <div className={` rounded ${errors.awbs ? 'border-red-500 border' : ''} `}>
+                    <div className={`rounded ${errors.awbs ? 'border-red-500 border' : ''}`}>
                         <Select
                             options={awbOptions}
                             isMulti
@@ -218,6 +244,7 @@ export default function Complaint() {
                             classNamePrefix="react-select"
                         />
                     </div>
+
                     {errors.awbs && <p className="text-red-500 text-sm mt-1">{errors.awbs}</p>}
                 </div>
 

@@ -63,7 +63,7 @@ export default function Sidebar() {
           icon: UserCheck,
           subMenu: [
             { icon: UserCheck, name: "Global Permission", module: "Global Permission", action: actions, href: "/admin/permission" },
-            { icon: UserCheck, name: "Order Permission", module: "Supplier Order Permission", action: actions, href: "/admin/permission/order" },
+            { icon: UserCheck, name: "Supplier Order Permission", module: "Supplier Order Permission", action: actions, href: "/admin/permission/order" },
           ],
         },
       ],
