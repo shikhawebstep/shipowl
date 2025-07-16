@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -436,6 +436,16 @@ export async function PUT(req: NextRequest) {
         }
       }
 
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Product',
+          action: 'Update',
+          data: productCreateResult,
+          response: { status: true, product: productCreateResult.product },
+          status: true
+        }, req);
+
       return NextResponse.json({ status: true, product: productCreateResult.product }, { status: 200 });
     }
 
@@ -443,12 +453,32 @@ export async function PUT(req: NextRequest) {
       await deleteFile(path.join(uploadDir, path.basename(fileUrl)));
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'Update',
+        data: productCreateResult,
+        response: { status: false, error: productCreateResult?.message || 'Product creation failed' },
+        status: false
+      }, req);
+
     logMessage('error', 'Product creation failed:', productCreateResult?.message || 'Unknown error');
     return NextResponse.json(
       { status: false, error: productCreateResult?.message || 'Product creation failed' },
       { status: 500 }
     );
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     // Log and handle any unexpected errors
     logMessage('error', 'Product Updation Error:', error);
     return NextResponse.json(
@@ -525,14 +555,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreProduct(adminId, String(adminRole), productIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Product',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, product: restoreResult.restoredProduct },
+          status: true
+        }, req);
+
       logMessage('info', 'Product restored successfully:', restoreResult.restoredProduct);
       return NextResponse.json({ status: true, product: restoreResult.restoredProduct }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'Product restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Product restore failed');
     return NextResponse.json({ status: false, error: 'Product restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ Product restore error:', error);
     return NextResponse.json({ status: false, error, message: 'Server error' }, { status: 500 });
   }
@@ -602,13 +662,41 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for product: ${productIdNum}`, { adminId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Product',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `Product soft deleted successfully` },
+          status: true
+        }, req);
       logMessage('info', `Product soft deleted successfully: ${productIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `Product soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'Product not found or deletion failed' },
+        status: false
+      }, req);
     logMessage('info', `Product not found or could not be deleted: ${productIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'Product not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during product deletion', { error });
     return NextResponse.json({ status: false, error, message: 'Internal server error' }, { status: 500 });
   }

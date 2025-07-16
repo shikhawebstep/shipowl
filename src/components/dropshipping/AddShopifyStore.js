@@ -10,15 +10,12 @@ import Image from 'next/image'
 export default function AddShopifyStore() {
     const { fetchImages } = useImageURL();
     const router = useRouter();
-    const [validationErrors, setValidationErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedShop, setSelectedShop] = useState('');
     const [shopifyStores, setShopifyStores] = useState([]);
     const { verifyDropShipperAuth, hasPermission } = useDropshipper();
-    const [formData, setFormData] = useState({
-        shop: '',
-    })
+   
     const fetchStores = useCallback(async () => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -69,135 +66,8 @@ export default function AddShopifyStore() {
 
     }, [verifyDropShipperAuth]);
 
-    const handleChange = (e) => {
-        const { name, type, value, checked } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? (checked ? true : false) : value
-        }));
-    };
-
-    const validate = () => {
-        const errors = {};
-
-        if (!formData.shop || formData.shop.trim() === '') {
-            errors.shop = 'Shop is required.';
-        }
-
-
-        return errors;
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-
-        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (dropshipperData?.project?.active_panel !== "dropshipper") {
-            localStorage.removeItem("shippingData");
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        const token = dropshipperData?.security?.token;
-        if (!token) {
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        const errors = validate();
-        if (Object.keys(errors).length > 0) {
-            setValidationErrors(errors);
-            setLoading(false);
-            return;
-        }
-
-        setValidationErrors({});
-
-        try {
-            Swal.fire({
-                title: 'Creating Shoap...',
-                text: 'Please wait while we save your Shoap.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            const form = new FormData();
-            form.append('shop', formData.shop);
-
-
-            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}api/dropshipper/shopify/connect`;
-
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                },
-                body: form,
-            });
-
-            const result = await response.json(); // Parse the result here
-
-            if (!response.ok) {
-                Swal.close();
-                Swal.fire({
-                    icon: "error",
-                    title: "Creation Failed",
-                    text: result.message || result.error || "An error occurred",
-                });
-
-
-                if (result.error && typeof result.error === 'object') {
-                    const entries = Object.entries(result.error);
-                    let focused = false;
-
-                    entries.forEach(([key, message]) => {
-                        setValidationErrors((prev) => ({
-                            ...prev,
-                            [key]: message,
-                        }));
-
-                        if (!focused) {
-                            setTimeout(() => {
-                                const input = document.querySelector(`[name="${key}"]`);
-                                if (input) input.focus();
-                            }, 300);
-
-                            focused = true;
-                        }
-                    });
-                }
-            } else {
-                Swal.close();
-                Swal.fire({
-                    icon: "success",
-                    title: "Shop Created",
-                    text: `The Shop has been created successfully!`,
-                    showConfirmButton: true,
-                }).then((res) => {
-                    if (res.isConfirmed) {
-                        setFormData({ name: '' });
-                        router.push(result.installUrl)
-
-                    }
-                });
-            }
-
-        } catch (error) {
-            console.error("Error:", error);
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Submission Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-            setError(error.message || "Submission failed.");
-        } finally {
-            setLoading(false);
-        }
-    };
+ 
+   const canEdit = hasPermission("Shopify", "Update");
 
     const handleShopSubmit = async (e) => {
         e.preventDefault();
@@ -296,12 +166,7 @@ export default function AddShopifyStore() {
     };
 
 
-    const canCreate = hasPermission("Shopify", "Create");
-    const canDestory = hasPermission("Shopify", "Permanent Delete");
-    const canRestore = hasPermission("Shopify", "Restore");
-    const canSoftDelete = hasPermission("Shopify", "Soft Delete");
-    const canEdit = hasPermission("Shopify", "Update");
-    const canViewTrashed = hasPermission("Shopify", "Trash Listing");
+  
     if (loading) {
         return (
             <div className="flex items-center justify-center h-[80vh]">
@@ -312,44 +177,7 @@ export default function AddShopifyStore() {
     return (
         <>
             <section className="">
-                <div className="grid md:grid-cols-2 gap-3">
-                    <div className="bg-white rounded-2xl w-full p-5">
-                        <h2 className='text-2xl font-bold pb-4'>Add New Store </h2>
-                        {canCreate ? (
-
-                            <form onSubmit={handleSubmit}>
-                                <div className=" ">
-                                    <div>
-                                        <label htmlFor="name" className="font-bold block text-[#232323]">
-                                            Shop Name <span className='text-red-500 text-lg'>*</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="shop"
-                                            value={formData?.shop || ''}
-                                            id="shop"
-                                            onChange={handleChange}
-                                            className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.name ? "border-red-500" : "border-[#E0E5F2]"
-                                                } `} />
-                                        {validationErrors.shop && (
-                                            <p className="text-red-500 text-sm mt-1">{validationErrors.shop}</p>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-wrap gap-3 mt-5">
-                                    <button type="submit" className="bg-orange-500 text-white md:md:px-15 rounded-md p-3 px-4">
-                                        {loading ? 'Connecting...' : 'Connect'}
-                                    </button>
-                                    <button type="button" className="bg-gray-500 text-white md:md:px-15 rounded-md p-3 px-4" onClick={() => router.back()}>
-                                        Cancel
-                                    </button>
-                                </div>
-                            </form>
-                        ) : (
-                            <p className='capitalize'>You have not permission to perform this action </p>
-                        )}
-                    </div>
+                
                     <div className="bg-white rounded-2xl overflow-auto w-full p-5">
                         <h2 className='text-2xl font-bold pb-4'>Store List</h2>
                         {shopifyStores.length > 0 ? (
@@ -407,7 +235,7 @@ export default function AddShopifyStore() {
                         )}
 
                     </div>
-                </div>
+               
 
             </section>
             {modalOpen && (

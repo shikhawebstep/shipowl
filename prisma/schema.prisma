@@ -569,7 +569,6 @@ model category {
   deletedBy            Int?
   deletedByRole        String?
   products             product[]
-  productRequests      productRequest[]
   @@index([createdBy])
   @@index([updatedBy])
   @@index([deletedAt])
@@ -595,27 +594,6 @@ model brand {
   @@index([createdBy])
   @@index([updatedBy])
   @@index([deletedAt])
-}
-
-model productRequest {
-  id                        Int             @id @default(autoincrement())
-  name                      String
-  categoryId                Int
-  expectedPrice             Int?
-  expectedDailyOrders       String?
-  url                       String?         @db.LongText
-  image                     String?         @db.LongText
-  status                    Boolean         @default(true)
-  createdAt                 DateTime        @default(now())
-  createdBy                 Int?
-  createdByRole             String?
-  updatedAt                 DateTime        @updatedAt
-  updatedBy                 Int?
-  updatedByRole             String?
-  deletedAt                 DateTime?
-  deletedBy                 Int?
-  deletedByRole             String?
-  category                  category        @relation(fields: [categoryId], references: [id])
 }
 
 model product {

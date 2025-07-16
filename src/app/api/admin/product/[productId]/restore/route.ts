@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getProductById, restoreProduct } from '@/app/models/admin/product/product';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -95,14 +95,43 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreProduct(adminId, String(adminRole), productIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Product',
+          action: 'restore',
+          data: restoreResult,
+          response: { status: true, product: restoreResult.restoredProduct },
+          status: true
+        }, req);
+
       logMessage('info', 'Product restored successfully:', restoreResult.restoredProduct);
       return NextResponse.json({ status: true, product: restoreResult.restoredProduct }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'restore',
+        data: restoreResult,
+        response: { status: false, error: 'Product restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Product restore failed');
     return NextResponse.json({ status: false, error: 'Product restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', '❌ Product restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }

@@ -1,31 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getRoleById, deleteRole } from '@/app/models/role';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    admin?: MainAdmin;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  admin?: MainAdmin;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    admin?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  admin?: SupplierStaff;
 }
 
 export async function DELETE(req: NextRequest) {
@@ -99,13 +99,40 @@ export async function DELETE(req: NextRequest) {
 
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Role',
+          action: 'Permanent Delete',
+          data: result,
+          response: { status: true, message: `Role permanently deleted successfully` },
+          status: true
+        }, req);
       logMessage('info', `Role permanently deleted successfully: ${roleIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `Role permanently deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Role',
+        action: 'Permanent Delete',
+        data: result,
+        response: { status: false, message: 'Role not found or deletion failed' },
+        status: false
+      }, req);
     logMessage('info', `Role not found or could not be deleted: ${roleIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'Role not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Role',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', 'Error during role deletion', { error });
     return NextResponse.json({ status: false, error, message: 'Internal server error 8' }, { status: 500 });
   }

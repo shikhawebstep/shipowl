@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getProductById, removeProductImageByIndex } from '@/app/models/admin/product/product';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
+import { ActivityLog } from '@/utils/commonUtils';
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -52,6 +53,21 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'Update',
+        data: { oneLineSimpleMessage: 'Image removal process completed' },
+        response: {
+          status: true,
+          message: 'Image removal process completed',
+          deleted,
+          notDeleted
+        },
+        status: true
+      }, req);
+
     return NextResponse.json({
       status: true,
       message: 'Image removal process completed',
@@ -59,7 +75,16 @@ export async function DELETE(req: NextRequest) {
       notDeleted
     }, { status: 200 });
 
-  } catch {
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Internal server error' },
+        status: false
+      }, req);
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }
 }
