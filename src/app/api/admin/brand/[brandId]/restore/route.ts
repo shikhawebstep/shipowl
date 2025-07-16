@@ -103,7 +103,7 @@ export async function PATCH(req: NextRequest) {
       await ActivityLog(
         {
           module: 'Brand',
-          action: 'Update',
+          action: 'restore',
           data: restoreResult,
           response: { status: true, brand: restoreResult.restoredBrand },
           status: true
@@ -116,7 +116,7 @@ export async function PATCH(req: NextRequest) {
     await ActivityLog(
       {
         module: 'Brand',
-        action: 'Update',
+        action: 'restore',
         data: restoreResult,
         response: { status: false, error: 'Brand restore failed' },
         status: false
@@ -129,7 +129,7 @@ export async function PATCH(req: NextRequest) {
     await ActivityLog(
       {
         module: 'Brand',
-        action: 'Update',
+        action: 'restore',
         data: { oneLineSimpleMessage: error || 'Internal Server Error' },
         response: { status: false, error: 'Server error' },
         status: false

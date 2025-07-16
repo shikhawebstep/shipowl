@@ -18,15 +18,6 @@ export async function DELETE(req: NextRequest) {
 
     const userCheck = await isUserExist(adminId, String(adminRole));
     if (!userCheck.status) {
-      await ActivityLog(
-        {
-          module: 'Brand',
-          action: 'Permanent Delete',
-          data: userCheck,
-          response: { status: false, message: `Admin not found` },
-          status: false
-        }, req);
-
       return NextResponse.json({ status: false, message: `Admin not found` }, { status: 404 });
     }
 
@@ -36,19 +27,6 @@ export async function DELETE(req: NextRequest) {
         adminId
       );
       if (!permissionCheck.status) {
-
-        await ActivityLog(
-          {
-            module: 'Brand',
-            action: 'Permanent Delete',
-            data: permissionCheck,
-            response: {
-              status: false,
-              message: permissionCheck.message || "No permission"
-            },
-            status: false
-          }, req);
-
         return NextResponse.json({
           status: false,
           message: permissionCheck.message || "No permission"

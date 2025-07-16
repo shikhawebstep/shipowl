@@ -65,15 +65,6 @@ export async function POST(req: NextRequest) {
     const userCheck: UserCheckResult = await isUserExist(adminId, String(adminRole));
 
     if (!userCheck.status) {
-      await ActivityLog(
-        {
-          module: 'Brand',
-          action: 'Create',
-          data: userCheck,
-          response: { status: false, error: `User Not Found: ${userCheck.message}` },
-          status: false
-        }, req);
-
       return NextResponse.json(
         { status: false, error: `User Not Found: ${userCheck.message}` },
         { status: 404 }
@@ -95,18 +86,6 @@ export async function POST(req: NextRequest) {
       logMessage('info', 'Fetched staff permissions:', staffPermissionsResult);
 
       if (!staffPermissionsResult.status) {
-        await ActivityLog(
-          {
-            module: 'Brand',
-            action: 'Create',
-            data: staffPermissionsResult,
-            response: {
-              status: false,
-              message: staffPermissionsResult.message || "You do not have permission to perform this action."
-            },
-            status: false
-          }, req);
-
         return NextResponse.json(
           {
             status: false,
