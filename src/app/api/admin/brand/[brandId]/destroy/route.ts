@@ -101,6 +101,7 @@ export async function DELETE(req: NextRequest) {
     if (result?.status) {
       await ActivityLog(
         {
+          panel: 'Admin',
           module: 'Brand',
           action: 'Permanent Delete',
           data: result,
@@ -113,6 +114,7 @@ export async function DELETE(req: NextRequest) {
 
     await ActivityLog(
       {
+        panel: 'Admin',
         module: 'Brand',
         action: 'Permanent Delete',
         data: result,
@@ -125,6 +127,7 @@ export async function DELETE(req: NextRequest) {
   } catch (error) {
     await ActivityLog(
       {
+        panel: 'Admin',
         module: 'Brand',
         action: 'Permanent Delete',
         data: { oneLineSimpleMessage: error || 'Internal Server Error' },

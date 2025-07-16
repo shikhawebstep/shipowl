@@ -102,6 +102,7 @@ export async function PATCH(req: NextRequest) {
 
       await ActivityLog(
         {
+          panel: 'Admin',
           module: 'Brand',
           action: 'restore',
           data: restoreResult,
@@ -115,6 +116,7 @@ export async function PATCH(req: NextRequest) {
 
     await ActivityLog(
       {
+        panel: 'Admin',
         module: 'Brand',
         action: 'restore',
         data: restoreResult,
@@ -128,6 +130,7 @@ export async function PATCH(req: NextRequest) {
   } catch (error) {
     await ActivityLog(
       {
+        panel: 'Admin',
         module: 'Brand',
         action: 'restore',
         data: { oneLineSimpleMessage: error || 'Internal Server Error' },

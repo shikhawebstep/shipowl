@@ -111,6 +111,7 @@ export async function POST(req: NextRequest) {
     if (!validation.isValid) {
       await ActivityLog(
         {
+          panel: 'Admin',
           module: 'Brand',
           action: 'Create',
           data: validation,
@@ -162,6 +163,7 @@ export async function POST(req: NextRequest) {
     if (brandCreateResult?.status) {
       await ActivityLog(
         {
+          panel: 'Admin',
           module: 'Brand',
           action: 'Create',
           data: brandCreateResult,
@@ -182,6 +184,7 @@ export async function POST(req: NextRequest) {
 
     await ActivityLog(
       {
+        panel: 'Admin',
         module: 'Brand',
         action: 'Create',
         data: brandCreateResult,
@@ -198,6 +201,7 @@ export async function POST(req: NextRequest) {
 
     await ActivityLog(
       {
+        panel: 'Admin',
         module: 'Brand',
         action: 'Create',
         data: { oneLineSimpleMessage: error || 'Internal Server Error' },

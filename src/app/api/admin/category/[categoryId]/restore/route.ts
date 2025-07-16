@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getCategoryById, restoreCategory } from '@/app/models/admin/category';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -95,14 +95,45 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreCategory(adminId, String(adminRole), categoryIdNum);
 
     if (restoreResult?.status) {
+
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Category',
+          action: 'restore',
+          data: restoreResult,
+          response: { status: true, category: restoreResult.restoredCategory },
+          status: true
+        }, req);
       logMessage('info', 'Category restored successfully:', restoreResult.restoredCategory);
       return NextResponse.json({ status: true, category: restoreResult.restoredCategory }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'restore',
+        data: restoreResult,
+        response: { status: false, error: 'Category restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Category restore failed');
     return NextResponse.json({ status: false, error: 'Category restore failed' }, { status: 500 });
 
   } catch (error) {
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ Category restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }

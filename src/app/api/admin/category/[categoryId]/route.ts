@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
       const options = {
         panel: 'Admin',
         module: 'Category',
-        action: 'Update',
+        action: 'View',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);
@@ -227,6 +227,17 @@ export async function PUT(req: NextRequest) {
     const categoryCreateResult = await updateCategory(adminId, String(adminRole), categoryIdNum, categoryPayload);
 
     if (categoryCreateResult?.status) {
+
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Category',
+          action: 'Update',
+          data: categoryCreateResult,
+          response: { status: true, category: categoryCreateResult.category },
+          status: true
+        }, req);
+
       logMessage('info', 'Category updated successfully:', categoryCreateResult.category);
       return NextResponse.json({ status: true, category: categoryCreateResult.category }, { status: 200 });
     }
@@ -240,14 +251,35 @@ export async function PUT(req: NextRequest) {
       await deleteFile(deletePath(fileData as UploadedFileInfo));
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'Update',
+        data: categoryCreateResult,
+        response: { status: false, error: categoryCreateResult?.message || 'Category creation failed' },
+        status: false
+      }, req);
+
     logMessage('error', 'Category update failed', categoryCreateResult?.message);
     return NextResponse.json(
       { status: false, error: categoryCreateResult?.message || 'Category creation failed' },
       { status: 500 }
     );
   } catch (error) {
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error, message: 'Internal server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ Category Updation Error:', error);
-    return NextResponse.json({ status: false, error, message: 'Internal server error 10' }, { status: 500 });
+    return NextResponse.json({ status: false, error, message: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -284,7 +316,7 @@ export async function PATCH(req: NextRequest) {
       const options = {
         panel: 'Admin',
         module: 'Category',
-        action: 'restore',
+        action: 'Update',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);
@@ -318,14 +350,45 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreCategory(adminId, String(adminRole), categoryIdNum);
 
     if (restoreResult?.status) {
+
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Category',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, category: restoreResult.restoredCategory },
+          status: true
+        }, req);
+
       logMessage('info', 'Category restored successfully:', restoreResult.restoredCategory);
       return NextResponse.json({ status: true, category: restoreResult.restoredCategory }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'Category restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Category restore failed');
     return NextResponse.json({ status: false, error: 'Category restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ Category restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }
@@ -395,15 +458,45 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for category: ${categoryIdNum}`, { adminId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Category',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `Category soft deleted successfully` },
+          status: true
+        }, req);
+
       logMessage('info', `Category soft deleted successfully: ${categoryIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `Category soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'Category not found or deletion failed' },
+        status: false
+      }, req);
+
     logMessage('info', `Category not found or could not be deleted: ${categoryIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'Category not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Category',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error, message: 'Internal server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during category deletion', { error });
-    return NextResponse.json({ status: false, error, message: 'Internal server error 11' }, { status: 500 });
+    return NextResponse.json({ status: false, error, message: 'Internal server error' }, { status: 500 });
   }
 }
 

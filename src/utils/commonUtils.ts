@@ -61,6 +61,7 @@ interface UserCheckResult {
 }
 
 interface FetchLogInfoParams {
+    panel: string;
     module: string;
     action: string;
     data: unknown;
@@ -100,12 +101,12 @@ export async function logMessage<T>(type: string, message: string, item?: T) {
 // Save Activity to DB
 // ---------------------------------------------
 export async function ActivityLog(
-    { module, action, data, response, status }: FetchLogInfoParams,
+    { panel, module, action, data, response, status }: FetchLogInfoParams,
     req: NextRequest
 ) {
     try {
         const { logInfo, message } = await fetchLogInfo(
-            { module, action, data, response, status },
+            { panel, module, action, data, response, status },
             req
         ) || {};
 
@@ -148,7 +149,7 @@ export async function ActivityLog(
 // ---------------------------------------------
 // Fetch Log Info (Client + Location)
 /// --------------------------------------------
-export async function fetchLogInfo({ module, action, data, response, status }: FetchLogInfoParams, req: NextRequest) {
+export async function fetchLogInfo({ panel, module, action, data, response, status }: FetchLogInfoParams, req: NextRequest) {
     try {
 
         const adminResult = await isAdminValid(req);
@@ -185,6 +186,7 @@ export async function fetchLogInfo({ module, action, data, response, status }: F
         const logInfo = {
             adminId: adminResult.adminId ?? 0,
             adminRole: adminResult.adminRole ?? 'Unknown',
+            panel,
             module,
             action,
             endpoint: url,
