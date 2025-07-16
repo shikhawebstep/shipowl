@@ -41,10 +41,10 @@ type UploadedFileInfo = {
 
 export async function GET(req: NextRequest) {
   try {
-    // Extract emailConfigId directly from the URL path
-    const emailConfigId = req.nextUrl.pathname.split('/').pop();
+    // Extract templateId directly from the URL path
+    const templateId = req.nextUrl.pathname.split('/').pop();
 
-    logMessage('debug', 'Requested EmailConfig ID:', emailConfigId);
+    logMessage('debug', 'Requested Template ID:', templateId);
 
     const adminId = Number(req.headers.get('x-admin-id'));
     const adminRole = req.headers.get('x-admin-role');
@@ -88,31 +88,31 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const emailConfigIdNum = Number(emailConfigId);
-    if (isNaN(emailConfigIdNum)) {
-      logMessage('warn', 'Invalid emailConfig ID', { emailConfigId });
-      return NextResponse.json({ error: 'Invalid emailConfig ID' }, { status: 400 });
+    const templateIdNum = Number(templateId);
+    if (isNaN(templateIdNum)) {
+      logMessage('warn', 'Invalid template ID', { templateId });
+      return NextResponse.json({ error: 'Invalid template ID' }, { status: 400 });
     }
 
-    const emailConfigResult = await getTemplateById(emailConfigIdNum);
-    if (emailConfigResult?.status) {
-      logMessage('info', 'EmailConfig found:', emailConfigResult.mail);
-      return NextResponse.json({ status: true, emailConfig: emailConfigResult.mail }, { status: 200 });
+    const templateResult = await getTemplateById(templateIdNum);
+    if (templateResult?.status) {
+      logMessage('info', 'Template found:', templateResult.mail);
+      return NextResponse.json({ status: true, template: templateResult.mail }, { status: 200 });
     }
 
-    logMessage('info', 'EmailConfig found:', emailConfigResult.mail);
-    return NextResponse.json({ status: false, message: 'EmailConfig not found' }, { status: 404 });
+    logMessage('info', 'Template found:', templateResult.mail);
+    return NextResponse.json({ status: false, message: 'Template not found' }, { status: 404 });
   } catch (error) {
-    logMessage('error', '❌ Error fetching single emailConfig:', error);
+    logMessage('error', '❌ Error fetching single template:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }
 }
 
 export async function PUT(req: NextRequest) {
   try {
-    // Extract emailConfigId directly from the URL path
-    const emailConfigId = req.nextUrl.pathname.split('/').pop();
-    logMessage('debug', 'Requested EmailConfig ID:', emailConfigId);
+    // Extract templateId directly from the URL path
+    const templateId = req.nextUrl.pathname.split('/').pop();
+    logMessage('debug', 'Requested Template ID:', templateId);
 
     // Get headers
     const adminIdHeader = req.headers.get("x-admin-id");
@@ -157,17 +157,17 @@ export async function PUT(req: NextRequest) {
       }
     }
 
-    const emailConfigIdNum = Number(emailConfigId);
-    if (isNaN(emailConfigIdNum)) {
-      logMessage('warn', 'Invalid emailConfig ID', { emailConfigId });
-      return NextResponse.json({ error: 'Invalid emailConfig ID' }, { status: 400 });
+    const templateIdNum = Number(templateId);
+    if (isNaN(templateIdNum)) {
+      logMessage('warn', 'Invalid template ID', { templateId });
+      return NextResponse.json({ error: 'Invalid template ID' }, { status: 400 });
     }
 
-    const emailConfigResult = await getTemplateById(emailConfigIdNum);
-    logMessage('debug', 'EmailConfig fetch result:', emailConfigResult);
-    if (!emailConfigResult?.status) {
-      logMessage('warn', 'EmailConfig not found', { emailConfigIdNum });
-      return NextResponse.json({ status: false, message: 'EmailConfig not found' }, { status: 404 });
+    const templateResult = await getTemplateById(templateIdNum);
+    logMessage('debug', 'Template fetch result:', templateResult);
+    if (!templateResult?.status) {
+      logMessage('warn', 'Template not found', { templateIdNum });
+      return NextResponse.json({ status: false, message: 'Template not found' }, { status: 404 });
     }
 
     const formData = await req.formData();
@@ -225,7 +225,7 @@ export async function PUT(req: NextRequest) {
     const smtp_secure_raw = formData.get('status')?.toString().toLowerCase();
     const smtp_secure = ['true', '1', true, 1, 'active', 'yes'].includes(smtp_secure_raw as string | number | boolean);
 
-    const emailConfigPayload = {
+    const templatePayload = {
       subject: extractString('subject') || '',
       html_template: extractString('html_template') || '',
       to: JSON.stringify(parseJsonArray('to')),
@@ -237,23 +237,23 @@ export async function PUT(req: NextRequest) {
       updatedByRole: adminRole || '',
     };
 
-    logMessage('info', 'EmailConfig payload:', emailConfigPayload);
+    logMessage('info', 'Template payload:', templatePayload);
 
-    const emailConfigCreateResult = await updateTemplate(adminId, String(adminRole), emailConfigIdNum, emailConfigPayload);
+    const templateCreateResult = await updateTemplate(adminId, String(adminRole), templateIdNum, templatePayload);
 
-    if (emailConfigCreateResult?.status) {
-      logMessage('info', 'EmailConfig updated successfully:', emailConfigCreateResult.mail);
-      return NextResponse.json({ status: true, emailConfig: emailConfigCreateResult.mail }, { status: 200 });
+    if (templateCreateResult?.status) {
+      logMessage('info', 'Template updated successfully:', templateCreateResult.mail);
+      return NextResponse.json({ status: true, template: templateCreateResult.mail }, { status: 200 });
     }
 
-    logMessage('error', 'EmailConfig update failed', emailConfigCreateResult?.message);
+    logMessage('error', 'Template update failed', templateCreateResult?.message);
     return NextResponse.json(
-      { status: false, error: emailConfigCreateResult?.message || 'EmailConfig creation failed' },
+      { status: false, error: templateCreateResult?.message || 'Template creation failed' },
       { status: 500 }
     );
   } catch (error) {
     // Log and handle any unexpected errors
-    logMessage('error', '❌ EmailConfig Updation Error:', error);
+    logMessage('error', '❌ Template Updation Error:', error);
     return NextResponse.json(
       { status: false, error, message: 'Internal Server Error 6' },
       { status: 500 }
