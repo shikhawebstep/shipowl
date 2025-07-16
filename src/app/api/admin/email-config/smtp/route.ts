@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -217,9 +217,29 @@ export async function PUT(req: NextRequest) {
     const SMTPConfigCreateResult = await updateSMTPConfig(adminId, String(adminRole), SMTPConfigPayload);
 
     if (SMTPConfigCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Mail',
+          action: 'Update',
+          data: SMTPConfigCreateResult,
+          response: { status: true, SMTPConfig: SMTPConfigCreateResult.message },
+          status: true
+        }, req);
+
       logMessage('info', 'SMTPConfig updated successfully:', SMTPConfigCreateResult.message);
       return NextResponse.json({ status: true, SMTPConfig: SMTPConfigCreateResult.message }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Mail',
+        action: 'Update',
+        data: SMTPConfigCreateResult,
+        response: { status: false, error: SMTPConfigCreateResult?.message || 'SMTPConfig creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'SMTPConfig update failed', SMTPConfigCreateResult?.message);
     return NextResponse.json(
@@ -227,10 +247,20 @@ export async function PUT(req: NextRequest) {
       { status: 500 }
     );
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Mail',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error, message: 'Internal Server Error 6' },
+        status: false
+      }, req);
+
     // Log and handle any unexpected errors
     logMessage('error', '❌ SMTPConfig Updation Error:', error);
     return NextResponse.json(
-      { status: false, error, message: 'Internal Server Error 6' },
+      { status: false, error, message: 'Internal Server Error' },
       { status: 500 }
     );
   }

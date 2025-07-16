@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getAllGlobalPermissions, updateGlobalPermissions } from '@/app/models/admin/globalPermission';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
 
     if (isStaffUser) {
       // mainAdminId = userCheck.admin?.admin?.id ?? adminId;
-      
+
       const options = {
         panel: 'Admin',
         module: 'Global Permission',
@@ -137,7 +137,7 @@ export async function PUT(req: NextRequest) {
 
     if (isStaffUser) {
       // mainAdminId = userCheck.admin?.admin?.id ?? adminId;
-      
+
       const options = {
         panel: 'Admin',
         module: 'Global Permission',
@@ -194,11 +194,32 @@ export async function PUT(req: NextRequest) {
     const updateResult = await updateGlobalPermissions(adminId, String(adminRole), adminPermissionPayload);
 
     if (updateResult?.status) {
+
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Global Permission',
+          action: 'Update',
+          data: updateResult,
+          response: { status: true, message: 'Permissions updated successfully' },
+          status: true
+        }, req);
+
       return NextResponse.json(
         { status: true, message: 'Permissions updated successfully' },
         { status: 200 }
       );
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Global Permission',
+        action: 'Update',
+        data: updateResult,
+        response: { status: false, error: 'Failed to update permissions' },
+        status: false
+      }, req);
 
     logMessage('warn', 'Permission update failed');
     return NextResponse.json(
@@ -207,9 +228,19 @@ export async function PUT(req: NextRequest) {
     );
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Global Permission',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: error || 'Internal server error while updating permissions' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error updating admin permissions:', error);
     return NextResponse.json(
-      { status: false, error: 'Internal server error while updating permissions' },
+      { status: false, error: error || 'Internal server error while updating permissions' },
       { status: 500 }
     );
   }

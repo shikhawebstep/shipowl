@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from '@/utils/commonUtils';
+import { ActivityLog, logMessage } from '@/utils/commonUtils';
 import { isUserExist } from '@/utils/auth/authUtils';
 import { getProductById, removeProductImageByIndex } from '@/app/models/admin/product/product';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -92,6 +92,20 @@ export async function DELETE(req: NextRequest) {
     const result = await removeProductImageByIndex(productId, type as ImageType, imageIndex);
 
     if (result.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Product',
+          action: 'Update',
+          data: result,
+          response: {
+            status: true,
+            message: 'Image removed successfully',
+            data: result.product,
+          },
+          status: true
+        }, req);
+
       logMessage('info', `Image index ${imageIndex} removed from product ${productId} by admin ${adminId}`);
       return NextResponse.json({
         status: true,
@@ -100,6 +114,18 @@ export async function DELETE(req: NextRequest) {
       }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'Update',
+        data: result,
+        response: {
+          status: false,
+          message: result.message || 'Image removal failed',
+        },
+        status: false
+      }, req);
     logMessage('warn', `Image removal failed: ${result.message}`, { productId, imageIndex });
     return NextResponse.json({
       status: false,
@@ -107,6 +133,17 @@ export async function DELETE(req: NextRequest) {
     }, { status: 400 });
 
   } catch (error) {
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Product',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: error || 'Internal server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Unexpected error during image deletion', { error });
     return NextResponse.json({
       status: false,

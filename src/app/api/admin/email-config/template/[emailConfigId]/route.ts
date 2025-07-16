@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -242,9 +242,29 @@ export async function PUT(req: NextRequest) {
     const templateCreateResult = await updateTemplate(adminId, String(adminRole), templateIdNum, templatePayload);
 
     if (templateCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Mail',
+          action: 'Update',
+          data: templateCreateResult,
+          response: { status: true, template: templateCreateResult.mail },
+          status: true
+        }, req);
+
       logMessage('info', 'Template updated successfully:', templateCreateResult.mail);
       return NextResponse.json({ status: true, template: templateCreateResult.mail }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Mail',
+        action: 'Update',
+        data: templateCreateResult,
+        response: { status: false, error: templateCreateResult?.message || 'Template creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Template update failed', templateCreateResult?.message);
     return NextResponse.json(
@@ -252,10 +272,20 @@ export async function PUT(req: NextRequest) {
       { status: 500 }
     );
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Mail',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error, message: 'Internal Server Error' },
+        status: false
+      }, req);
+
     // Log and handle any unexpected errors
     logMessage('error', '❌ Template Updation Error:', error);
     return NextResponse.json(
-      { status: false, error, message: 'Internal Server Error 6' },
+      { status: false, error, message: 'Internal Server Error' },
       { status: 500 }
     );
   }
