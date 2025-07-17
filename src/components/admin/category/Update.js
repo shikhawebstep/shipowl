@@ -41,11 +41,11 @@ export default function Update() {
     };
 
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+   const handleChange = (e) => {
+        const { name, type, value, checked } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: type === 'checkbox' ? checked : value
         }));
     };
 

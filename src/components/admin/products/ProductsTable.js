@@ -16,16 +16,13 @@ import { Trash2, RotateCcw, Pencil } from "lucide-react";
 import { useImageURL } from "@/components/ImageURLContext";
 import { IoFilterSharp } from "react-icons/io5";
 const ProductTable = () => {
-    const { fetchImages, getProductDescription } = useImageURL();
+    const { getProductDescription } = useImageURL();
     const { setActiveTab } = useContext(ProductContextEdit);
     const { setActiveTabs } = useContext(ProductContext)
     const [showVariantPopup, setShowVariantPopup] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [showRtoLiveCount, setShowRtoLiveCount] = useState(false);
-    const [selectedModel, setSelectedModel] = useState('');
-    const [category, setCategory] = useState('');
-    const [categoryData, setCategoryData] = useState([]);
     const [products, setProducts] = useState([]);
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const [isTrashed, setIsTrashed] = useState(false);
@@ -38,6 +35,13 @@ const ProductTable = () => {
         getProductDescription(id, setDescription);
 
     }
+
+    const [tabStatus, setTabStatus] = useState("active");
+    const inactiveProducts = products.filter((product) => !product.status);
+    const isDisabled = inactiveProducts.length === 0;
+    const filterProducts = products.filter((item) =>
+        tabStatus === "active" ? item.status === true : item.status === false
+    );
 
     const [productNameFilter, setProductNameFilter] = useState("");
     const [skuFilter, setSkuFilter] = useState("");
@@ -133,6 +137,7 @@ const ProductTable = () => {
     const handleSoftDelete = (id) => softDelete(id, () => fetchAll(setProducts, setLoading));
     const handleRestore = (id) => restore(id, () => fetchTrashed(setProducts, setLoading));
     const handleDestroy = (id) => destroy(id, () => fetchTrashed(setProducts, setLoading));
+  
 
 
 
@@ -207,6 +212,9 @@ const ProductTable = () => {
                     }
                 });
 
+                // Apply default filter to show only 'active' products in 4th column (index 3)
+                table.column(4).search("^active$", true, false).draw();
+
                 return () => {
                     if (table) {
                         table.destroy();
@@ -259,44 +267,8 @@ const ProductTable = () => {
 
     return (
         <div className="">
-            <div className="md:flex flex-wrap justify-between items-center gap-2 mb-4">
-                <div className="grid lg:w-4/12 md:grid-cols-2 gap-4 items-end">
+            <div className="mb-4">
 
-
-                    <div className="">
-                        <label className="block text-sm font-medium text-gray-700">Select Model</label>
-                        <select
-                            className="w-full mt-1 px-3 py-3 border-[#DFEAF2] uppercase bg-white border rounded-lg text-sm"
-                        >
-                            <option value="">All</option>
-                            {/* {[...new Set((products ?? []).map(item => item.list_as).filter(Boolean))].map((model) => (
-                                <option key={model} value={model}>{model}</option>
-                            ))} */}
-
-                        </select>
-                    </div>
-
-                    <div className="">
-                        <label className="block text-sm font-medium text-gray-700">Filter By Category</label>
-                        <select
-                            className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"
-                        >
-                            <option value="">All</option>
-                            {/* {[...new Set((products ?? []).map(item => item.categoryId).filter(Boolean))].map((catId) => {
-                                const cat = (categoryData ?? []).find(c => c.id === catId);
-                                return (
-                                    <option key={catId} value={catId}>
-                                        {cat ? cat.name : catId}
-                                    </option>
-                                );
-                            })} */}
-                        </select>
-                    </div>
-
-
-
-
-                </div>
                 <div className='flex gap-1 flex-wrap mt-3 md:mt-0 items-center'>
                     <button
                         onClick={handleClearFilters}
@@ -310,7 +282,7 @@ const ProductTable = () => {
                     <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap">Import</button> */}
                     <button
                         onClick={() => {
-                            const allIds = products.map(product => product.id);
+                            const allIds = filterProducts.map(product => product.id);
                             setSelected(allIds);
                         }}
                         className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
@@ -353,13 +325,13 @@ const ProductTable = () => {
                             <span className="ml-2 text-sm  text-gray-600">RTO Count</span>
                         </label>
                         <div className="flex gap-3 justify-between md:justify-end w-full  flex-wrap items-center md:mt-0 mt-4">
-                            <label className="md:flex hidden items-center cursor-pointer">
+                            {/* <label className="md:flex hidden items-center cursor-pointer">
                                 <input type="checkbox" className="sr-only" checked={showRtoLiveCount} onChange={() => setShowRtoLiveCount(!showRtoLiveCount)} />
                                 <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${showRtoLiveCount ? "bg-orange-500" : ""}`}>
                                     <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${showRtoLiveCount ? "translate-x-5" : ""}`}></div>
                                 </div>
                                 <span className="ml-2  text-sm text-gray-600">Show RTO Live Count</span>
-                            </label>
+                            </label> */}
                             {selected < 1 && <span className="font-semibold md:block hidden text-[#2B3674]">Total: {products.length} Products</span>}
                             {selected.length > 0 && (
                                 <h5 className="font-semibold text-[#2B3674] bg-[#DFE9FF] p-3 flex rounded-md gap-7">
@@ -373,18 +345,16 @@ const ProductTable = () => {
                                 <button className='bg-red-500 text-white p-2 rounded-md' onClick={handleBulkDelete}>Delete Selected</button>
                             )}
 
-                            <button className="bg-[#F4F7FE] w-9/12 md:w-auto rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
-                                {/* Month Input */}
+                            {/* <button className="bg-[#F4F7FE] w-9/12 md:w-auto rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
+                              
                                 <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="outline-0 w-full" />
-                            </button>
+                            </button> */}
                             <button onClick={() => setIsPopupOpen((prev) => !prev)} className="bg-[#F4F7FE] p-2 rounded-lg relative">
                                 <MoreHorizontal className="text-[#F98F5C]" />
                                 {isPopupOpen && (
                                     <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
                                         <ul className="py-2 text-sm text-[#2B3674]">
                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
                                         </ul>
                                     </div>
                                 )}
@@ -469,6 +439,68 @@ const ProductTable = () => {
                             </div>
                         </div>
                     )}
+                    <div className="flex space-x-4 border-b border-gray-200 mb-6">
+                        <button
+                            onClick={() => {
+                                setTabStatus('active');
+                                if ($.fn.DataTable.isDataTable("#productTable")) {
+                                    $("#productTable").DataTable().column(4).search("^active$", true, false).draw();
+                                }
+                            }}
+                            className={`px-4 py-2 font-medium border-b-2 transition-all duration-200
+            ${tabStatus === 'active'
+                                    ? "border-orange-500 text-orange-600"
+                                    : "border-transparent text-gray-500 hover:text-orange-600"
+                                }`}
+                        >
+                            Active Products
+                        </button>
+
+                        <div className="relative group inline-block">
+                            <button
+                                disabled={isDisabled}
+                                onClick={() => {
+                                    setTabStatus('inactive');
+                                    if ($.fn.DataTable.isDataTable("#productTable")) {
+                                        $("#productTable").DataTable().column(4).search("^inactive$", true, false).draw();
+                                    }
+                                }}
+                                className={`px-4 py-2 font-medium border-b-2 transition-all duration-200 relative
+                ${tabStatus === 'inactive'
+                                        ? "border-orange-500 text-orange-600"
+                                        : "border-transparent text-gray-500 hover:text-orange-600"
+                                    }
+                ${isDisabled ? 'cursor-not-allowed' : ''}
+            `}
+                            >
+                                Inactive Products
+                            </button>
+
+                            {isDisabled && (
+                                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                                    No inactive Products
+                                    <div className="absolute bottom-[-4px] left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                                </div>
+                            )}
+                        </div>
+
+                        <button
+                            disabled
+                            onClick={() => {
+                                setTabStatus('new');
+                                if ($.fn.DataTable.isDataTable("#productTable")) {
+                                    $("#productTable").DataTable().search("new").draw();
+                                }
+                            }}
+                            className={`px-4 py-2 font-medium border-b-2 transition-all duration-200
+            ${tabStatus === 'new'
+                                    ? "border-orange-500 text-orange-600"
+                                    : "border-transparent text-gray-500 hover:text-orange-600"
+                                }`}
+                        >
+                            New Product Request From Supplier
+                        </button>
+                    </div>
 
                     <div className="flex justify-end mb-4 gap-2">
                         <button
@@ -487,7 +519,7 @@ const ProductTable = () => {
                     {
                         viewType === "grid" && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 h-full">
-                                {products.map((item) => {
+                                {filterProducts.map((item) => {
                                     // Ensure gallery is a valid string and split to array
                                     const imageUrl = typeof item?.gallery === 'string' && item.gallery.trim() !== ''
                                         ? item.gallery.split(',')

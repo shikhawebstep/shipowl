@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Menu, X, Mail, Home, ShoppingCart, Package, Gift, BarChart, CreditCard,
-  FileText, Settings, Volume2, MapPin, User, Warehouse, ClipboardList,Ticket,
+  FileText, Settings, Volume2, MapPin, User, Warehouse, ClipboardList, Ticket,
   BadgeDollarSign, ShieldCheck, LayoutDashboard, UserCheck, Users, Image as LucideImage, Banknote, Tags
 } from "lucide-react";
 import { GoUnverified } from "react-icons/go";
@@ -42,7 +42,7 @@ export default function Sidebar() {
     { title: "Product Management", module: "Product", action: actions, icon: Package, href: "/admin/products/list" },
     { title: "Dropshipper Banners", module: "dropshiperBanners", action: actions, icon: LucideImage, href: "/admin/dropshipper/banner" },
 
-     {
+    {
       children: [
         {
           name: "Email Settings",
@@ -76,14 +76,14 @@ export default function Sidebar() {
           icon: LayoutDashboard,
           subMenu: [
             { icon: ClipboardList, module: "Supplier", action: actions, name: "Supplier List", href: "/admin/supplier/list" },
-            { icon: GoUnverified, module: "Supplier", action: actions, name: "unverified Supplier List", href: "/admin/supplier/Unverified/list" },
+            { icon: GoUnverified, module: "Supplier", action: actions, name: "Unverified Supplier List", href: "/admin/supplier/Unverified/list" },
             { icon: Banknote, module: "Supplier", action: actions, name: "Bank Details Update Requests ", href: "/admin/supplier/bankaccount-update-requests" },
-            { icon: ClipboardList, module: "productRequest", action: actions, name: "New Product Request (In progress)", href: "/admin/products/new" },
-            { icon: ShoppingCart, module: "order", action: actions, name: "Orders(In progress)", href: "/admin/supplier/orders" },
-            { icon: Warehouse, module: "warehouse", action: actions, name: "Warehouse", href: "/admin/supplier/warehouse/list" },
-            { icon: ClipboardList, module: "rto", action: actions, name: "RTO Management (in progress)", href: "/admin/supplier/orders/rto-orders" },
-            { icon: BadgeDollarSign, module: "billing", action: actions, name: "Billings(In progress)", href: "/admin/billing" },
-            { icon: CreditCard, module: "payment", action: actions, name: "Payment(In progress)", href: "/admin/payments" },
+            // { icon: ClipboardList, module: "productRequest", action: actions, name: "New Product Request (In progress)", href: "/admin/products/new" },
+            // { icon: ShoppingCart, module: "order", action: actions, name: "Orders(In progress)", href: "/admin/supplier/orders" },
+            // { icon: Warehouse, module: "warehouse", action: actions, name: "Warehouse", href: "/admin/supplier/warehouse/list" },
+            // { icon: ClipboardList, module: "rto", action: actions, name: "RTO Management (in progress)", href: "/admin/supplier/orders/rto-orders" },
+            // { icon: BadgeDollarSign, module: "billing", action: actions, name: "Billings(In progress)", href: "/admin/billing" },
+            // { icon: CreditCard, module: "payment", action: actions, name: "Payment(In progress)", href: "/admin/payments" },
           ],
         },
       ],
@@ -97,15 +97,15 @@ export default function Sidebar() {
           subMenu: [
             { icon: Users, module: "Dropshipper", action: actions, name: "Dropshippers List", href: "/admin/dropshipper/list" },
             { icon: Banknote, module: "Dropshipper", action: actions, name: "Bank Details Update Requests", href: "/admin/dropshipper/bankaccount-update-requests" },
-            { icon: ShoppingCart, module: "manange-orders", action: actions, name: "Manage Orders(In progress)", href: "/admin/dropshipper/manage-orders" },
-            { icon: Package, module: "manage-products", action: actions, name: "Manage Products(In progress)", href: "/admin/dropshipper/manage-products" },
-            { icon: Gift, module: "source", action: actions, name: "Source a Product(In progress)", href: "/admin/dropshipper/product/source" },
-            { icon: BarChart, module: "reports", action: actions, name: "Reports(In progress)", href: "/report" },
-            { icon: CreditCard, module: "payment", action: actions, name: "Payments(In progress)", href: "#" },
-            { icon: FileText, module: "ndr", action: actions, name: "Manage NDR(In progress)", href: "#" },
-            { icon: MapPin, module: "high-rto", action: actions, name: "High RTO Pincode(In progress)", href: "#" },
-            { icon: Volume2, module: "booster", action: actions, name: "Boosters(In progress)", href: "#" },
-            { icon: Settings, module: "integrations", action: actions, name: "Integrations(In progress)", href: "#" },
+            // { icon: ShoppingCart, module: "manange-orders", action: actions, name: "Manage Orders(In progress)", href: "/admin/dropshipper/manage-orders" },
+            // { icon: Package, module: "manage-products", action: actions, name: "Manage Products(In progress)", href: "/admin/dropshipper/manage-products" },
+            // { icon: Gift, module: "source", action: actions, name: "Source a Product(In progress)", href: "/admin/dropshipper/product/source" },
+            // { icon: BarChart, module: "reports", action: actions, name: "Reports(In progress)", href: "/report" },
+            // { icon: CreditCard, module: "payment", action: actions, name: "Payments(In progress)", href: "#" },
+            // { icon: FileText, module: "ndr", action: actions, name: "Manage NDR(In progress)", href: "#" },
+            // { icon: MapPin, module: "high-rto", action: actions, name: "High RTO Pincode(In progress)", href: "#" },
+            // { icon: Volume2, module: "booster", action: actions, name: "Boosters(In progress)", href: "#" },
+            // { icon: Settings, module: "integrations", action: actions, name: "Integrations(In progress)", href: "#" },
           ],
         },
       ],
@@ -118,10 +118,10 @@ export default function Sidebar() {
           icon: LayoutDashboard,
           subMenu: [
             { icon: ClipboardList, module: "courier", action: actions, name: "Courier Company", href: "/admin/courier/list" },
-            { icon: ClipboardList, module: "api", action: actions, name: "Api Credentials (in progress)", href: "/admin/api/list" },
+            // { icon: ClipboardList, module: "api", action: actions, name: "Api Credentials (in progress)", href: "/admin/api/list" },
             { icon: ClipboardList, module: "Good Pincode", action: actions, name: "Good Performing Page", href: "/admin/good-pincodes/list" },
             { icon: ClipboardList, module: "Bad Pincode", action: actions, name: "Bad Performing Page", href: "/admin/bad-pincodes/list" },
-            { icon: Package, name: "High RTO", module: "High RTO", action: actions, href: "/admin/high-rto/list" },
+            // { icon: Package, name: "High RTO", module: "High RTO", action: actions, href: "/admin/high-rto/list" },
           ],
         },
       ],

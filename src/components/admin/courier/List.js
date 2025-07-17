@@ -30,6 +30,17 @@ export default function List() {
 
     const [activeFilter, setActiveFilter] = useState(null);
 
+
+    const [tabStatus, setTabStatus] = useState("active");
+
+    const inactiveCompany = data.filter((brand) => !brand.status);
+    const isDisabled = inactiveCompany.length === 0;
+
+
+    const filteredCompany = data.filter((item) =>
+        tabStatus === "active" ? item.status === true : item.status === false
+    );
+
     const { verifyAdminAuth, isAdminStaff, extractedPermissions } = useAdmin();
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("courier-company", "courierCompanies");
@@ -66,52 +77,62 @@ export default function List() {
     const handleSoftDelete = (id) => softDelete(id, () => fetchAll(setData, setLoading));
     const handleRestore = (id) => restore(id, () => fetchTrashed(setData, setLoading));
     const handleDestroy = (id) => destroy(id, () => fetchTrashed(setData, setLoading));
-    useEffect(() => {
-        if (typeof window !== 'undefined' && data.length > 0 && !loading) {
-            let table = null;
+   
 
-            Promise.all([
-                import('jquery'),
-                import('datatables.net'),
-                import('datatables.net-dt'),
-                import('datatables.net-buttons'),
-                import('datatables.net-buttons-dt')
-            ]).then(([jQuery]) => {
-                window.jQuery = window.$ = jQuery.default;
 
-                // Destroy existing DataTable if it exists
-                if ($.fn.DataTable.isDataTable('#courierCompanytable')) {
-                    $('#courierCompanytable').DataTable().destroy();
+   useEffect(() => {
+    if (typeof window !== 'undefined' && data.length > 0 && !loading) {
+        let table = null;
+
+        Promise.all([
+            import('jquery'),
+            import('datatables.net'),
+            import('datatables.net-dt'),
+            import('datatables.net-buttons'),
+            import('datatables.net-buttons-dt')
+        ]).then(([jQuery]) => {
+            window.jQuery = window.$ = jQuery.default;
+
+            if ($.fn.DataTable.isDataTable('#courierCompanytable')) {
+                $('#courierCompanytable').DataTable().destroy();
+                $('#courierCompanytable').empty();
+            }
+
+            const isMobile = window.innerWidth <= 768;
+            const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+            table = $('#courierCompanytable').DataTable({
+                pagingType,
+                language: {
+                    paginate: {
+                        previous: "<",
+                        next: ">"
+                    }
+                },
+                // 👇 Remove index column sorting disable if no index column
+                // columnDefs: [
+                //     { orderable: false, targets: 0 }
+                // ]
+            });
+
+            // ❌ Removed dynamic index update
+
+            // ✅ Apply default filter on column 7 (8th column)
+            table.column(7).search("^active$", true, false).draw();
+
+            return () => {
+                if (table) {
+                    table.destroy();
                     $('#courierCompanytable').empty();
                 }
+            };
+        }).catch((error) => {
+            console.error('Failed to load DataTables dependencies:', error);
+        });
+    }
+}, [data, loading]);
 
-                // Reinitialize DataTable with new data
-                const isMobile = window.innerWidth <= 768;
-                const pagingType = isMobile ? 'simple' : 'simple_numbers';
-
-                table = $('#courierCompanytable').DataTable({
-                    pagingType,
-                    language: {
-                        paginate: {
-                            previous: "<",
-                            next: ">"
-                        }
-                    }
-                });
-
-                return () => {
-                    if (table) {
-                        table.destroy();
-                        $('#courierCompanytable').empty();
-                    }
-                };
-            }).catch((error) => {
-                console.error('Failed to load DataTables dependencies:', error);
-            });
-        }
-    }, [data, loading]);
-
-
+    
     if (loading) {
         return (
             <div className="flex items-center justify-center h-[80vh]">
@@ -165,15 +186,15 @@ export default function List() {
                         >
                             Clear All Filters
                         </button>
-                         <button
-                        onClick={() => {
-                            const allIds = data.map(data => data.id);
-                            setSelected(allIds);
-                        }}
-                        className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
-                    >
-                        Select All
-                    </button>
+                        <button
+                            onClick={() => {
+                                const allIds = data.map(data => data.id);
+                                setSelected(allIds);
+                            }}
+                            className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                        >
+                            Select All
+                        </button>
                         {selected.length > 0 && (
                             <button
                                 onClick={async () => {
@@ -269,13 +290,13 @@ export default function List() {
                             type="text"
                             value={
                                 activeFilter.key === 'courierName' ? courierNameFilter :
-                                    activeFilter.key === 'courierCode' ? courierCodeFilter :
-                                        activeFilter.key === 'website' ? websiteFilter :
-                                            activeFilter.key === 'contactEmail' ? contactEmailFilter :
-                                                activeFilter.key === 'contactNumber' ? contactNumberFilter :
-                                                    activeFilter.key === 'rtoCharges' ? rtoChargesFilter :
-                                                        activeFilter.key === 'flatRate' ? flatRateFilter :
-                                                            activeFilter.key === 'status' ? statusFilter : ''
+                                activeFilter.key === 'courierCode' ? courierCodeFilter :
+                                activeFilter.key === 'website' ? websiteFilter :
+                                activeFilter.key === 'contactEmail' ? contactEmailFilter :
+                                activeFilter.key === 'contactNumber' ? contactNumberFilter :
+                                activeFilter.key === 'rtoCharges' ? rtoChargesFilter :
+                                activeFilter.key === 'flatRate' ? flatRateFilter :
+                                activeFilter.key === 'status' ? statusFilter : ''
                             }
                             onChange={(e) => activeFilter.setValue(e.target.value)}
                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md"
@@ -298,13 +319,13 @@ export default function List() {
                                             .column(activeFilter.columnIndex)
                                             .search(
                                                 activeFilter.key === 'courierName' ? courierNameFilter :
-                                                    activeFilter.key === 'courierCode' ? courierCodeFilter :
-                                                        activeFilter.key === 'website' ? websiteFilter :
-                                                            activeFilter.key === 'contactEmail' ? contactEmailFilter :
-                                                                activeFilter.key === 'contactNumber' ? contactNumberFilter :
-                                                                    activeFilter.key === 'rtoCharges' ? rtoChargesFilter :
-                                                                        activeFilter.key === 'flatRate' ? flatRateFilter :
-                                                                            activeFilter.key === 'status' ? statusFilter : ''
+                                                activeFilter.key === 'courierCode' ? courierCodeFilter :
+                                                activeFilter.key === 'website' ? websiteFilter :
+                                                activeFilter.key === 'contactEmail' ? contactEmailFilter :
+                                                activeFilter.key === 'contactNumber' ? contactNumberFilter :
+                                                activeFilter.key === 'rtoCharges' ? rtoChargesFilter :
+                                                activeFilter.key === 'flatRate' ? flatRateFilter :
+                                                activeFilter.key === 'status' ? statusFilter : ''
                                             )
                                             .draw();
                                     }
@@ -317,6 +338,52 @@ export default function List() {
                         </div>
                     </div>
                 )}
+
+                <div className="flex space-x-4 border-b border-gray-200 mb-6">
+                    <button
+                        onClick={() => {
+                            setTabStatus('active');
+                            if ($.fn.DataTable.isDataTable("#courierCompanytable")) {
+                                $("#courierCompanytable").DataTable().column(4).search("^active$", true, false).draw();
+                            }
+                        }}
+                        className={`px-4 py-2 font-medium border-b-2 transition-all duration-200
+            ${tabStatus === 'active'
+                                ? "border-orange-500 text-orange-600"
+                                : "border-transparent text-gray-500 hover:text-orange-600"
+                            }`}
+                    >
+                        Active Company
+                    </button>
+
+                    <div className="relative group inline-block">
+                        <button
+                            disabled={isDisabled}
+                            onClick={() => {
+                                setTabStatus('inactive');
+                                if ($.fn.DataTable.isDataTable("#courierCompanytable")) {
+                                    $("#courierCompanytable").DataTable().column(4).search("^inactive$", true, false).draw();
+                                }
+                            }}
+                            className={`px-4 py-2 font-medium border-b-2 transition-all duration-200 relative
+                ${tabStatus === 'inactive'
+                                    ? "border-orange-500 text-orange-600"
+                                    : "border-transparent text-gray-500 hover:text-orange-600"
+                                }
+                ${isDisabled ? 'cursor-not-allowed' : ''}
+            `}
+                        >
+                            Inactive Company
+                        </button>
+
+                        {isDisabled && (
+                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                                No inactive Company
+                                <div className="absolute bottom-[-4px] left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                            </div>
+                        )}
+                    </div>
+                </div>
 
                 {data.length > 0 ? (
                     <div className="overflow-x-auto relative main-outer-wrapper w-full">
@@ -384,9 +451,9 @@ export default function List() {
                                         <td className="p-2 whitespace-nowrap px-5">{item.flatShippingRate || 'NIL'}</td>
                                         <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
                                             {item.status ? (
-                                                <span className="bg-green-100 text-green-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
+                                                <span className="bg-green-100 text-green-800  font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
                                             ) : (
-                                                <span className="bg-red-100 text-red-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
+                                                <span className="bg-red-100 text-red-800  font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
                                             )}
                                         </td>
                                         <td className="p-2 px-5 text-[#8F9BBA] text-center">

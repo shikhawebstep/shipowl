@@ -346,7 +346,7 @@ const SupplierList = () => {
                     </button>
                     <button
                         onClick={() => {
-                            const allIds = suppliers.map(data => data.id);
+                            const allIds = filteredSuppliers.map(data => data.id);
                             setSelected(allIds);
                         }}
                         className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"

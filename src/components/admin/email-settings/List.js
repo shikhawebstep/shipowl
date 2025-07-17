@@ -20,6 +20,17 @@ export default function List() {
     const [subjectFilter, setSubjectFilter] = useState('');
     const [activeFilter, setActiveFilter] = useState(null);
 
+    const [tabStatus, setTabStatus] = useState("active");
+
+    const inactiveTemplates = emails.filter((brand) => !brand.status);
+    const isDisabled = inactiveTemplates.length === 0;
+
+
+    const filteredTemplates = emails.filter((item) =>
+        tabStatus === "active" ? item.status === true : item.status === false
+    );
+
+
     const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
 
     const hasPermission = (action) =>
@@ -137,6 +148,7 @@ export default function List() {
                 const isMobile = window.innerWidth <= 768;
                 const pagingType = isMobile ? 'simple' : 'simple_numbers';
 
+                // ✅ Correctly assign the table instance here
                 tableInstance = $('#emailTable').DataTable({
                     pagingType,
                     language: {
@@ -144,8 +156,24 @@ export default function List() {
                             previous: "<",
                             next: ">"
                         }
-                    }
+                    },
+                    columnDefs: [
+                        { orderable: false, targets: 0 } // Disable sorting on index column
+                    ]
                 });
+
+                // 🟧 Add dynamic index update on draw
+                tableInstance.on('order.dt search.dt draw.dt', function () {
+                    tableInstance
+                        .column(0, { search: 'applied', order: 'applied' })
+                        .nodes()
+                        .each((cell, i) => {
+                            cell.innerHTML = i + 1;
+                        });
+                });
+
+                // Apply default filter on column 4 (5th column, zero-based index)
+                tableInstance.column(4).search("^active$", true, false).draw();
             };
 
             initializeDataTable();
@@ -157,6 +185,9 @@ export default function List() {
             };
         }
     }, [emails, loading]);
+
+
+
     const parseAndRenderEmails = (data) => {
         try {
             const emails = JSON.parse(data);
@@ -202,14 +233,62 @@ export default function List() {
                             Clear All Filters
                         </button>
 
+
+
+                    </div>
+
+                    <div className="flex space-x-4 border-b border-gray-200 mb-6">
+                        <button
+                            onClick={() => {
+                                setTabStatus('active');
+                                if ($.fn.DataTable.isDataTable("#emailTable")) {
+                                    $("#emailTable").DataTable().column(4).search("^active$", true, false).draw();
+                                }
+                            }}
+                            className={`px-4 py-2 font-medium border-b-2 transition-all duration-200
+            ${tabStatus === 'active'
+                                    ? "border-orange-500 text-orange-600"
+                                    : "border-transparent text-gray-500 hover:text-orange-600"
+                                }`}
+                        >
+                            Active Templates
+                        </button>
+
+                        <div className="relative group inline-block">
+                            <button
+                                disabled={isDisabled}
+                                onClick={() => {
+                                    setTabStatus('inactive');
+                                    if ($.fn.DataTable.isDataTable("#emailTable")) {
+                                        $("#emailTable").DataTable().column(4).search("^inactive$", true, false).draw();
+                                    }
+                                }}
+                                className={`px-4 py-2 font-medium border-b-2 transition-all duration-200 relative
+                ${tabStatus === 'inactive'
+                                        ? "border-orange-500 text-orange-600"
+                                        : "border-transparent text-gray-500 hover:text-orange-600"
+                                    }
+                ${isDisabled ? 'cursor-not-allowed' : ''}
+            `}
+                            >
+                                Inactive Templates
+                            </button>
+
+                            {isDisabled && (
+                                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                                    No inactive Templates
+                                    <div className="absolute bottom-[-4px] left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                     {
                         emails.length > 0 ? (
                             <table className="w-full main-tables text-sm text-left text-gray-700" id="emailTable">
-                                <thead className="text-xs uppercase text-gray-700">
-                                    <tr className="border-b border-gray-200">
-                                        <th className="px-6 py-3 whitespace-nowrap">SR.</th>
-                                        <th className="px-6 py-3 whitespace-nowrap">
+                                <thead className="">
+                                    <tr className="uppercase border-b pb-2 text-[#A3AED0] border-[#E9EDF7]">
+                                        <th className="whitespace-nowrap">SR.</th>
+                                        <th className="whitespace-nowrap">
                                             <button
                                                 onClick={(e) =>
                                                     setActiveFilter({
@@ -226,7 +305,7 @@ export default function List() {
                                                 Panel <IoFilterSharp />
                                             </button>
                                         </th>
-                                        <th className="px-6 py-3 whitespace-nowrap">
+                                        <th className="whitespace-nowrap">
                                             <button
                                                 onClick={(e) =>
                                                     setActiveFilter({
@@ -243,7 +322,7 @@ export default function List() {
                                                 Module <IoFilterSharp />
                                             </button>
                                         </th>
-                                        <th className="px-6 py-3 whitespace-nowrap">
+                                        <th className="whitespace-nowrap">
                                             <button
                                                 onClick={(e) =>
                                                     setActiveFilter({
@@ -260,7 +339,7 @@ export default function List() {
                                                 Action <IoFilterSharp />
                                             </button>
                                         </th>
-                                        <th className="px-6 py-3 whitespace-nowrap">
+                                        <th className="whitespace-nowrap">
                                             <button
                                                 onClick={(e) =>
                                                     setActiveFilter({
@@ -277,7 +356,7 @@ export default function List() {
                                                 Status <IoFilterSharp />
                                             </button>
                                         </th>
-                                        <th className="px-6 py-3 whitespace-nowrap">
+                                        <th className="whitespace-nowrap">
                                             <button
                                                 onClick={(e) =>
                                                     setActiveFilter({
@@ -294,27 +373,27 @@ export default function List() {
                                                 Subject <IoFilterSharp />
                                             </button>
                                         </th>
-                                        <th className="px-6 py-3 whitespace-nowrap">Body</th>
-                                        <th className="px-6 py-3 whitespace-nowrap">To Mails</th>
-                                        <th className="px-6 py-3 whitespace-nowrap">CC Mail</th>
-                                        <th className="px-6 py-3 whitespace-nowrap">BCC Mails</th>
-                                        <th className="px-6 py-3 whitespace-nowrap">Action</th>
+                                        <th className="whitespace-nowrap">Body</th>
+                                        <th className="whitespace-nowrap">To Mails</th>
+                                        <th className="whitespace-nowrap">CC Mail</th>
+                                        <th className="whitespace-nowrap">BCC Mails</th>
+                                        <th className="whitespace-nowrap">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {emails.map((item, index) => (
-                                        <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-left font-medium text-gray-900">{index + 1}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{item.panel}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{item.module}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{item.action}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                        <tr key={item.id} className="bg-transparent border-b border-[#E9EDF7] text-[#2B3674] ">
+                                            <td className="whitespace-nowrap text-left font-medium text-gray-900">{index + 1}</td>
+                                            <td className="whitespace-nowrap">{item.panel}</td>
+                                            <td className="whitespace-nowrap">{item.module}</td>
+                                            <td className="whitespace-nowrap">{item.action}</td>
+                                            <td className="whitespace-nowrap">
                                                 <span className={`px-3 py-1 rounded text-white ${item.status === true ? 'bg-green-500' : 'bg-red-500'}`}>
                                                     {item.status ? "Active" : 'Inactive'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{item.subject}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                            <td className="whitespace-nowrap">{item.subject}</td>
+                                            <td className="whitespace-nowrap">
                                                 {item.html_template ? (
                                                     <button onClick={() => handleView(item.html_template)} className="text-blue-600 hover:underline">
                                                         View
@@ -323,17 +402,17 @@ export default function List() {
                                                     '-'
                                                 )}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                            <td className="whitespace-nowrap">
                                                 {parseAndRenderEmails(item.to)}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                            <td className="whitespace-nowrap">
                                                 {item.cc ? parseAndRenderEmails(item.cc) : "-"}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                            <td className="whitespace-nowrap">
                                                 {item.bcc ? parseAndRenderEmails(item.bcc) : "-"}
                                             </td>
 
-                                            <td className="px-6 py-4 whitespace-nowrap text-center">
+                                            <td className="whitespace-nowrap text-center">
                                                 {
                                                     canEdit && <button className="text-indigo-600 hover:underline" onClick={() => handleEdit(item.id)}>Edit</button>
                                                 }

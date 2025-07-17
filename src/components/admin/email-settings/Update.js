@@ -86,7 +86,7 @@ export default function Update() {
             }
 
             const result = await response.json();
-            const emails = result?.emailConfig || {};
+            const emails = result?.template || {};
 
             // Prefill fields
             setStatus(emails.status || 'Inactive');
@@ -292,13 +292,18 @@ export default function Update() {
                     </div>
                     <div className="mt-8 p-4 border rounded-lg bg-gray-50">
                         <h3 className="text-lg font-semibold mb-2 text-gray-800">From Email – Available Variables</h3>
-                        <ul className="space-y-2 text-sm text-gray-700 list-disc list-inside">
-                            {Object.entries(fromEmailVariables).map(([variable, description]) => (
-                                <li key={variable}>
-                                    <code className="text-orange-600 font-mono">{variable}</code> – {description}
-                                </li>
-                            ))}
-                        </ul>
+                        {fromEmailVariables && Object.keys(fromEmailVariables).length > 0 ? (
+                            <ul className="space-y-2 text-sm text-gray-700 list-disc list-inside">
+                                {Object.entries(fromEmailVariables).map(([variable, description]) => (
+                                    <li key={variable}>
+                                        <code className="text-orange-600 font-mono">{variable}</code> – {description}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="text-sm text-gray-500">No variables available.</p>
+                        )}
+
                     </div>
 
                     <div>

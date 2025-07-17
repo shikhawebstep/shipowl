@@ -38,6 +38,16 @@ const Dropshipper = () => {
     const [emailFilter, setEmailFilter] = useState('');
     const [addressFilter, setAddressFilter] = useState('');
     const [activeFilter, setActiveFilter] = useState(null); // common popup control
+    const [tabStatus, setTabStatus] = useState("active");
+
+    // Check if any inactive dropshippers exist
+    const inactiveDropshipper = dropshippers.filter((item) => item.status === "inactive");
+    const isDisabled = inactiveDropshipper.length === 0;
+
+    // Filter dropshippers based on tab status
+    const filteredDropshipper = dropshippers.filter((item) =>
+        tabStatus === "active" ? item.status === "active" : item.status === "inactive"
+    );
 
 
     const handleToggleTrash = async () => {
@@ -65,49 +75,67 @@ const Dropshipper = () => {
         };
         fetchData();
     }, [, verifyAdminAuth]);
+
     useEffect(() => {
-        if (typeof window !== "undefined" && dropshippers.length > 0 && !loading) {
+        if (typeof window !== 'undefined' && dropshippers.length > 0 && !loading) {
             let table = null;
 
             Promise.all([
-                import("jquery"),
-                import("datatables.net"),
-                import("datatables.net-dt"),
-                import("datatables.net-buttons"),
-                import("datatables.net-buttons-dt")
-            ])
-                .then(([jQuery]) => {
-                    window.jQuery = window.$ = jQuery.default;
+                import('jquery'),
+                import('datatables.net'),
+                import('datatables.net-dt'),
+                import('datatables.net-buttons'),
+                import('datatables.net-buttons-dt')
+            ]).then(([jQuery]) => {
+                window.jQuery = window.$ = jQuery.default;
 
-                    if ($.fn.DataTable.isDataTable("#dropshipperTable")) {
-                        $("#dropshipperTable").DataTable().destroy();
-                        // Remove the empty() call here
-                    }
+                if ($.fn.DataTable.isDataTable('#dropshipperTable')) {
+                    $('#dropshipperTable').DataTable().destroy();
+                    $('#dropshipperTable').empty();
+                }
 
-                    const isMobile = window.innerWidth <= 768;
-                    const pagingType = isMobile ? 'simple' : 'simple_numbers';
+                const isMobile = window.innerWidth <= 768;
+                const pagingType = isMobile ? 'simple' : 'simple_numbers';
 
-                    table = $('#dropshipperTable').DataTable({
-                        pagingType,
-                        language: {
-                            paginate: {
-                                previous: "<",
-                                next: ">"
-                            }
+                table = $('#dropshipperTable').DataTable({
+                    pagingType,
+                    language: {
+                        paginate: {
+                            previous: "<",
+                            next: ">"
                         }
-                    });
-
-                    return () => {
-                        if (table) {
-                            table.destroy();
-                        }
-                    };
-                })
-                .catch((error) => {
-                    console.error("Failed to load DataTables dependencies:", error);
+                    },
+                    columnDefs: [
+                        { orderable: false, targets: 0 } // Disable sorting on index column
+                    ]
                 });
+
+                // 🟧 Add dynamic index update on draw
+                table.on('order.dt search.dt draw.dt', function () {
+                    table
+                        .column(0, { search: 'applied', order: 'applied' })
+                        .nodes()
+                        .each((cell, i) => {
+                            cell.innerHTML = i + 1;
+                        });
+                });
+
+                // Apply default filter on column 5 (index 5)
+                table.column(5).search("^active$", true, false).draw();
+
+                return () => {
+                    if (table) {
+                        table.destroy();
+                        $('#dropshipperTable').empty();
+                    }
+                };
+            }).catch((error) => {
+                console.error('Failed to load DataTables dependencies:', error);
+            });
         }
     }, [loading]);
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -286,7 +314,7 @@ const Dropshipper = () => {
                     </button>
                     <button
                         onClick={() => {
-                            const allIds = dropshippers.map(data => data.id);
+                            const allIds = filteredDropshipper.map(data => data.id);
                             setSelected(allIds);
                         }}
                         className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
@@ -352,7 +380,7 @@ const Dropshipper = () => {
                         </button>
                     </div>
 
-                    {/* 👇 This is key: use activeFilter.key to get fresh value */}
+
                     <input
                         type="text"
                         value={
@@ -395,7 +423,51 @@ const Dropshipper = () => {
                 </div>
             )}
 
+            <div className="flex space-x-4 border-b border-gray-200 mb-6">
+                <button
+                    onClick={() => {
+                        setTabStatus('active');
+                        if ($.fn.DataTable.isDataTable("#dropshipperTable")) {
+                            $("#dropshipperTable").DataTable().column(5).search("^active$", true, false).draw();
+                        }
+                    }}
+                    className={`px-4 py-2 font-medium border-b-2 transition-all duration-200
+            ${tabStatus === 'active'
+                            ? "border-orange-500 text-orange-600"
+                            : "border-transparent text-gray-500 hover:text-orange-600"
+                        }`}
+                >
+                    Active Dropshipper
+                </button>
 
+                <div className="relative group inline-block">
+                    <button
+                        disabled={isDisabled}
+                        onClick={() => {
+                            setTabStatus('inactive');
+                            if ($.fn.DataTable.isDataTable("#dropshipperTable")) {
+                                $("#dropshipperTable").DataTable().column(5).search("^inactive$", true, false).draw();
+                            }
+                        }}
+                        className={`px-4 py-2 font-medium border-b-2 transition-all duration-200 relative
+                ${tabStatus === 'inactive'
+                                ? "border-orange-500 text-orange-600"
+                                : "border-transparent text-gray-500 hover:text-orange-600"
+                            }
+                ${isDisabled ? 'cursor-not-allowed' : ''}
+            `}
+                    >
+                        Inactive Dropshipper
+                    </button>
+
+                    {isDisabled && (
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                            No inactive Dropshipper
+                            <div className="absolute bottom-[-4px] left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                        </div>
+                    )}
+                </div>
+            </div>
             {dropshippers.length > 0 ? (
                 <div className="overflow-x-auto w-full relative main-outer-wrapper">
                     <table className="display main-tables w-full" id="dropshipperTable">
@@ -458,6 +530,7 @@ const Dropshipper = () => {
                                 </th>
 
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">View More</th>
+                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Status</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Check Reporting</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Update Password</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">View Profile</th>
@@ -502,6 +575,17 @@ const Dropshipper = () => {
                                                     {expandedItem?.id === item.id
                                                         ? "Hide Bank Details"
                                                         : "View Bank Details"}
+                                                </button>
+                                            </td>
+                                            <td className="p-3 px-4 text-left whitespace-nowrap">
+                                                <button className={`p-2 cursor-pointer capitalize rounded-md px-3 text-left whitespace-nowrap text-white ${item.status?.toLowerCase() === 'inactive'
+                                                    ? 'bg-green-500'
+                                                    : item.status?.toLowerCase() === 'active'
+                                                        ? 'bg-red-500'
+                                                        : 'bg-gray-300'
+                                                    }`}
+                                                >
+                                                    {item.status?.toLowerCase() === 'active' ? 'inactive' : 'active' || '-'}
                                                 </button>
                                             </td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">

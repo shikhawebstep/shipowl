@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
@@ -27,7 +27,7 @@ export default function List() {
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/category", "categories");
     const { fetchImages, handleBulkDelete } = useImageURL();
-
+    const tableRef = useRef(null);
     const [categoryName, setCategoryName] = useState('');
     const [showFilter, setShowFilter] = useState(null);
     const [showStatusFilter, setShowStatusFilter] = useState(false);
@@ -35,6 +35,13 @@ export default function List() {
 
     const [showDescriptionFilter, setShowDescriptionFilter] = useState(false);
     const [descriptionFilter, setDescriptionFilter] = useState('');
+    const [tabStatus, setTabStatus] = useState("active");
+    const inactiveCategoryData = categoryData.filter((cat) => !cat.status);
+    const isDisabled = inactiveCategoryData.length === 0;
+
+    const filteredCategoryData = categoryData.filter((item) =>
+        tabStatus === "active" ? item.status === true : item.status === false
+    );
 
     const handleClearFilters = () => {
         setCategoryName('');
@@ -85,48 +92,57 @@ export default function List() {
     const handleSoftDelete = (id) => softDelete(id, () => fetchAll(setCategoryData, setLoading));
     const handleRestore = (id) => restore(id, () => fetchTrashed(setCategoryData, setLoading));
     const handleDestroy = (id) => destroy(id, () => fetchTrashed(setCategoryData, setLoading));
-    useEffect(() => {
-        if (typeof window !== 'undefined' && categoryData.length > 0 && !loading) {
-            let table = null;
 
-            Promise.all([
-                import('jquery'),
-                import('datatables.net'),
-                import('datatables.net-dt'),
-                import('datatables.net-buttons'),
-                import('datatables.net-buttons-dt')
-            ]).then(([jQuery]) => {
-                window.jQuery = window.$ = jQuery.default;
 
-                if ($.fn.DataTable.isDataTable('#categoryTable')) {
-                    $('#categoryTable').DataTable().destroy();
+   useEffect(() => {
+    if (typeof window !== 'undefined' && categoryData.length > 0 && !loading) {
+        let table = null;
+
+        Promise.all([
+            import('jquery'),
+            import('datatables.net'),
+            import('datatables.net-dt'),
+            import('datatables.net-buttons'),
+            import('datatables.net-buttons-dt')
+        ]).then(([jQuery]) => {
+            window.jQuery = window.$ = jQuery.default;
+
+            // Destroy existing DataTable if it exists
+            if ($.fn.DataTable.isDataTable('#categoryTable')) {
+                $('#categoryTable').DataTable().destroy();
+                $('#categoryTable').empty();
+            }
+
+            // Reinitialize DataTable with new data
+            const isMobile = window.innerWidth <= 768;
+            const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+            table = $('#categoryTable').DataTable({
+                pagingType,
+                language: {
+                    paginate: {
+                        previous: "<",
+                        next: ">"
+                    }
+                }
+            });
+
+            // Apply default filter on 5th column (index 4), e.g. show only 'active' categories
+            table.column(4).search("^active$", true, false).draw();
+
+            return () => {
+                if (table) {
+                    table.destroy();
                     $('#categoryTable').empty();
                 }
+            };
+        }).catch((error) => {
+            console.error('Failed to load DataTables dependencies:', error);
+        });
+    }
+}, [categoryData, loading]);
 
-                const isMobile = window.innerWidth <= 768;
-                const pagingType = isMobile ? 'simple' : 'simple_numbers';
 
-                table = $('#categoryTable').DataTable({
-                    pagingType,
-                    language: {
-                        paginate: {
-                            previous: "<",
-                            next: ">"
-                        }
-                    }
-                });
-
-                return () => {
-                    if (table) {
-                        table.destroy();
-                        $('#categoryTable').empty();
-                    }
-                };
-            }).catch((error) => {
-                console.error('Failed to load DataTables dependencies:', error);
-            });
-        }
-    }, [categoryData, loading]);
 
     const exportCsv = () => {
         const table = $('#categoryTable').DataTable();
@@ -167,7 +183,7 @@ export default function List() {
                         <div className="flex gap-3  items-center">
                             <button
                                 onClick={() => {
-                                    const allIds = categoryData.map(data => data.id);
+                                    const allIds = filteredCategoryData.map(data => data.id);
                                     setSelected(allIds);
                                 }}
                                 className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
@@ -234,9 +250,58 @@ export default function List() {
                         </div>
                     </div>
 
+                    <div className="flex space-x-4 border-b border-gray-200 mb-6">
+                        <button
+                            onClick={() => {
+                                setTabStatus('active');
+                                if ($.fn.DataTable.isDataTable("#categoryTable")) {
+                                     $("#categoryTable").DataTable().column(4).search("^active$", true, false).draw();
+                                }
+                            }}
+                            className={`px-4 py-2 font-medium border-b-2 transition-all duration-200
+            ${tabStatus === 'active'
+                                    ? "border-orange-500 text-orange-600"
+                                    : "border-transparent text-gray-500 hover:text-orange-600"
+                                }`}
+                        >
+                            Active categories
+                        </button>
+
+                        <div className="relative group inline-block">
+                            <button
+                                disabled={isDisabled}
+                                onClick={() => {
+                                    setTabStatus('inactive');
+                                    if ($.fn.DataTable.isDataTable("#categoryTable")) {
+                                         $("#categoryTable").DataTable().column(4).search("^inactive$", true, false).draw();
+                                    }
+                                }}
+                                className={`px-4 py-2 font-medium border-b-2 transition-all duration-200 relative
+                ${tabStatus === 'inactive'
+                                        ? "border-orange-500 text-orange-600"
+                                        : "border-transparent text-gray-500 hover:text-orange-600"
+                                    }
+                ${isDisabled ? 'cursor-not-allowed' : ''}
+            `}
+                            >
+                                Inactive categories
+                            </button>
+
+                            {isDisabled && (
+                                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                                    No inactive categories
+                                    <div className="absolute bottom-[-4px] left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+
+
+
                     {categoryData.length > 0 ? (
                         <div className="overflow-x-auto w-full relative">
-                            <table id="categoryTable" className="display main-tables">
+                            <table id="categoryTable" className="display main-tables w-full">
                                 <thead>
                                     <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                         <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">Category Image</th>
@@ -461,9 +526,6 @@ export default function List() {
                                 </thead>
                                 <tbody>
                                     {categoryData.map((item) => {
-
-
-
                                         return (
                                             <tr
                                                 key={item.id}
