@@ -521,7 +521,7 @@ export async function PATCH(req: NextRequest) {
       const options = {
         panel: 'Admin',
         module: 'Product',
-        action: 'restore',
+        action: 'Restore',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);

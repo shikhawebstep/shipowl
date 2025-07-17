@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { createBadPincode, getBadPincodesByStatus, getBadPincodeByPincode } from '@/app/models/badPincode';
@@ -135,16 +135,45 @@ export async function POST(req: NextRequest) {
     const badPincodeCreateResult = await createBadPincode(adminId, String(adminRole), badPincodePayload);
 
     if (badPincodeCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Bad Pincode',
+          action: 'Create',
+          data: badPincodeCreateResult,
+          response: { status: true, badPincode: badPincodeCreateResult.badPincode },
+          status: true
+        }, req);
+
       return NextResponse.json({ status: true, badPincode: badPincodeCreateResult.badPincode }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Create',
+        data: badPincodeCreateResult,
+        response: { status: false, error: badPincodeCreateResult?.message || 'BadPincode creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'BadPincode creation failed:', badPincodeCreateResult?.message || 'Unknown error');
     return NextResponse.json(
       { status: false, error: badPincodeCreateResult?.message || 'BadPincode creation failed' },
       { status: 500 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Create',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'BadPincode Creation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }

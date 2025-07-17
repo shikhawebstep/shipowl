@@ -120,7 +120,7 @@ export default function Login() {
             if (admin) {
                 const shippingData = {
                     project: {
-                        name: "Shipping OWL",
+                        name: "ShipOwl",
                         environment: "production",
                         active_panel: "supplier",
                     },

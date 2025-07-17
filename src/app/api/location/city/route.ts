@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { createCity, getCitiesByStatus } from '@/app/models/location/city';
@@ -12,26 +12,26 @@ import { getStatesByStatus } from '@/app/models/location/state';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    admin?: MainAdmin;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  admin?: MainAdmin;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    admin?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  admin?: SupplierStaff;
 }
 
 export async function POST(req: NextRequest) {
@@ -163,17 +163,46 @@ export async function POST(req: NextRequest) {
     const cityCreateResult = await createCity(adminId, String(adminRole), cityPayload);
 
     if (cityCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'City (Location)',
+          action: 'Create',
+          data: cityCreateResult,
+          response: { status: true, message: "City created successfully", city: cityCreateResult.city },
+          status: true
+        }, req);
+
       logMessage('info', 'City created successfully:', cityCreateResult.city);
       return NextResponse.json({ status: true, message: "City created successfully", city: cityCreateResult.city }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'City (Location)',
+        action: 'Create',
+        data: cityCreateResult,
+        response: { status: false, error: cityCreateResult?.message || 'City creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'City creation failed:', cityCreateResult?.message || 'Unknown error');
     return NextResponse.json(
       { status: false, error: cityCreateResult?.message || 'City creation failed' },
       { status: 500 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'City (Location)',
+        action: 'Create',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'City Creation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }

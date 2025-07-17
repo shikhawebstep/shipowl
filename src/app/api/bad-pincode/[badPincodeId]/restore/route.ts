@@ -1,31 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getBadPincodeById, restoreBadPincode } from '@/app/models/badPincode';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    admin?: MainAdmin;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  admin?: MainAdmin;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    admin?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  admin?: SupplierStaff;
 }
 
 export async function PATCH(req: NextRequest) {
@@ -100,14 +100,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreBadPincode(adminId, String(adminRole), badPincodeIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Bad Pincode',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, badPincode: restoreResult.restoredBadPincode },
+          status: true
+        }, req);
+
       logMessage('info', 'BadPincode restored successfully:', restoreResult.restoredBadPincode);
       return NextResponse.json({ status: true, badPincode: restoreResult.restoredBadPincode }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'BadPincode restore failed' } ,
+        status: false
+      }, req);
 
     logMessage('error', 'BadPincode restore failed');
     return NextResponse.json({ status: false, error: 'BadPincode restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ BadPincode restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { createDropshipperProduct, checkProductForDropshipper } from '@/app/models/dropshipper/product';
@@ -469,6 +469,19 @@ export async function POST(req: NextRequest) {
       );
 
       if (!productCreateResult.status) {
+        await ActivityLog(
+          {
+            panel: 'Dropshipper',
+            module: 'Product',
+            action: 'Create',
+            data: productCreateResult,
+            response: {
+              status: false,
+              message: productCreateResult?.message || 'Failed to create product',
+            },
+            status: false
+          }, req);
+
         return NextResponse.json(
           {
             status: false,
@@ -478,6 +491,16 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      await ActivityLog(
+        {
+          panel: 'Dropshipper',
+          module: 'Product',
+          action: 'Create',
+          data: productCreateResult,
+          response: { status: true, product: productCreateResult.product, message: 'Product pushed to Shopify' },
+          status: true
+        }, req);
+
       return NextResponse.json(
         { status: true, product: productCreateResult.product, message: 'Product pushed to Shopify' },
         { status: 200 }
@@ -485,6 +508,20 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       // Log the error if you have a logger or console
       console.error('Shopify API error:', error);
+
+      await ActivityLog(
+        {
+          panel: 'Dropshipper',
+          module: 'Product',
+          action: 'Create',
+          data: { oneLineSimpleMessage: error || 'Failed to create product on Shopify' },
+          response: {
+            status: false,
+            message: 'Failed to create product on Shopify',
+            error: error instanceof Error ? error.message : 'Unknown error'
+          },
+          status: false
+        }, req);
 
       return NextResponse.json(
         {
@@ -496,8 +533,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Product',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Product Creation Exception:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }

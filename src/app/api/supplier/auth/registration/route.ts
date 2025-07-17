@@ -459,7 +459,7 @@ export async function POST(req: NextRequest) {
       "{{name}}": supplierCreateResult.supplier.name,
       "{{email}}": supplierCreateResult.supplier.email,
       "{{year}}": new Date().getFullYear().toString(),
-      "{{appName}}": "Shipping OWL",
+      "{{appName}}": "ShipOwl",
       "{{verificationLink}}": `https://shipowl.io/supplier/auth/register/verify?token=${token}`,
       "{{password}}": password
     };

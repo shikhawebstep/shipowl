@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
@@ -142,6 +142,16 @@ export async function PUT(req: NextRequest) {
         );
 
         if (updateResult?.status) {
+            await ActivityLog(
+                {
+                    panel: 'Dropshipper',
+                    module: 'Shopify',
+                    action: 'Update',
+                    data: updateResult,
+                    response: { status: true, shopifyStore: updateResult.shopifyStore },
+                    status: true
+                }, req);
+
             return NextResponse.json(
                 { status: true, shopifyStore: updateResult.shopifyStore },
                 { status: 200 }
@@ -156,15 +166,34 @@ export async function PUT(req: NextRequest) {
             await deleteFile(deletePath(fileData as UploadedFileInfo));
         }
 
+        await ActivityLog(
+            {
+                panel: 'Dropshipper',
+                module: 'Shopify',
+                action: 'Update',
+                data: updateResult,
+                response: { status: false, error: updateResult?.message || 'ShopifyStore update failed' },
+                status: false
+            }, req);
+
         return NextResponse.json(
             { status: false, error: updateResult?.message || 'ShopifyStore update failed' },
             { status: 500 }
         );
 
-    } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : 'Internal Server Error';
-        logMessage('error', 'ShopifyStore Update Error:', errorMessage);
-        return NextResponse.json({ status: false, error: errorMessage }, { status: 500 });
+    } catch (error) {
+        await ActivityLog(
+            {
+                panel: 'Dropshipper',
+                module: 'Shopify',
+                action: 'Update',
+                data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+                response: { status: false, error: 'Server error' },
+                status: false
+            }, req);
+
+        logMessage('error', 'ShopifyStore Update Error:', error);
+        return NextResponse.json({ status: false, error }, { status: 500 });
     }
 }
 
@@ -201,7 +230,7 @@ export async function DELETE(req: NextRequest) {
             const permissionCheck = await checkStaffPermissionStatus({
                 panel: 'Dropshipper',
                 module: 'Shopify',
-                action: 'Update',
+                action: 'Delete',
             }, dropshipperId);
 
             if (!permissionCheck.status) {
@@ -227,13 +256,46 @@ export async function DELETE(req: NextRequest) {
         const deleteShopifyStoreResult = await deleteShopifyStoreById(shopifyStoreId);
 
         if (!deleteShopifyStoreResult.status) {
+            await ActivityLog(
+                {
+                    panel: 'Dropshipper',
+                    module: 'Shopify',
+                    action: 'Delete',
+                    data: deleteShopifyStoreResult,
+                    response: { status: false, error: deleteShopifyStoreResult.message },
+                    status: false
+                }, req);
+
+
             logMessage('error', 'Error during shopify store deletion', { message: deleteShopifyStoreResult.message });
             return NextResponse.json({ status: false, error: deleteShopifyStoreResult.message }, { status: 500 });
         }
 
+        await ActivityLog(
+            {
+                panel: 'Dropshipper',
+                module: 'Shopify',
+                action: 'Delete',
+                data: deleteShopifyStoreResult,
+                response: { status: true, error: deleteShopifyStoreResult.message },
+                status: false
+            }, req);
+
+
         return NextResponse.json({ status: true, error: deleteShopifyStoreResult.message }, { status: 500 });
 
     } catch (error) {
+        await ActivityLog(
+            {
+                panel: 'Dropshipper',
+                module: 'Shopify',
+                action: 'Delete',
+                data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+                response: { status: false, error: 'Server error' },
+                status: false
+            }, req);
+
+
         logMessage('error', 'Error during product deletion', { error });
         return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
     }

@@ -272,7 +272,7 @@ export const getProductsByFiltersAndStatus = async (
                     product: {
                         select: {
                             id: true,
-                            shippingOwlProductId: true,
+                            shipOwlProductId: true,
                             categoryId: true,
                             name: true,
                             gallery: true,
@@ -352,7 +352,7 @@ export const getProductsByFiltersAndStatus = async (
                     product: {
                         select: {
                             id: true,
-                            shippingOwlProductId: true,
+                            shipOwlProductId: true,
                             categoryId: true,
                             name: true,
                             gallery: true,
@@ -505,7 +505,7 @@ export const getProductsByStatus = async (
                     product: {
                         select: {
                             id: true,
-                            shippingOwlProductId: true,
+                            shipOwlProductId: true,
                             categoryId: true,
                             name: true,
                             gallery: true,
@@ -561,7 +561,7 @@ export const getProductsByStatus = async (
                     product: {
                         select: {
                             id: true,
-                            shippingOwlProductId: true,
+                            shipOwlProductId: true,
                             categoryId: true,
                             name: true,
                             gallery: true,
@@ -640,7 +640,7 @@ export const getProductsByStatus = async (
                     product: {
                         select: {
                             id: true,
-                            shippingOwlProductId: true,
+                            shipOwlProductId: true,
                             categoryId: true,
                             name: true,
                             gallery: true,

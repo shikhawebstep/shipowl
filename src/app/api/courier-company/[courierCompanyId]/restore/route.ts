@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getCourierCompanyById, restoreCourierCompany } from '@/app/models/courierCompany';
 
@@ -71,14 +71,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreCourierCompany(adminId, String(adminRole), courierCompanyIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Courier Company',
+          action: 'Permanent Delete',
+          data: restoreResult,
+          response: { status: true, courierCompany: restoreResult.restoredCourierCompany },
+          status: false
+        }, req);
+
       logMessage('info', 'CourierCompany restored successfully:', restoreResult.restoredCourierCompany);
       return NextResponse.json({ status: true, courierCompany: restoreResult.restoredCourierCompany }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Courier Company',
+        action: 'Permanent Delete',
+        data: restoreResult,
+        response: { status: false, error: 'CourierCompany restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'CourierCompany restore failed');
     return NextResponse.json({ status: false, error: 'CourierCompany restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Courier Company',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ CourierCompany restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }

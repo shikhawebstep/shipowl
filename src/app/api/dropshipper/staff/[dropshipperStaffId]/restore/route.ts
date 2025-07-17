@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getDropshipperStaffById, restoreDropshipperStaff } from '@/app/models/dropshipper/staff';
 
@@ -41,14 +41,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreDropshipperStaff(dropshipperIdHeaderNum, String(dropshipperRole), Number(dropshipperStaffId));
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Dropshipper',
+          module: 'Sub User',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, dropshipper: restoreResult.restoredDropshipperStaff, message: 'Dropshipper Staff restored successfully' },
+          status: true
+        }, req);
+
       logMessage('info', 'Dropshipper restored successfully:', restoreResult.restoredDropshipperStaff);
       return NextResponse.json({ status: true, dropshipper: restoreResult.restoredDropshipperStaff, message: 'Dropshipper Staff restored successfully' }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Sub User',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'Dropshipper restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Dropshipper restore failed');
     return NextResponse.json({ status: false, error: 'Dropshipper restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Sub User',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ Dropshipper restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }

@@ -1,32 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { createCountry, getCountriesByStatus } from '@/app/models/location/country';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    admin?: MainAdmin;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  admin?: MainAdmin;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    admin?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  admin?: SupplierStaff;
 }
 
 export async function POST(req: NextRequest) {
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
     if (isStaffUser) {
       // mainAdminId = userCheck.admin?.admin?.id ?? adminId;
-      
+
       const options = {
         panel: 'Admin',
         module: 'Country',
@@ -129,17 +129,46 @@ export async function POST(req: NextRequest) {
     const countryCreateResult = await createCountry(adminId, String(adminRole), countryPayload);
 
     if (countryCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Country (Location)',
+          action: 'Create',
+          data: countryCreateResult,
+          response: { status: true, message: "Country created successfully", country: countryCreateResult.country },
+          status: true
+        }, req);
+
       logMessage('info', 'Country created successfully:', countryCreateResult.country);
       return NextResponse.json({ status: true, message: "Country created successfully", country: countryCreateResult.country }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Country (Location)',
+        action: 'Create',
+        data: countryCreateResult,
+        response: { status: false, error: countryCreateResult?.message || 'Country creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Country creation failed:', countryCreateResult?.message || 'Unknown error');
     return NextResponse.json(
       { status: false, error: countryCreateResult?.message || 'Country creation failed' },
       { status: 500 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Country (Location)',
+        action: 'Create',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Country Creation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }

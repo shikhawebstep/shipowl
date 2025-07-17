@@ -61,7 +61,7 @@ export async function PATCH(req: NextRequest) {
       const options = {
         panel: 'Admin',
         module: 'Dropshipper',
-        action: 'restore',
+        action: 'Restore',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { IoMdAnalytics } from "react-icons/io";
 import {
   Home, ShoppingCart, Package, Gift, BarChart, CreditCard,
-  FileText, Settings, Link, Volume2, MapPin, ChevronDown, X, Ticket
+  FileText, Settings,UserCheck, Link, Volume2, MapPin, ChevronDown, X, Ticket
 } from "lucide-react";
 import { HiBars3CenterLeft } from "react-icons/hi2";
 import { FaShopify } from "react-icons/fa";
@@ -47,15 +47,22 @@ const Sidebar = () => {
     {
       name: "Manage Orders", icon: ShoppingCart, href: "#", section: "MENU",
       subMenu: [
-        { name: "All Orders (In progress)", module: "All Orders (In progress)", href: "/dropshipping/manage-orders" },
-        { name: "Pending Orders (In progress)", module: "Pending Orders (In progress)", href: "/dropshipping/pending-orders" }
+        { name: "All Orders (In progress)", icon: ShoppingCart, module: "All Orders (In progress)", href: "/dropshipping/manage-orders" },
+        { name: "Pending Orders (In progress)", icon: ShoppingCart, module: "Pending Orders (In progress)", href: "/dropshipping/pending-orders" }
       ]
     },
     {
       name: "Raise ticket", icon: Ticket, href: "#", section: "MENU",
       subMenu: [
-        { name: "Complaints", module: "Raise Ticket", href: "/dropshipping/complaints" },
-        { name: "Pending Orders (In progress)", module: "Pending Orders (In progress)", href: "/dropshipping/pending-orders" }
+        { name: "Complaints", module: "Raise Ticket", icon: Ticket,href: "/dropshipping/complaints" },
+        { name: "Pending Orders (In progress)", module: "Pending Orders (In progress)", icon: Ticket, href: "/dropshipping/pending-orders" }
+      ]
+    },
+    {
+      name: "Permissions", icon: UserCheck, href: "#", section: "MENU",
+      subMenu: [
+        { name: "Permission", module: "Permission", icon: UserCheck,href: "/dropshipping/permission" },
+        { name: "Role Management", module: "Role", icon: UserCheck, href: "/dropshipping/permission/role" }
       ]
     },
     { name: "Link Shopify Store", icon: FaShopify, module: "Shopify", href: "/dropshipping/store/link", section: "MENU" },
@@ -158,7 +165,7 @@ const Sidebar = () => {
                                         ${isSubActive ? "bg-[#2C3454] text-white border-[#F98F5C]" : "bg-[#F0F1F3] text-[#2C3454] border-[#667085] hover:bg-[#2C3454] hover:text-white hover:border-[#F98F5C]"}`}
                                       onClick={() => setIsSidebarOpen(false)}
                                     >
-                                      {subItem.name}
+                                     <subItem.icon className="w-5 h-5 mr-2" />  {subItem.name}
                                     </a>
                                   </li>
                                 );

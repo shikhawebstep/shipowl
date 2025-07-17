@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getBadPincodeById, deleteBadPincode } from '@/app/models/badPincode';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -99,13 +99,43 @@ export async function DELETE(req: NextRequest) {
 
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Bad Pincode',
+          action: 'Permanent Delete',
+          data: result,
+          response: { status: true, message: `BadPincode permanently deleted successfully` },
+          status: true
+        }, req);
+
       logMessage('info', `BadPincode permanently deleted successfully: ${badPincodeIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `BadPincode permanently deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Permanent Delete',
+        data: result,
+        response: { status: false, message: 'BadPincode not found or deletion failed' },
+        status: false
+      }, req);
+
     logMessage('info', `BadPincode not found or could not be deleted: ${badPincodeIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'BadPincode not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during badPincode deletion', { error });
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }

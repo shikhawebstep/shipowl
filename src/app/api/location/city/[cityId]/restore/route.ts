@@ -1,31 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getCityById, restoreCity } from '@/app/models/location/city';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    admin?: MainAdmin;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  admin?: MainAdmin;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    admin?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  admin?: SupplierStaff;
 }
 
 export async function PATCH(req: NextRequest) {
@@ -62,7 +62,7 @@ export async function PATCH(req: NextRequest) {
 
     if (isStaffUser) {
       // mainAdminId = userCheck.admin?.admin?.id ?? adminId;
-      
+
       const options = {
         panel: 'Admin',
         module: 'City',
@@ -100,14 +100,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreCity(adminId, String(adminRole), cityIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'City (Location)',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, city: restoreResult.city },
+          status: true
+        }, req);
+
       logMessage('info', 'City restored successfully:', restoreResult.city);
       return NextResponse.json({ status: true, city: restoreResult.city }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'City (Location)',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'City restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'City restore failed');
     return NextResponse.json({ status: false, error: 'City restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'City (Location)',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ City restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }

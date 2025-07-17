@@ -25,6 +25,8 @@ export default function My() {
     const canSoftDelete = hasPermission("Product", "Soft Delete");
     const canEdit = hasPermission("Product", "Update");
     const canViewTrashed = hasPermission("Product", "Trash Listing");
+
+    
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(null);
     const router = useRouter();

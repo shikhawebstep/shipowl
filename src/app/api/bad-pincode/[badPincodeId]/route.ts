@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { getBadPincodeById, updateBadPincode, softDeleteBadPincode, restoreBadPincode } from '@/app/models/badPincode';
@@ -221,17 +221,46 @@ export async function PUT(req: NextRequest) {
     const badPincodeCreateResult = await updateBadPincode(adminId, String(adminRole), badPincodeIdNum, badPincodePayload);
 
     if (badPincodeCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Bad Pincode',
+          action: 'Update',
+          data: badPincodeCreateResult,
+          response: { status: true, badPincode: badPincodeCreateResult.badPincode },
+          status: true
+        }, req);
+
       logMessage('info', 'BadPincode updated successfully:', badPincodeCreateResult.badPincode);
       return NextResponse.json({ status: true, badPincode: badPincodeCreateResult.badPincode }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Update',
+        data: badPincodeCreateResult,
+        response: { status: false, error: badPincodeCreateResult?.message || 'BadPincode creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'BadPincode update failed', badPincodeCreateResult?.message);
     return NextResponse.json(
       { status: false, error: badPincodeCreateResult?.message || 'BadPincode creation failed' },
       { status: 500 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ BadPincode Updation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }
@@ -309,14 +338,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreBadPincode(adminId, String(adminRole), badPincodeIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Bad Pincode',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, badPincode: restoreResult.restoredBadPincode },
+          status: true
+        }, req);
+
       logMessage('info', 'BadPincode restored successfully:', restoreResult.restoredBadPincode);
       return NextResponse.json({ status: true, badPincode: restoreResult.restoredBadPincode }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'BadPincode restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'BadPincode restore failed');
     return NextResponse.json({ status: false, error: 'BadPincode restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ BadPincode restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }
@@ -391,13 +450,45 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for badPincode: ${badPincodeIdNum}`, { adminId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Bad Pincode',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `BadPincode soft deleted successfully` },
+          status: true
+        }, req);
+
+
       logMessage('info', `BadPincode soft deleted successfully: ${badPincodeIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `BadPincode soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'BadPincode not found or deletion failed' },
+        status: false
+      }, req);
+
+
     logMessage('info', `BadPincode not found or could not be deleted: ${badPincodeIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'BadPincode not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during badPincode deletion', { error });
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }

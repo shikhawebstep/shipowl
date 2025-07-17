@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -152,24 +152,53 @@ export async function POST(req: NextRequest) {
                 }
             }
 
+            await ActivityLog(
+                {
+                    panel: 'Dropshipper',
+                    module: 'Bank Account Change Request',
+                    action: 'Apply',
+                    data: dropshipperBankAccountChangeRequestResult,
+                    response: { status: false, error: dropshipperBankAccountChangeRequestResult?.message || 'Failed to create/update dropshipper bank account change request' },
+                    status: false
+                }, req);
             logMessage('error', 'Failed to create/update dropshipper bank account change request', dropshipperBankAccountChangeRequestResult?.message);
             return NextResponse.json({ status: false, error: dropshipperBankAccountChangeRequestResult?.message || 'Failed to create/update dropshipper bank account change request' }, { status: 500 });
         }
 
+        await ActivityLog(
+            {
+                panel: 'Dropshipper',
+                module: 'Bank Account Change Request',
+                action: 'Apply',
+                data: dropshipperBankAccountChangeRequestResult,
+                response: {
+                    status: true,
+                    message: dropshipperBankAccountChangeRequestResult?.message || 'Dropshipper bank account change request processed successfully.',
+                },
+                status: true
+            }, req);
         return NextResponse.json({
             status: true,
             message: dropshipperBankAccountChangeRequestResult?.message || 'Dropshipper bank account change request processed successfully.',
         }, { status: 200 });
 
-    } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : 'Internal Server Error';
-        logMessage('error', 'Error during dropshipper bank account change request process:', errorMessage);
-        return NextResponse.json({ status: false, error: errorMessage }, { status: 500 });
+    } catch (error) {
+        await ActivityLog(
+            {
+                panel: 'Dropshipper',
+                module: 'Bank Account Change Request',
+                action: 'Apply',
+                data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+                response: { status: false, error: 'Server error' },
+                status: false
+            }, req);
+        logMessage('error', 'Error during dropshipper bank account change request process:', error);
+        return NextResponse.json({ status: false, error }, { status: 500 });
     }
 }
 
 export const config = {
-  api: {
-    bodyParser: false,
-  },
+    api: {
+        bodyParser: false,
+    },
 };

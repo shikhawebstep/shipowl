@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import bcrypt from 'bcryptjs';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -230,16 +230,44 @@ export async function POST(req: NextRequest) {
       } else {
         logMessage('info', 'No uploaded files to delete.');
       }
+
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Sub User',
+          action: 'Create',
+          data: adminStaffCreateResult,
+          response: { status: false, error: adminStaffCreateResult?.message || 'Admin creation failed' },
+          status: false
+        }, req);
       logMessage('error', 'Admin creation failed:', adminStaffCreateResult?.message || 'Unknown error');
       return NextResponse.json({ status: false, error: adminStaffCreateResult?.message || 'Admin creation failed' }, { status: 500 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Sub User',
+        action: 'Create',
+        data: adminStaffCreateResult,
+        response: { status: true, error: adminStaffCreateResult?.message || 'Admin created Successfuly' },
+        status: true
+      }, req);
     return NextResponse.json(
       { status: true, error: adminStaffCreateResult?.message || 'Admin created Successfuly' },
       { status: 200 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Sub User',
+        action: 'Create',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', 'Admin Creation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }

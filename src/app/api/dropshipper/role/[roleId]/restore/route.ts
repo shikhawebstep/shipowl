@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getRoleById, restoreRole } from '@/app/models/role';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
-interface MainDropshipper {
+interface MainAdmin {
   id: number;
   name: string;
   email: string;
@@ -13,19 +13,19 @@ interface MainDropshipper {
   // other optional properties if needed
 }
 
-interface SupplierStaff {
+interface AdminStaff {
   id: number;
   name: string;
   email: string;
   password: string;
   role?: string;
-  dropshipper?: MainDropshipper;
+  dropshipper?: MainAdmin;
 }
 
 interface UserCheckResult {
   status: boolean;
   message?: string;
-  dropshipper?: SupplierStaff;
+  dropshipper?: AdminStaff;
 }
 
 export async function PATCH(req: NextRequest) {
@@ -49,7 +49,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Check if dropshipper exists
-    //  let mainDropshipperId = dropshipperId;
+    //  let mainAdminId = dropshipperId;
     const userCheck: UserCheckResult = await isUserExist(dropshipperId, String(dropshipperRole));
     if (!userCheck.status) {
       return NextResponse.json(
@@ -58,14 +58,14 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const isStaff = !['dropshipper', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
 
     if (isStaff) {
-      //  mainDropshipperId = userCheck.dropshipper?.dropshipper?.id ?? dropshipperId;
+      //  mainAdminId = userCheck.dropshipper?.dropshipper?.id ?? dropshipperId;
       const options = {
-        panel: 'Dropshipper',
+        panel: 'Admin',
         module: 'Role',
-        action: 'restore',
+        action: 'Restore',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, dropshipperId);
@@ -99,14 +99,41 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreRole(dropshipperId, String(dropshipperRole), roleIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Role',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, role: restoreResult.restoredRole },
+          status: true
+        }, req);
       logMessage('info', 'Role restored successfully:', restoreResult.restoredRole);
       return NextResponse.json({ status: true, role: restoreResult.restoredRole }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Role',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'Role restore failed' },
+        status: false
+      }, req);
     logMessage('error', 'Role restore failed');
     return NextResponse.json({ status: false, error: 'Role restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Role',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', '❌ Role restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }

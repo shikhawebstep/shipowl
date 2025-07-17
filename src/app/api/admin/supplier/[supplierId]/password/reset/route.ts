@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sendEmail } from '@/utils/email/sendEmail';
 import bcrypt from 'bcryptjs';
-import { logMessage } from '@/utils/commonUtils';
+import { ActivityLog, logMessage } from '@/utils/commonUtils';
 import { getSupplierById } from '@/app/models/supplier/supplier';
 import { isUserExist } from '@/utils/auth/authUtils';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
             '{{email}}': supplier.email,
             '{{password}}': password,
             '{{year}}': new Date().getFullYear().toString(),
-            '{{appName}}': 'Shipping OWL',
+            '{{appName}}': 'ShipOwl',
         };
 
         let htmlBody = htmlTemplate?.trim()
@@ -180,6 +180,20 @@ export async function POST(req: NextRequest) {
         const emailResult = await sendEmail(emailConfig, mailData);
 
         if (!emailResult.status) {
+            await ActivityLog(
+                {
+                    panel: 'Admin',
+                    module: 'Supplier',
+                    action: 'Password Change',
+                    data: emailResult,
+                    response: {
+                        status: false,
+                        message: 'Password changed successfully, but failed to send email notification.',
+                        emailError: emailResult.error,
+                    },
+                    status: false
+                }, req);
+
             return NextResponse.json(
                 {
                     status: false,
@@ -190,6 +204,19 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        await ActivityLog(
+            {
+                panel: 'Admin',
+                module: 'Supplier',
+                action: 'Password Change',
+                data: emailResult,
+                response: {
+                    status: true,
+                    message: 'Password changed successfully. A confirmation email has been sent.',
+                },
+                status: true
+            }, req);
+
         return NextResponse.json(
             {
                 status: true,
@@ -198,6 +225,16 @@ export async function POST(req: NextRequest) {
             { status: 200 }
         );
     } catch (error) {
+        await ActivityLog(
+            {
+                panel: 'Admin',
+                module: 'Supplier',
+                action: 'Password Change',
+                data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+                response: { status: false, error: 'Server error' },
+                status: false
+            }, req);
+
         console.error('❌ Password change error:', error);
         return NextResponse.json(
             {

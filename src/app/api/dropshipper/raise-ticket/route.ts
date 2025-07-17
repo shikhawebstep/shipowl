@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
 
       const permissionCheck = await checkStaffPermissionStatus({
         panel: 'Dropshipper',
-        module: 'raise-ticket',
+        module: 'Raise Ticket',
         action: 'Create',
       }, dropshipperId);
 
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     const description = (formData.get('description') as string) || '';
 
     const isMultipleImages = true;
-    const uploadDir = path.join(process.cwd(), 'tmp', 'uploads', 'dropshipper', `${mainDropshipperId}`, 'raise-ticket');
+    const uploadDir = path.join(process.cwd(), 'tmp', 'uploads', 'dropshipper', `${mainDropshipperId}`, 'Raise Ticket');
     const fileData = await saveFilesFromFormData(formData, 'gallery', {
       dir: uploadDir,
       pattern: 'slug-unique',
@@ -165,6 +165,24 @@ export async function POST(req: NextRequest) {
 
     logMessage('info', 'Raise Ticket created successfully');
 
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Raise Ticket',
+        action: 'Create',
+        data: { oneLineSimpleMessage: "Raise Ticket created successfully" },
+        response: {
+          status: true,
+          message: "Raise Ticket created successfully",
+          data: {
+            ticket: raiseTicket,
+            mappedOrders,
+            failedOrders,
+          }
+        },
+        status: false
+      }, req);
+
     return NextResponse.json({
       status: true,
       message: "Raise Ticket created successfully",
@@ -176,6 +194,16 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Raise Ticket',
+        action: 'Create',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Raise Ticket Creation Error:', error);
     return NextResponse.json(
       { status: false, message: 'Internal Server Error', error },
@@ -214,8 +242,8 @@ export async function GET(req: NextRequest) {
 
       const permissionCheck = await checkStaffPermissionStatus({
         panel: 'Dropshipper',
-        module: 'raise-ticket',
-        action: 'Read',
+        module: 'Raise Ticket',
+        action: 'View List',
       }, dropshipperId);
 
       if (!permissionCheck.status) {

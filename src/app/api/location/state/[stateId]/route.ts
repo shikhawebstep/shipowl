@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { getStateById, updateState, softDeleteState, restoreState } from '@/app/models/location/state';
@@ -9,26 +9,26 @@ import { getCountriesByStatus } from '@/app/models/location/country';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    admin?: MainAdmin;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  admin?: MainAdmin;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    admin?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  admin?: SupplierStaff;
 }
 
 export async function GET(req: NextRequest) {
@@ -242,17 +242,46 @@ export async function PUT(req: NextRequest) {
     const stateCreateResult = await updateState(adminId, String(adminRole), stateIdNum, statePayload);
 
     if (stateCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'State (Location)',
+          action: 'Update',
+          data: stateCreateResult,
+          response: { status: true, message: "State updated successfully", state: stateCreateResult.state },
+          status: true
+        }, req);
+
       logMessage('info', 'State updated successfully:', stateCreateResult.state);
       return NextResponse.json({ status: true, message: "State updated successfully", state: stateCreateResult.state }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'State (Location)',
+        action: 'Update',
+        data: stateCreateResult,
+        response: { status: false, error: stateCreateResult?.message || 'State creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'State update failed', stateCreateResult?.message);
     return NextResponse.json(
       { status: false, error: stateCreateResult?.message || 'State creation failed' },
       { status: 500 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'State (Location)',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ State Updation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }
@@ -330,14 +359,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreState(adminId, String(adminRole), stateIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'State (Location)',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, state: restoreResult.state },
+          status: true
+        }, req);
+
       logMessage('info', 'State restored successfully:', restoreResult.state);
       return NextResponse.json({ status: true, state: restoreResult.state }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'State (Location)',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'State restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'State restore failed');
     return NextResponse.json({ status: false, error: 'State restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'State (Location)',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ State restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }
@@ -412,13 +471,43 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for state: ${stateIdNum}`, { adminId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'State (Location)',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `State soft deleted successfully` },
+          status: true
+        }, req);
+
       logMessage('info', `State soft deleted successfully: ${stateIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `State soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'State (Location)',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'State not found or deletion failed' },
+        status: false
+      }, req);
+
     logMessage('info', `State not found or could not be deleted: ${stateIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'State not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'State (Location)',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during state deletion', { error });
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }

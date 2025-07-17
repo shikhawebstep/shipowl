@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { checkDropshipperProductForDropshipper, updateDropshipperProduct, softDeleteDropshipperProduct, restoreDropshipperProduct, checkProductForDropshipper, checkSupplierProductForDropshipper } from '@/app/models/dropshipper/product';
@@ -234,8 +234,28 @@ export async function PUT(req: NextRequest) {
     const productCreateResult = await updateDropshipperProduct(mainDropshipperId, String(dropshipperRole), dropshipperProductId, productPayload);
 
     if (productCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Dropshipper',
+          module: 'Product',
+          action: 'Update',
+          data: productCreateResult,
+          response: { status: true, message: productCreateResult.message },
+          status: true
+        }, req);
+
       return NextResponse.json({ status: true, message: productCreateResult.message }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Product',
+        action: 'Update',
+        data: productCreateResult,
+        response: { status: false, error: productCreateResult?.message || 'Product creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Product creation failed:', productCreateResult?.message || 'Unknown error');
     return NextResponse.json(
@@ -243,6 +263,16 @@ export async function PUT(req: NextRequest) {
       { status: 500 }
     );
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Product',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Product Creation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }
@@ -288,14 +318,41 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreDropshipperProduct(mainDropshipperId, String(dropshipperRole), dropshipperProductId);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Dropshipper',
+          module: 'Product',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, product: restoreResult.restoredDropshipperProduct },
+          status: true
+        }, req);
       logMessage('info', 'Product restored successfully:', restoreResult.restoredDropshipperProduct);
       return NextResponse.json({ status: true, product: restoreResult.restoredDropshipperProduct }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Product',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'Product restore failed' },
+        status: false
+      }, req);
     logMessage('error', 'Product restore failed');
     return NextResponse.json({ status: false, error: 'Product restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Product',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', '❌ Product restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }
@@ -352,13 +409,40 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for product: ${dropshipperProductId}`, { mainDropshipperId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Dropshipper',
+          module: 'Product',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `Product soft deleted successfully` },
+          status: true
+        }, req);
       logMessage('info', `Product soft deleted successfully: ${dropshipperProductId}`, { mainDropshipperId });
       return NextResponse.json({ status: true, message: `Product soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Product',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'Product not found or deletion failed' },
+        status: false
+      }, req);
     logMessage('info', `Product not found or could not be deleted: ${dropshipperProductId}`, { mainDropshipperId });
     return NextResponse.json({ status: false, message: 'Product not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Product',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', 'Error during product deletion', { error });
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }

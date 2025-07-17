@@ -109,15 +109,10 @@ export default function List() {
                         next: ">"
                     }
                 },
-                // 👇 Remove index column sorting disable if no index column
-                // columnDefs: [
-                //     { orderable: false, targets: 0 }
-                // ]
+               
             });
 
-            // ❌ Removed dynamic index update
-
-            // ✅ Apply default filter on column 7 (8th column)
+          
             table.column(7).search("^active$", true, false).draw();
 
             return () => {
@@ -245,8 +240,8 @@ export default function List() {
                                             )}
                                         </li>
                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                        
+                                        
                                     </ul>
                                 </div>
                             )}
@@ -344,7 +339,7 @@ export default function List() {
                         onClick={() => {
                             setTabStatus('active');
                             if ($.fn.DataTable.isDataTable("#courierCompanytable")) {
-                                $("#courierCompanytable").DataTable().column(4).search("^active$", true, false).draw();
+                                $("#courierCompanytable").DataTable().column(7).search("^active$", true, false).draw();
                             }
                         }}
                         className={`px-4 py-2 font-medium border-b-2 transition-all duration-200
@@ -362,7 +357,7 @@ export default function List() {
                             onClick={() => {
                                 setTabStatus('inactive');
                                 if ($.fn.DataTable.isDataTable("#courierCompanytable")) {
-                                    $("#courierCompanytable").DataTable().column(4).search("^inactive$", true, false).draw();
+                                    $("#courierCompanytable").DataTable().column(7).search("^inactive$", true, false).draw();
                                 }
                             }}
                             className={`px-4 py-2 font-medium border-b-2 transition-all duration-200 relative

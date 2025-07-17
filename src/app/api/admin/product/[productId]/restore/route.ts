@@ -61,7 +61,7 @@ export async function PATCH(req: NextRequest) {
       const options = {
         panel: 'Admin',
         module: 'Product',
-        action: 'restore',
+        action: 'Restore',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);
@@ -99,7 +99,7 @@ export async function PATCH(req: NextRequest) {
         {
           panel: 'Admin',
           module: 'Product',
-          action: 'restore',
+          action: 'Restore',
           data: restoreResult,
           response: { status: true, product: restoreResult.restoredProduct },
           status: true
@@ -113,7 +113,7 @@ export async function PATCH(req: NextRequest) {
       {
         panel: 'Admin',
         module: 'Product',
-        action: 'restore',
+        action: 'Restore',
         data: restoreResult,
         response: { status: false, error: 'Product restore failed' },
         status: false
@@ -127,7 +127,7 @@ export async function PATCH(req: NextRequest) {
       {
         panel: 'Admin',
         module: 'Product',
-        action: 'restore',
+        action: 'Restore',
         data: { oneLineSimpleMessage: error || 'Internal Server Error' },
         response: { status: false, error: 'Server error' },
         status: false

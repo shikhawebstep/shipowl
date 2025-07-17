@@ -243,7 +243,7 @@ export async function handleForgetPassword(
             "{{email}}": admin.email,
             "{{resetUrl}}": urlPanel,
             "{{year}}": new Date().getFullYear().toString(),
-            "{{appName}}": "Shipping OWL",
+            "{{appName}}": "ShipOwl",
         };
 
         let htmlBody = htmlTemplate?.trim()
@@ -403,7 +403,7 @@ export async function handleResetPassword(
             "{{name}}": admin.name,
             "{{email}}": admin.email,
             "{{year}}": new Date().getFullYear().toString(),
-            "{{appName}}": "Shipping OWL",
+            "{{appName}}": "ShipOwl",
         };
 
         let htmlBody = htmlTemplate?.trim()
@@ -594,7 +594,7 @@ export async function handleVerifyStatus(
             "{{email}}": admin.email,
             "{{year}}": new Date().getFullYear().toString(),
             "{{loginLink}}": loginLink,
-            "{{appName}}": "Shipping OWL",
+            "{{appName}}": "ShipOwl",
         };
 
         let htmlBody = htmlTemplate?.trim()

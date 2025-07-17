@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getSupplierById, deleteSupplier } from '@/app/models/supplier/supplier';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -35,7 +35,7 @@ export async function DELETE(req: NextRequest) {
       const options = {
         panel: 'Admin',
         module: 'Supplier',
-        action: 'delete',
+        action: 'Permanent Delete',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);
@@ -71,13 +71,43 @@ export async function DELETE(req: NextRequest) {
 
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Supplier',
+          action: 'Permanent Delete',
+          data: result,
+          response: { status: true, message: `Supplier permanently deleted successfully` },
+          status: true
+        }, req);
+
       logMessage('info', `Supplier permanently deleted successfully: ${supplierIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `Supplier permanently deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Permanent Delete',
+        data: result,
+        response: { status: false, message: 'Supplier not found or deletion failed' },
+        status: false
+      }, req);
+
     logMessage('info', `Supplier not found or could not be deleted: ${supplierIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'Supplier not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during supplier deletion', { error });
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }

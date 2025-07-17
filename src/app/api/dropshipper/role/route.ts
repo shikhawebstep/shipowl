@@ -3,7 +3,7 @@ import path from 'path';
 import bwipjs from 'bwip-js';
 import fs from 'fs/promises';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Staff role permission check
-    const isStaff = !['dropshipper', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
     if (isStaff) {
       const options = { panel: 'Dropshipper', module: 'Role', action: 'Create' };
       const staffPermissionsResult = await checkStaffPermissionStatus(options, dropshipperId);
@@ -153,6 +153,19 @@ export async function POST(req: NextRequest) {
     );
 
     if (!updateResult.status) {
+      await ActivityLog(
+        {
+          panel: 'Dropshipper',
+          module: 'Role',
+          action: 'Create',
+          data: updateResult,
+          response: {
+            status: false,
+            message: updateResult.message || "Failed to assign permissions.",
+            error: updateResult.error,
+          },
+          status: false
+        }, req);
       return NextResponse.json({
         status: false,
         message: updateResult.message || "Failed to assign permissions.",
@@ -160,6 +173,25 @@ export async function POST(req: NextRequest) {
       }, { status: 500 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Role',
+        action: 'Create',
+        data: updateResult,
+        response: {
+          status: true,
+          message: "Role created and permissions assigned successfully.",
+          role: roleCreateResult.role,
+          permissions: {
+            assigned: updateResult.assigned,
+            removed: updateResult.removed,
+            skipped: updateResult.skipped,
+            invalid: updateResult.invalid, // Optional: for debugging
+          }
+        },
+        status: false
+      }, req);
     return NextResponse.json({
       status: true,
       message: "Role created and permissions assigned successfully.",
@@ -173,6 +205,15 @@ export async function POST(req: NextRequest) {
     }, { status: 200 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Role',
+        action: 'Create',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', '❌ Role Creation Exception:', error);
     return NextResponse.json(
       { status: false, message: 'Something went wrong while creating the role.', error },
@@ -208,7 +249,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Staff role permission check
-    const isStaff = !['dropshipper', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
     if (isStaff) {
       const options = { panel: 'Dropshipper', module: 'Role', action: 'View Listing' };
       const staffPermissionsResult = await checkStaffPermissionStatus(options, dropshipperId);

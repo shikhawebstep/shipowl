@@ -338,8 +338,8 @@ const SupplierList = () => {
                                         </button>
                                         } </li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                    
+                                    
                                 </ul>
                             </div>
                         )}
@@ -380,7 +380,7 @@ const SupplierList = () => {
                         }
 
                         {canViewTrashed && <button
-                            className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                            className={`p-3 py-2 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                             onClick={handleToggleTrash}
                         >
                             {isTrashed ? "Supplier Listing (Simple)" : "Trashed Supplier"}

@@ -504,7 +504,7 @@ export default function List() {
                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" >
                                                 Bulk Delete
                                             </li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                            
                                         </ul>
                                     </div>
                                 )}

@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
             '{{email}}': dropshipper.email,
             '{{password}}': password,
             '{{year}}': new Date().getFullYear().toString(),
-            '{{appName}}': 'Shipping OWL',
+            '{{appName}}': 'ShipOwl',
         };
 
         let htmlBody = htmlTemplate?.trim()

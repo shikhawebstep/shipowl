@@ -9,6 +9,7 @@ import { DropshipperProfileProvider } from "./dropshipper/update/DropshipperProf
 import { ProfileProvider } from "../admin/supplier/ProfileContext";
 import { HashLoader } from "react-spinners";
 import { ImageURLProvider } from "../ImageURLContext";
+import { DropshipperActionProvider } from '@/components/commonfunctions/DropshipperMainContext'
 
 const authPages = [
   '/dropshipping/shopify/success',
@@ -37,9 +38,11 @@ function LayoutWrapperInner({ children }) {
       <div className={`px-3 mt-20 lg:mt-0 lg:px-0 ${isAuthPage ? "w-full" : "main-outlet xl:w-[81.5%] lg:w-[73%]"}`}>
         {!isAuthPage && <Header />}
         <div className="md:p-7 xl:p-3 md:pt-0">
-          <ProfileProvider>
-            <DropshipperProfileProvider>{children}</DropshipperProfileProvider>
-          </ProfileProvider>
+          <DropshipperActionProvider>
+            <ProfileProvider>
+              <DropshipperProfileProvider>{children}</DropshipperProfileProvider>
+            </ProfileProvider>
+          </DropshipperActionProvider>
         </div>
       </div>
     </div>

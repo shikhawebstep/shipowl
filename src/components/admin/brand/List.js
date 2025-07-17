@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import HashLoader from "react-spinners/HashLoader";
 import { IoFilterSharp } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa";
-import { BadgePlus, Trash2, RotateCcw, Pencil } from "lucide-react";
+import { Trash2, RotateCcw, Pencil } from "lucide-react";
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useAdminActions } from "@/components/commonfunctions/MainContext";
 import { useImageURL } from "@/components/ImageURLContext";
@@ -26,7 +26,7 @@ export default function List() {
     const [activeFilter, setActiveFilter] = useState(null);
     const [localInputValue, setLocalInputValue] = useState("");
     const [isClient, setIsClient] = useState(false);
-  
+
     const router = useRouter();
 
     const { handleBulkDelete } = useImageURL();
@@ -40,7 +40,7 @@ export default function List() {
     const isDisabled = inactiveBrandData.length === 0;
 
 
-      const filteredBrandData = brandData.filter((item) =>
+    const filteredBrandData = brandData.filter((item) =>
         tabStatus === "active" ? item.status === true : item.status === false
     );
 
@@ -74,52 +74,52 @@ export default function List() {
     }, [fetchAll]);
 
     useEffect(() => {
-    if (typeof window !== 'undefined' && brandData.length > 0 && !loading) {
-        let table = null;
+        if (typeof window !== 'undefined' && brandData.length > 0 && !loading) {
+            let table = null;
 
-        Promise.all([
-            import('jquery'),
-            import('datatables.net'),
-            import('datatables.net-dt'),
-            import('datatables.net-buttons'),
-            import('datatables.net-buttons-dt')
-        ]).then(([jQuery]) => {
-            window.jQuery = window.$ = jQuery.default;
+            Promise.all([
+                import('jquery'),
+                import('datatables.net'),
+                import('datatables.net-dt'),
+                import('datatables.net-buttons'),
+                import('datatables.net-buttons-dt')
+            ]).then(([jQuery]) => {
+                window.jQuery = window.$ = jQuery.default;
 
-            // Destroy existing DataTable if it exists
-            if ($.fn.DataTable.isDataTable('#brandTable')) {
-                $('#brandTable').DataTable().destroy();
-                $('#brandTable').empty();
-            }
-
-            // Reinitialize DataTable with new data
-            const isMobile = window.innerWidth <= 768;
-            const pagingType = isMobile ? 'simple' : 'simple_numbers';
-
-            table = $('#brandTable').DataTable({
-                pagingType,
-                language: {
-                    paginate: {
-                        previous: "<",
-                        next: ">"
-                    }
-                }
-            });
-
-            // Apply default filter on 5th column (index 4), e.g. show only 'active' brands
-            table.column(4).search("^active$", true, false).draw();
-
-            return () => {
-                if (table) {
-                    table.destroy();
+                // Destroy existing DataTable if it exists
+                if ($.fn.DataTable.isDataTable('#brandTable')) {
+                    $('#brandTable').DataTable().destroy();
                     $('#brandTable').empty();
                 }
-            };
-        }).catch((error) => {
-            console.error('Failed to load DataTables dependencies:', error);
-        });
-    }
-}, [brandData, loading]);
+
+                // Reinitialize DataTable with new data
+                const isMobile = window.innerWidth <= 768;
+                const pagingType = isMobile ? 'simple' : 'simple_numbers';
+
+                table = $('#brandTable').DataTable({
+                    pagingType,
+                    language: {
+                        paginate: {
+                            previous: "<",
+                            next: ">"
+                        }
+                    }
+                });
+
+                // Apply default filter on 5th column (index 4), e.g. show only 'active' brands
+                table.column(4).search("^active$", true, false).draw();
+
+                return () => {
+                    if (table) {
+                        table.destroy();
+                        $('#brandTable').empty();
+                    }
+                };
+            }).catch((error) => {
+                console.error('Failed to load DataTables dependencies:', error);
+            });
+        }
+    }, [brandData, loading]);
 
 
     const handleCheckboxChange = (id) => {
@@ -163,6 +163,11 @@ export default function List() {
             setLocalInputValue(activeFilter.value || "");
         }
     }, [activeFilter]);
+    if(brandData.length === 0){
+        return(
+            <p className="text-center font-bold">No Brands Found</p>
+        )
+    }
 
     return (
         <div className="w-full">
@@ -210,12 +215,12 @@ export default function List() {
                                     className={`text-sm px-4 py-2 flex items-center gap-2  rounded-md text-white ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                                     onClick={handleToggleTrash}
                                 >
-                                    <Trash2 size={16} /> {isTrashed ? "Brand Listing" : "Trashed Brand"}
+                                    {isTrashed ? "Brand Listing" : "Trashed Brand"}
                                 </button>
                             )}
                             {canAdd && (
                                 <Link href="/admin/brand/create" className="bg-[#4285F4] text-white px-4 py-2 rounded-md text-sm flex items-center gap-2 ">
-                                    <BadgePlus size={16} /> Add Brand
+                                    Add Brand
                                 </Link>
                             )}
                         </div>
@@ -302,7 +307,7 @@ export default function List() {
                             onClick={() => {
                                 setTabStatus('active');
                                 if ($.fn.DataTable.isDataTable("#brandTable")) {
-                                      $("#brandTable").DataTable().column(4).search("^active$", true, false).draw();
+                                    $("#brandTable").DataTable().column(4).search("^active$", true, false).draw();
                                 }
                             }}
                             className={`px-4 py-2 font-medium border-b-2 transition-all duration-200
@@ -320,7 +325,7 @@ export default function List() {
                                 onClick={() => {
                                     setTabStatus('inactive');
                                     if ($.fn.DataTable.isDataTable("#brandTable")) {
-                                          $("#brandTable").DataTable().column(4).search("^inactive$", true, false).draw();
+                                        $("#brandTable").DataTable().column(4).search("^inactive$", true, false).draw();
                                     }
                                 }}
                                 className={`px-4 py-2 font-medium border-b-2 transition-all duration-200 relative
@@ -344,7 +349,9 @@ export default function List() {
                     </div>
 
                     {
-                        isClient && !loading && <div className="overflow-x-auto">
+                        isClient && !loading && brandData.length > 0 &&
+
+                        <div className="overflow-x-auto">
                             <table id="brandTable" className="display main-tables w-full">
                                 <thead>
                                     <tr className="uppercase border-b pb-2 text-[#A3AED0] border-[#E9EDF7]">

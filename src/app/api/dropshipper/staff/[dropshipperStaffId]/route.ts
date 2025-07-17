@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -209,20 +209,48 @@ export async function PUT(req: NextRequest) {
       } else {
         logMessage('info', 'No uploaded files to delete.');
       }
+      await ActivityLog(
+        {
+          panel: 'Dropshipper',
+          module: 'Sub User',
+          action: 'Update',
+          data: dropshipperStaffCreateResult,
+          response: { status: false, error: dropshipperStaffCreateResult?.message || 'Dropshipper creation failed' },
+          status: false
+        }, req);
+
       logMessage('error', 'Dropshipper creation failed:', dropshipperStaffCreateResult?.message || 'Unknown error');
       return NextResponse.json({ status: false, error: dropshipperStaffCreateResult?.message || 'Dropshipper creation failed' }, { status: 500 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Sub User',
+        action: 'Update',
+        data: dropshipperStaffCreateResult,
+        response: { status: true, error: dropshipperStaffCreateResult?.message || 'Dropshipper created Successfuly' },
+        status: true
+      }, req);
 
     return NextResponse.json(
       { status: true, error: dropshipperStaffCreateResult?.message || 'Dropshipper created Successfuly' },
       { status: 200 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Sub User',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Dropshipper Creation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }
-
 }
 
 export async function PATCH(req: NextRequest) {

@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
         const replacements: Record<string, string> = {
             '{{orderTableRows}}': orderTableRows,
             '{{year}}': new Date().getFullYear().toString(),
-            '{{appName}}': 'Shipping OWL',
+            '{{appName}}': 'ShipOwl',
         };
 
         let htmlBody = htmlTemplate?.trim()

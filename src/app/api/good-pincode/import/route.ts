@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { parseFilesFromFormData } from '@/utils/parseCsvExcel';
@@ -158,6 +158,21 @@ export async function POST(req: NextRequest) {
       const importGoodPincodesResult = await importGoodPincodes(adminId, String(adminRole), validPincodes);
 
       if (importGoodPincodesResult?.status) {
+        await ActivityLog(
+          {
+            panel: 'Admin',
+            module: 'Good Pincode',
+            action: 'Import',
+            data: importGoodPincodesResult,
+            response: {
+              status: true,
+              message: importGoodPincodesResult.message || 'Pincodes imported successfully.',
+              importedCount: validPincodes.length,
+              invalidPincodes
+            },
+            status: true
+          }, req);
+
         return NextResponse.json({
           status: true,
           message: importGoodPincodesResult.message || 'Pincodes imported successfully.',
@@ -165,6 +180,20 @@ export async function POST(req: NextRequest) {
           invalidPincodes
         }, { status: 200 });
       }
+
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Good Pincode',
+          action: 'Import',
+          data: importGoodPincodesResult,
+          response: {
+            status: false,
+            error: importGoodPincodesResult?.message || 'GoodPincode import failed',
+            invalidPincodes
+          },
+          status: false
+        }, req);
 
       logMessage('error', 'GoodPincode import failed:', importGoodPincodesResult?.message || 'Unknown error');
       return NextResponse.json(
@@ -176,11 +205,30 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     } else {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Good Pincode',
+          action: 'Import',
+          data: { oneLineSimpleMessage: 'Parsed data is not in expected format' },
+          response: { status: false, error: 'File parsing failed' },
+          status: false
+        }, req);
+
       logMessage('warn', 'Parsed data is not in expected format');
       return NextResponse.json({ status: false, error: 'File parsing failed' }, { status: 400 });
     }
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Good Pincode',
+        action: 'Import',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'GoodPincode Import Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }

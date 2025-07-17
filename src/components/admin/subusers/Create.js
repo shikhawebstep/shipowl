@@ -6,11 +6,14 @@ import Swal from "sweetalert2";
 // import Select from "react-select";
 import { HashLoader } from "react-spinners";
 import dynamic from 'next/dynamic';
+import { useAdminActions } from "@/components/commonfunctions/MainContext";
 
 const Select = dynamic(() => import('react-select'), { ssr: false });
 export default function Create() {
+  const { fetchAll } = useAdminActions("admin/role", "roles");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [roleData, setRoleData] = useState([]);
   const [countryData, setCountryData] = useState([]);
   const [stateData, setStateData] = useState([]);
   const [cityData, setCityData] = useState([]);
@@ -29,6 +32,7 @@ export default function Create() {
     permanentCity: "",
     permanentState: "",
     permanentCountry: "",
+    role:''
   });
 
   const handleChange = (e) => {
@@ -45,7 +49,7 @@ export default function Create() {
     }
   };
 
-  
+
 
   const validate = () => {
     const newErrors = {};
@@ -57,6 +61,7 @@ export default function Create() {
       permanentCountry,
       permanentState,
       permanentCity,
+      role,
     } = formData;
 
     if (!name.trim()) newErrors.name = "Name is required";
@@ -70,6 +75,7 @@ export default function Create() {
     if (!permanentCountry) newErrors.permanentCountry = "Country is required";
     if (!permanentState) newErrors.permanentState = "State is required";
     if (!permanentCity) newErrors.permanentCity = "City is required";
+    if (!role) newErrors.role = "Role is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -93,7 +99,7 @@ export default function Create() {
         if (value instanceof File || value instanceof Blob) {
           data.append(key, value);
         }
-       
+
         // Handle primitive values (string, number, boolean)
         else {
           data.append(key, value);
@@ -124,6 +130,7 @@ export default function Create() {
         phoneNumber: "",
         permanentAddress: "",
         permanentCity: "",
+        role:"",
         permanentState: "",
         permanentCountry: "",
       });
@@ -162,7 +169,7 @@ export default function Create() {
       if (setLoading) setLoading(false);
     }
   }, [router]);
- 
+
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
@@ -199,9 +206,10 @@ export default function Create() {
 
   useEffect(() => {
     fetchCountryAndState();
-  }, [ fetchCountryAndState]);
+    fetchAll(setRoleData, setLoading);
+  }, [fetchCountryAndState]);
 
- 
+
 
   const formFields = [
     { label: "Name", name: "name", type: "text", required: true },
@@ -210,7 +218,7 @@ export default function Create() {
     { label: "Phone Number", name: "phoneNumber", type: "text" },
     { label: "Permanent Address", name: "permanentAddress", type: "text" },
   ];
-  if (loading ) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <HashLoader size={60} color="#F97316" loading={true} />
@@ -269,9 +277,9 @@ export default function Create() {
       </div>
 
 
-     
-      <div className="md:grid lg:grid-cols-3 md:grid-cols-2 gap-4 grid-cols-1 mt-3">
-        {["permanentCountry", "permanentState", "permanentCity"].map((field) => (
+
+      <div className="md:grid lg:grid-cols-2 md:grid-cols-2 gap-4 grid-cols-1 mt-3">
+        {["permanentCountry", "permanentState", "permanentCity", "role"].map((field) => (
           <div key={field} className="relative">
             <label className="block text-[#232323] font-bold mb-1 capitalize">
               {field.replace("permanent", "")} <span className="text-red-500">*</span>
@@ -281,13 +289,14 @@ export default function Create() {
               isDisabled={
                 (field === "permanentCountry" && loadingCountries) ||
                 (field === "permanentState" && loadingStates) ||
-                (field === "permanentCity" && loadingCities)
+                (field === "permanentCity" && loadingCities) 
               }
               name={field}
               value={selectOptions(
                 field === "permanentCountry" ? countryData :
-                  field === "permanentState" ? stateData :
-                    cityData
+                field === "permanentState" ? stateData :
+                field === "role" ? roleData :
+                cityData
               ).find((item) => item.value === formData[field])}
               onChange={(selectedOption) => {
                 const value = selectedOption ? selectedOption.value : "";
@@ -304,8 +313,9 @@ export default function Create() {
 
               options={selectOptions(
                 field === "permanentCountry" ? countryData :
-                  field === "permanentState" ? stateData :
-                    cityData
+                field === "permanentState" ? stateData :
+                field === "role" ? roleData :
+                cityData
               )}
               isClearable
             />
@@ -324,7 +334,7 @@ export default function Create() {
         ))}
       </div>
 
-    
+
 
       <div className="flex space-x-4 mt-6">
         <button

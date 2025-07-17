@@ -13,7 +13,7 @@ interface MainDropshipper {
   // other optional properties if needed
 }
 
-interface SupplierStaff {
+interface DropshipperStaff {
   id: number;
   name: string;
   email: string;
@@ -25,7 +25,7 @@ interface SupplierStaff {
 interface UserCheckResult {
   status: boolean;
   message?: string;
-  dropshipper?: SupplierStaff;
+  dropshipper?: DropshipperStaff;
 }
 
 export async function GET(req: NextRequest) {
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const isStaff = !['dropshipper', 'dropshipper', 'supplier'].includes(String(dropshipperRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(dropshipperRole));
 
     if (isStaff) {
       // mainDropshipperId = userCheck.dropshipper?.dropshipper?.id ?? dropshipperId;

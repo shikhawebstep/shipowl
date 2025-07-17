@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getCourierCompanyById, deleteCourierCompany } from '@/app/models/courierCompany';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
+import { ActivityLog } from '@/utils/commonUtils';
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function DELETE(req: NextRequest) {
 
     if (!['admin', 'supplier', 'dropshipper'].includes(String(adminRole))) {
       const permissionCheck = await checkStaffPermissionStatus(
-        { panel: 'Admin', module: 'CourierCompany', action: 'Permanent Delete' },
+        { panel: 'Admin', module: 'Courier Company', action: 'Permanent Delete' },
         adminId
       );
       if (!permissionCheck.status) {
@@ -41,7 +42,7 @@ export async function DELETE(req: NextRequest) {
       const courierCompanyName = courierCompanyResult?.courierCompany?.name ?? null;
 
       if (!courierCompanyResult?.status || !courierCompanyResult?.courierCompany) {
-        notDeleted.push({ id: courierCompanyId, name: courierCompanyName, reason: 'CourierCompany not found' });
+        notDeleted.push({ id: courierCompanyId, name: courierCompanyName, reason: 'Courier Company not found' });
         continue;
       }
 
@@ -53,14 +54,39 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Courier Company',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: 'Courier Company deletion completed' },
+        response: {
+          status: true,
+          message: 'Courier Company deletion completed',
+          deleted,
+          notDeleted
+        },
+        status: false
+      }, req);
+
     return NextResponse.json({
       status: true,
-      message: 'CourierCompany deletion completed',
+      message: 'Courier Company deletion completed',
       deleted,
       notDeleted
     }, { status: 200 });
 
-  } catch {
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Courier Company',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }
 }

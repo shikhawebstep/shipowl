@@ -321,7 +321,7 @@ export async function POST(req: NextRequest) {
       "{{email}}": dropshipperCreateResult.dropshipper.email,
       "{{verificationLink}}": `https://shipowl.io/dropshipping/auth/register/verify?token=${token}`,
       "{{year}}": new Date().getFullYear().toString(),
-      "{{appName}}": "Shipping OWL",
+      "{{appName}}": "ShipOwl",
     };
 
     let htmlBody = htmlTemplate?.trim()

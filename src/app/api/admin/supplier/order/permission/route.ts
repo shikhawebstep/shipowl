@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getSupplierOrderPermissions, updateSupplierOrderPermission } from '@/app/models/admin/supplier/order/permission';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -202,14 +202,44 @@ export async function POST(req: NextRequest) {
     const updateSupplierOrderPermissionResult = await updateSupplierOrderPermission(adminId, String(adminRole), permissionPayload);
 
     if (updateSupplierOrderPermissionResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Supplier',
+          action: 'Permanent Delete',
+          data: updateSupplierOrderPermissionResult,
+          response: { status: true },
+          status: true
+        }, req);
+
       return NextResponse.json({ status: true }, { status: 200 });
     }
 
     // Continue your logic with cleanedPermissions...
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Permanent Delete',
+        data: updateSupplierOrderPermissionResult,
+        response: { status: true, data: cleanedPermissions },
+        status: false
+      }, req);
+
     return NextResponse.json({ status: true, data: cleanedPermissions });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error processing request:', error);
     return NextResponse.json(
       { status: false, error: "Failed to process request" },

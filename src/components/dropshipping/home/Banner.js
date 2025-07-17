@@ -4,16 +4,19 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css';
-import { Navigation } from 'swiper/modules';
 import 'swiper/css/navigation';
+import Image from 'next/image';
+import bannerImge from '@/app/assets/homebanner.jpg';
+
 function Banner() {
   const router = useRouter();
   const [bannerImages, setBannerImages] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const fetchBanners = useCallback(async () => {
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData") || "{}");
 
     if (dropshipperData?.project?.active_panel !== "dropshipper") {
       localStorage.removeItem("shippingData");
@@ -42,20 +45,19 @@ function Banner() {
       if (!response.ok) {
         Swal.fire({
           icon: "error",
-          title: "Something Wrong!",
+          title: "Something went wrong!",
           text: result.error || result.message || "Network Error.",
         });
-        throw new Error(result.message || result.error || "Something Wrong!");
+        throw new Error(result.message || result.error || "Something went wrong!");
       }
 
-      // Split the image string into an array
-      const imageString = result?.banner?.image || "";
-      const imageArray = imageString
-        .split(",")
-        .map((url) => url.trim())
-        .filter((url) => url); // Remove empty entries
+      // Parse banner images safely
+      const imageString = result?.banner?.image;
+      const imageArray = typeof imageString === "string"
+        ? imageString.split(',').map((url) => url.trim()).filter(Boolean)
+        : [];
 
-      setBannerImages(imageArray);
+      setBannerImages(imageArray.length ? imageArray : []);
     } catch (error) {
       console.error("Error fetching banner images:", error);
     } finally {
@@ -74,23 +76,23 @@ function Banner() {
           <Swiper
             spaceBetween={20}
             slidesPerView={1}
-            modules={[Navigation]}
+            modules={[Navigation, Autoplay]}
             loop
-            navigation={true}
-            autoplay={{ delay: 3000 }}
+            navigation
+            autoplay={{ delay: 3000, disableOnInteraction: false }}
           >
             {bannerImages.map((url, index) => (
               <SwiperSlide key={index}>
                 <div
                   className="w-full h-[300px] bg-cover bg-center rounded-xl"
                   style={{ backgroundImage: `url(${url})` }}
-                ></div>
+                />
               </SwiperSlide>
             ))}
           </Swiper>
         ) : (
-          <div className="h-[300px] flex items-center justify-center text-gray-500">
-            {loading ? "Loading banners..." : "No banners available."}
+          <div className="h-[300px] flex items-center justify-center">
+            <Image src={bannerImge} alt="Default Banner" className="rounded-xl h-full w-full object-cover" />
           </div>
         )}
       </div>

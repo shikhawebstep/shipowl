@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { checkDropshipperProductForDropshipper, deleteDropshipperProduct } from '@/app/models/dropshipper/product';
 import { getGlobalPermissionsByFilter } from '@/app/models/admin/globalPermission';
@@ -81,14 +81,41 @@ export async function DELETE(req: NextRequest) {
 
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Dropshipper',
+          module: 'Product',
+          action: 'Delete',
+          data: result,
+          response: { status: true, message: `Product permanently deleted successfully` },
+          status: true
+        }, req);
       logMessage('info', `Product permanently deleted successfully: ${dropshipperProductId}`, { mainDropshipperId });
       return NextResponse.json({ status: true, message: `Product permanently deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Product',
+        action: 'Delete',
+        data: result,
+        response: { status: false, message: 'Product not found or deletion failed' },
+        status: false
+      }, req);
     logMessage('info', `Product not found or could not be deleted: ${dropshipperProductId}`, { mainDropshipperId });
     return NextResponse.json({ status: false, message: 'Product not found or deletion failed' }, { status: 404 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Dropshipper',
+        module: 'Product',
+        action: 'Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', '❌ Product restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }

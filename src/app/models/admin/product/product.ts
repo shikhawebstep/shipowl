@@ -262,22 +262,22 @@ export async function generateProductSlug(name: string) {
     return slug;
 }
 
-export async function generateUniqueShippingOwlProductId() {
+export async function generateUniqueShipOwlProductId() {
     let isIdTaken = true;
-    let shippingOwlProductId = '';
+    let shipOwlProductId = '';
 
     while (isIdTaken) {
         const randomNumber = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
-        shippingOwlProductId = `PRD-${randomNumber}`;
+        shipOwlProductId = `PRD-${randomNumber}`;
 
         const existingProduct = await prisma.product.findUnique({
-            where: { shippingOwlProductId },
+            where: { shipOwlProductId },
         });
 
         isIdTaken = !!existingProduct;
     }
 
-    return shippingOwlProductId;
+    return shipOwlProductId;
 }
 
 export async function createProduct(adminId: number, adminRole: string, product: Product) {
@@ -322,12 +322,12 @@ export async function createProduct(adminId: number, adminRole: string, product:
         // Generate a unique slug for the product
         const slug = await generateProductSlug(name);
 
-        const shippingOwlProductId = await generateUniqueShippingOwlProductId();
+        const shipOwlProductId = await generateUniqueShipOwlProductId();
 
         // Create the product in the database
         const newProduct = await prisma.product.create({
             data: {
-                shippingOwlProductId,
+                shipOwlProductId,
                 name,
                 categoryId,  // Use categoryId here
                 main_sku,
@@ -623,7 +623,7 @@ export const getProductsByFiltersAndStatus = async (productFilters: ProductFilte
             orderBy: { id: "desc" },
             select: {
                 id: true,
-                shippingOwlProductId: true,
+                shipOwlProductId: true,
                 categoryId: true,
                 name: true,
                 slug: true,
@@ -706,7 +706,7 @@ export const getProductsByStatus = async (status: "active" | "inactive" | "delet
             orderBy: { id: "desc" },
             select: {
                 id: true,
-                shippingOwlProductId: true,
+                shipOwlProductId: true,
                 categoryId: true,
                 name: true,
                 slug: true,

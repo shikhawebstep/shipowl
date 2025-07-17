@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { getCourierCompanyById, checkCodeAvailabilityForUpdate, updateCourierCompany, softDeleteCourierCompany, restoreCourierCompany } from '@/app/models/courierCompany';
@@ -164,17 +164,46 @@ export async function PUT(req: NextRequest) {
     const courierCompanyCreateResult = await updateCourierCompany(adminId, String(adminRole), courierCompanyIdNum, courierCompanyPayload);
 
     if (courierCompanyCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Courier Company',
+          action: 'Update',
+          data: courierCompanyCreateResult,
+          response: { status: true, courierCompany: courierCompanyCreateResult.courierCompany },
+          status: true
+        }, req);
+
       logMessage('info', 'CourierCompany updated successfully:', courierCompanyCreateResult.courierCompany);
       return NextResponse.json({ status: true, courierCompany: courierCompanyCreateResult.courierCompany }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Courier Company',
+        action: 'Update',
+        data: courierCompanyCreateResult,
+        response: { status: false, error: courierCompanyCreateResult?.message || 'CourierCompany creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'CourierCompany update failed', courierCompanyCreateResult?.message);
     return NextResponse.json(
       { status: false, error: courierCompanyCreateResult?.message || 'CourierCompany creation failed' },
       { status: 500 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Courier Company',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ CourierCompany Updation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }
@@ -224,14 +253,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreCourierCompany(adminId, String(adminRole), courierCompanyIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Courier Company',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, courierCompany: restoreResult.restoredCourierCompany },
+          status: true
+        }, req);
+
       logMessage('info', 'CourierCompany restored successfully:', restoreResult.restoredCourierCompany);
       return NextResponse.json({ status: true, courierCompany: restoreResult.restoredCourierCompany }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Courier Company',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'CourierCompany restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'CourierCompany restore failed');
     return NextResponse.json({ status: false, error: 'CourierCompany restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Courier Company',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ CourierCompany restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }
@@ -278,13 +337,43 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for courierCompany: ${courierCompanyIdNum}`, { adminId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Courier Company',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `CourierCompany soft deleted successfully` },
+          status: false
+        }, req);
+
       logMessage('info', `CourierCompany soft deleted successfully: ${courierCompanyIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `CourierCompany soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Courier Company',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'CourierCompany not found or deletion failed' },
+        status: false
+      }, req);
+
     logMessage('info', `CourierCompany not found or could not be deleted: ${courierCompanyIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'CourierCompany not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Courier Company',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during courierCompany deletion', { error });
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }

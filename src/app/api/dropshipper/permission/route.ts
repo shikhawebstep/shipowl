@@ -4,7 +4,6 @@ import { logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getDropshipperStaffPermissionsByStatus } from '@/app/models/dropshipper/permission';
 
-
 export async function GET(req: NextRequest) {
   try {
     logMessage('debug', 'GET request received for fetching dropshippers');

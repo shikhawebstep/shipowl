@@ -17,6 +17,7 @@ import {
   BadgeDollarSign,
   ChevronDown,
   ChevronUp,
+  UserCheck,
 } from "lucide-react";
 
 import logo from "@/app/images/Shipowllogo.png";
@@ -27,6 +28,7 @@ export default function Sidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const { isSupplierStaff, extractedPermissions, checkSupplierRole } = useSupplier();
+
   useEffect(() => {
     checkSupplierRole();
   }, []);
@@ -50,6 +52,14 @@ export default function Sidebar() {
     { name: "Dashboard", icon: Home, module: "Category", action: actions, href: "/supplier" },
     { name: "Products", icon: Package, module: "Product", action: actions, href: "/supplier/product/my" },
     { name: "New Product Request", icon: Package, module: "Product", action: actions, href: "/supplier/product/request" },
+    {
+      name: "Permissions",
+      icon: UserCheck,
+      children: [
+        { name: "Permission", icon: UserCheck, module: "Permission", action: actions, href: "/supplier/permission" },
+        { name: "Role Management", icon: UserCheck, module: "Role Management", action: actions, href: "/supplier/permission/role" }
+      ]
+    },
     { name: "Orders", icon: ClipboardList, module: "Order", action: actions, href: "/supplier/orders" },
     { name: "Warehouse", icon: Warehouse, module: "Warehouse", action: actions, href: "/supplier/warehouse" },
     { name: "Subuser Listing", icon: Package, module: "Sub User", action: actions, href: "/supplier/sub-user/list" },
@@ -65,8 +75,6 @@ export default function Sidebar() {
     return extractedPermissions.length > 0 ? hasPermission(item.module, item.action) : true;
   }), [isSupplierStaff, extractedPermissions]);
 
-
-
   return (
     <>
       {/* Mobile Header */}
@@ -79,12 +87,12 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Overlay for mobile sidebar */}
+      {/* Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-[#0000006b] bg-opacity-30 z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
-        ></div>
+        />
       )}
 
       {/* Sidebar */}
@@ -103,43 +111,45 @@ export default function Sidebar() {
         <nav className="p-3 h-full">
           <ul className="space-y-1">
             {menuItems.map((item) => {
-              const isActive = pathname === item.href || pathname === item.href;
-              const isSubmenuOpen = openSubMenu === item.name;
+              const isActive = pathname === item.href;
+              const isOpen = openSubMenu === item.name;
 
               return (
-                <li key={item.name} className="w-full">
-                  {item.subMenu ? (
+                <li key={item.name}>
+                  {item.children ? (
                     <>
                       <button
-                        onClick={() => setOpenSubMenu(isSubmenuOpen ? null : item.name)}
+                        onClick={() => setOpenSubMenu(isOpen ? null : item.name)}
                         className={`font-medium flex gap-2 items-center w-full p-3 rounded-lg border-l-4
-                          ${isSubmenuOpen ? "bg-[#2C3454] text-white border-[#F98F5C]" : "bg-[#F0F1F3] text-[#2C3454] border-[#667085]"}
+                          ${isOpen ? "bg-[#2C3454] text-white border-[#F98F5C]" : "bg-[#F0F1F3] text-[#2C3454] border-[#667085]"}
                           hover:bg-[#2C3454] hover:text-white hover:border-[#F98F5C]`}
                       >
                         <item.icon className="w-5 h-5" />
                         <span className="flex-1 text-left">{item.name}</span>
-                        {isSubmenuOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
 
-                      <ul className="ml-6 mt-1 space-y-1">
-                        {item.subMenu.map((sub) => {
-                          const isSubActive = pathname === sub.href || pathname === sub.href;
-                          return (
-                            <li key={sub.name}>
-                              <Link href={sub.href}>
-                                <button
-                                  onClick={() => setIsSidebarOpen(false)}
-                                  className={`text-left font-normal flex gap-2 items-center w-full p-2 pl-4 rounded-lg border-l-4
-                                    ${isSubActive ? "bg-[#2C3454] text-white border-[#F98F5C]" : "bg-[#F0F1F3] border-[#667085]"}
-                                    hover:bg-[#2C3454] hover:text-white hover:border-[#F98F5C]`}
-                                >
-                                  • <span>{sub.name}</span>
-                                </button>
-                              </Link>
-                            </li>
-                          );
-                        })}
-                      </ul>
+                      {isOpen && (
+                        <ul className="ml-6 mt-1 space-y-1">
+                          {item.children.map((sub) => {
+                            const isSubActive = pathname === sub.href;
+                            return (
+                              <li key={sub.name}>
+                                <Link href={sub.href}>
+                                  <button
+                                    onClick={() => setIsSidebarOpen(false)}
+                                    className={`text-left font-normal flex gap-2 items-center w-full p-2 pl-4 rounded-lg border-l-4
+                                      ${isSubActive ? "bg-[#2C3454] text-white border-[#F98F5C]" : "bg-[#F0F1F3] border-[#667085]"}
+                                      hover:bg-[#2C3454] hover:text-white hover:border-[#F98F5C]`}
+                                  >
+                                    <sub.icon className="w-5 h-5" /> <span>{sub.name}</span>
+                                  </button>
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
                     </>
                   ) : (
                     <Link href={item.href}>

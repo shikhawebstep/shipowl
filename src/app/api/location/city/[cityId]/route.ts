@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { getCityById, updateCity, softDeleteCity, restoreCity } from '@/app/models/location/city';
@@ -275,17 +275,46 @@ export async function PUT(req: NextRequest) {
     const cityCreateResult = await updateCity(adminId, String(adminRole), cityIdNum, cityPayload);
 
     if (cityCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'City (Location)',
+          action: 'Update',
+          data: cityCreateResult,
+          response: { status: true, message: "City updated successfully", city: cityCreateResult.city },
+          status: true
+        }, req);
+
       logMessage('info', 'City updated successfully:', cityCreateResult.city);
       return NextResponse.json({ status: true, message: "City updated successfully", city: cityCreateResult.city }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'City (Location)',
+        action: 'Update',
+        data: cityCreateResult,
+        response: { status: false, error: cityCreateResult?.message || 'City creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'City update failed', cityCreateResult?.message);
     return NextResponse.json(
       { status: false, error: cityCreateResult?.message || 'City creation failed' },
       { status: 500 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'City (Location)',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ City Updation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }
@@ -329,7 +358,7 @@ export async function PATCH(req: NextRequest) {
       const options = {
         panel: 'Admin',
         module: 'City',
-        action: 'Restore',
+        action: 'Update',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);
@@ -363,14 +392,46 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreCity(adminId, String(adminRole), cityIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'City (Location)',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, city: restoreResult.city },
+          status: true
+        }, req);
+
+
       logMessage('info', 'City restored successfully:', restoreResult.city);
       return NextResponse.json({ status: true, city: restoreResult.city }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'City (Location)',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'City restore failed' },
+        status: false
+      }, req);
+
 
     logMessage('error', 'City restore failed');
     return NextResponse.json({ status: false, error: 'City restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'City (Location)',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ City restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }
@@ -445,13 +506,43 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for city: ${cityIdNum}`, { adminId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'City (Location)',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `City soft deleted successfully` },
+          status: true
+        }, req);
+
       logMessage('info', `City soft deleted successfully: ${cityIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `City soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'City (Location)',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'City not found or deletion failed' },
+        status: false
+      }, req);
+
     logMessage('info', `City not found or could not be deleted: ${cityIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'City not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'City (Location)',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during city deletion', { error });
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }

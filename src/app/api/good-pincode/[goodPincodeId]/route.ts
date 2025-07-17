@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
-import { getGoodPincodeById, updateGoodPincode, softDeleteGoodPincode, restoreGoodPincode, getGoodPincodeByPincodeForUpdate } from '@/app/models/goodPincode';
+import { getGoodPincodeById, updateGoodPincode, softDeleteGoodPincode, restoreGoodPincode } from '@/app/models/goodPincode';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 import { getPincodeDetails } from '@/utils/location/pincodeUtils';
 
@@ -78,6 +78,7 @@ export async function GET(req: NextRequest) {
         );
       }
     }
+
 
     const goodPincodeIdNum = Number(goodPincodeId);
     if (isNaN(goodPincodeIdNum)) {
@@ -187,20 +188,9 @@ export async function PUT(req: NextRequest) {
     }
 
     // Extract fields
+    const pincode = extractString('pincode');
     const statusRaw = formData.get('status')?.toString().toLowerCase();
     const status = ['true', '1', true, 1, 'active', 'yes'].includes(statusRaw as string | number | boolean);
-
-    const pincode = extractString('pincode');
-
-    const getGoodPincodeByPincodeForUpdateResult = await getGoodPincodeByPincodeForUpdate(pincode || '', goodPincodeIdNum);
-
-    if (!getGoodPincodeByPincodeForUpdateResult?.status) {
-      logMessage('warn', 'GoodPincode already exists:', getGoodPincodeByPincodeForUpdateResult?.message || 'Unknown error');
-      return NextResponse.json(
-        { status: false, error: getGoodPincodeByPincodeForUpdateResult?.message || 'GoodPincode already exists' },
-        { status: 400 }
-      );
-    }
 
     const {
       status: pincodeDetailStatus,
@@ -231,17 +221,46 @@ export async function PUT(req: NextRequest) {
     const goodPincodeCreateResult = await updateGoodPincode(adminId, String(adminRole), goodPincodeIdNum, goodPincodePayload);
 
     if (goodPincodeCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Good Pincode',
+          action: 'Update',
+          data: goodPincodeCreateResult,
+          response: { status: true, goodPincode: goodPincodeCreateResult.goodPincode },
+          status: true
+        }, req);
+
       logMessage('info', 'GoodPincode updated successfully:', goodPincodeCreateResult.goodPincode);
       return NextResponse.json({ status: true, goodPincode: goodPincodeCreateResult.goodPincode }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Good Pincode',
+        action: 'Update',
+        data: goodPincodeCreateResult,
+        response: { status: false, error: goodPincodeCreateResult?.message || 'GoodPincode creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'GoodPincode update failed', goodPincodeCreateResult?.message);
     return NextResponse.json(
       { status: false, error: goodPincodeCreateResult?.message || 'GoodPincode creation failed' },
       { status: 500 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Good Pincode',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ GoodPincode Updation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }
@@ -319,14 +338,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreGoodPincode(adminId, String(adminRole), goodPincodeIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Good Pincode',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, goodPincode: restoreResult.restoredGoodPincode },
+          status: true
+        }, req);
+
       logMessage('info', 'GoodPincode restored successfully:', restoreResult.restoredGoodPincode);
       return NextResponse.json({ status: true, goodPincode: restoreResult.restoredGoodPincode }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Good Pincode',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'GoodPincode restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'GoodPincode restore failed');
     return NextResponse.json({ status: false, error: 'GoodPincode restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Good Pincode',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ GoodPincode restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }
@@ -366,7 +415,7 @@ export async function DELETE(req: NextRequest) {
 
       const options = {
         panel: 'Admin',
-        module: 'Good Pincode',
+        module: 'Product',
         action: 'Soft Delete',
       };
 
@@ -401,13 +450,45 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for goodPincode: ${goodPincodeIdNum}`, { adminId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Good Pincode',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `GoodPincode soft deleted successfully` },
+          status: true
+        }, req);
+
+
       logMessage('info', `GoodPincode soft deleted successfully: ${goodPincodeIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `GoodPincode soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Good Pincode',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'GoodPincode not found or deletion failed' },
+        status: false
+      }, req);
+
+
     logMessage('info', `GoodPincode not found or could not be deleted: ${goodPincodeIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'GoodPincode not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Good Pincode',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during goodPincode deletion', { error });
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }

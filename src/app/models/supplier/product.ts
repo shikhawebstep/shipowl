@@ -263,7 +263,7 @@ export const getProductsByFiltersAndStatus = async (
                 },
                 select: {
                     id: true,
-                    shippingOwlProductId: true,
+                    shipOwlProductId: true,
                     categoryId: true,
                     name: true,
                     slug: true,
@@ -319,7 +319,7 @@ export const getProductsByFiltersAndStatus = async (
                     product: {
                         select: {
                             id: true,
-                            shippingOwlProductId: true,
+                            shipOwlProductId: true,
                             categoryId: true,
                             name: true,
                             slug: true,
@@ -399,7 +399,7 @@ export const getProductsByFiltersAndStatus = async (
                 },
                 select: {
                     id: true,
-                    shippingOwlProductId: true,
+                    shipOwlProductId: true,
                     categoryId: true,
                     name: true,
                     slug: true,
@@ -530,7 +530,7 @@ export const getProductsByStatus = async (
                 },
                 select: {
                     id: true,
-                    shippingOwlProductId: true,
+                    shipOwlProductId: true,
                     categoryId: true,
                     name: true,
                     slug: true,
@@ -584,7 +584,7 @@ export const getProductsByStatus = async (
                     product: {
                         select: {
                             id: true,
-                            shippingOwlProductId: true,
+                            shipOwlProductId: true,
                             categoryId: true,
                             name: true,
                             slug: true,
@@ -662,7 +662,7 @@ export const getProductsByStatus = async (
                 },
                 select: {
                     id: true,
-                    shippingOwlProductId: true,
+                    shipOwlProductId: true,
                     categoryId: true,
                     name: true,
                     slug: true,

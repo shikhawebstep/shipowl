@@ -13,7 +13,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useAdminActions } from "@/components/commonfunctions/MainContext";
-import { BadgePlus, Trash2, RotateCcw, Pencil } from "lucide-react";
+import { Trash2, RotateCcw, Pencil } from "lucide-react";
 import { useImageURL } from "@/components/ImageURLContext";
 import { IoFilterSharp } from "react-icons/io5";
 
@@ -175,7 +175,7 @@ export default function List() {
                 </div>
             ) : (
                 <div className="bg-white rounded-3xl p-5 main-outer-wrapper">
-                    <div className="flex border border-[#E9EDF7] rounded-md p-3 justify-between items-center mb-4">
+                    <div className="flex p-3 justify-between items-center mb-4">
                         <h2 className="md:text-2xl font-bold text-[#2B3674]">
                             {isTrashed ? "Trashed Category List" : "Category List"}
                         </h2>
@@ -215,14 +215,14 @@ export default function List() {
                                         className={`text-sm p-2  gap-2 md:flex hidden text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                                         onClick={handleToggleTrash}
                                     >
-                                        <Trash2 className="text-sm" /> {isTrashed ? "Category Listing (Simple)" : "Trashed Category"}
+                                        {isTrashed ? "Category Listing (Simple)" : "Trashed Category"}
                                     </button>
                                 )}
                                 {canAdd && (
                                     <button
                                         className="bg-[#4285F4] gap-2 md:flex hidden text-sm  text-white rounded-md p-2 px-4"
                                     >
-                                        <BadgePlus className="text-sm" />  <Link href="/admin/category/create"> Add Category</Link>
+                                        <Link href="/admin/category/create"> Add Category</Link>
                                     </button>
                                 )}
                             </div>
@@ -237,10 +237,8 @@ export default function List() {
                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => exportCsv()}>
                                                 Export CSV
                                             </li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleBulkDelete()}>
-                                                Bulk Delete
-                                            </li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                            
+                                            
                                             <li className="px-4 block md:hidden py-2 hover:bg-gray-100 cursor-pointer"><Link href="/admin/category/create"> Add Category</Link></li>
                                             <li className="px-4 block md:hidden py-2 hover:bg-gray-100 cursor-pointer" onClick={handleToggleTrash}>{isTrashed ? "Category Listing (Simple)" : "Trashed Category"}</li>
                                         </ul>

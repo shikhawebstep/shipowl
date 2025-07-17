@@ -90,7 +90,7 @@ export default function Login() {
             // ✅ Store session in localStorage
             const shippingData = {
                 project: {
-                    name: "Shipping OWL",
+                    name: "ShipOwl",
                     environment: "production",
                     active_panel: "dropshipper",
                 },

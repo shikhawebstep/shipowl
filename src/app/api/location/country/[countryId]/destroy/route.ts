@@ -1,31 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getCountryById, deleteCountry } from '@/app/models/location/country';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    admin?: MainAdmin;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  admin?: MainAdmin;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    admin?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  admin?: SupplierStaff;
 }
 
 export async function DELETE(req: NextRequest) {
@@ -59,7 +59,7 @@ export async function DELETE(req: NextRequest) {
 
     if (isStaffUser) {
       // mainAdminId = userCheck.admin?.admin?.id ?? adminId;
-      
+
       const options = {
         panel: 'Admin',
         module: 'Country',
@@ -98,13 +98,43 @@ export async function DELETE(req: NextRequest) {
 
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Country (Location)',
+          action: 'Permanent Delete',
+          data: result,
+          response: { status: true, message: `Country permanently deleted successfully` },
+          status: true
+        }, req);
+
       logMessage('info', `Country permanently deleted successfully: ${countryIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `Country permanently deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Country (Location)',
+        action: 'Permanent Delete',
+        data: result,
+        response: { status: false, message: 'Country not found or deletion failed' },
+        status: false
+      }, req);
+
     logMessage('info', `Country not found or could not be deleted: ${countryIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'Country not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Country (Location)',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during country deletion', { error });
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }

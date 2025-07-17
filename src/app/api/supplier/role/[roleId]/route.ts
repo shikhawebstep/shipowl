@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const isStaff = !['supplier', 'dropshipper', 'supplier'].includes(String(supplierRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(supplierRole));
 
     if (isStaff) {
       //  mainSupplierId = userCheck.supplier?.supplier?.id ?? supplierId;
@@ -134,7 +134,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: `User Not Found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const isStaff = !['supplier', 'dropshipper', 'supplier'].includes(String(supplierRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(supplierRole));
 
     if (isStaff) {
       const options = {
@@ -208,6 +208,15 @@ export async function PUT(req: NextRequest) {
     const roleCreateResult = await updateRole(supplierId, String(supplierRole), roleIdNum, rolePayload);
 
     if (!roleCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Supplier',
+          module: 'Role',
+          action: 'Update',
+          data: roleCreateResult,
+          response: { status: false, error: roleCreateResult?.message || 'Role creation failed' },
+          status: false
+        }, req);
       logMessage('error', 'Role update failed', roleCreateResult?.message);
       return NextResponse.json(
         { status: false, error: roleCreateResult?.message || 'Role creation failed' },
@@ -222,9 +231,27 @@ export async function PUT(req: NextRequest) {
       console.log(`Permission #${index + 1}:`, permissionId);
     });
 
+    await ActivityLog(
+      {
+        panel: 'Supplier',
+        module: 'Role',
+        action: 'Update',
+        data: roleCreateResult,
+        response: { status: true, role: roleCreateResult.role },
+        status: true
+      }, req);
     logMessage('info', 'Role updated successfully:', roleCreateResult.role);
     return NextResponse.json({ status: true, role: roleCreateResult.role }, { status: 200 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Supplier',
+        module: 'Role',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     // Log and handle any unexpected errors
     logMessage('error', '❌ Role Updation Error:', error);
     return NextResponse.json(
@@ -261,13 +288,13 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: `User Not Found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const isStaff = !['supplier', 'dropshipper', 'supplier'].includes(String(supplierRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(supplierRole));
 
     if (isStaff) {
       const options = {
         panel: 'Supplier',
         module: 'Role',
-        action: 'restore',
+        action: 'Restore',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, supplierId);
@@ -301,14 +328,41 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreRole(supplierId, String(supplierRole), roleIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Supplier',
+          module: 'Role',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, role: restoreResult.restoredRole },
+          status: true
+        }, req);
       logMessage('info', 'Role restored successfully:', restoreResult.restoredRole);
       return NextResponse.json({ status: true, role: restoreResult.restoredRole }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Supplier',
+        module: 'Role',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'Role restore failed' },
+        status: false
+      }, req);
     logMessage('error', 'Role restore failed');
     return NextResponse.json({ status: false, error: 'Role restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Supplier',
+        module: 'Role',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', '❌ Role restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }
@@ -338,7 +392,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: `Supplier not found: ${userCheck.message}` }, { status: 404 });
     }
 
-    const isStaff = !['supplier', 'dropshipper', 'supplier'].includes(String(supplierRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(supplierRole));
 
     if (isStaff) {
       const options = {
@@ -378,13 +432,40 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for role: ${roleIdNum}`, { supplierId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Supplier',
+          module: 'Role',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `Role soft deleted successfully` },
+          status: false
+        }, req);
       logMessage('info', `Role soft deleted successfully: ${roleIdNum}`, { supplierId });
       return NextResponse.json({ status: true, message: `Role soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Supplier',
+        module: 'Role',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'Role not found or deletion failed' },
+        status: false
+      }, req);
     logMessage('info', `Role not found or could not be deleted: ${roleIdNum}`, { supplierId });
     return NextResponse.json({ status: false, message: 'Role not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Supplier',
+        module: 'Role',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', 'Error during role deletion', { error });
     return NextResponse.json({ status: false, error, message: 'Internal server error 7' }, { status: 500 });
   }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getAdminStaffById, deleteAdminStaff } from '@/app/models/admin/staff';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
+import { ActivityLog } from '@/utils/commonUtils';
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function DELETE(req: NextRequest) {
 
     if (!['admin', 'supplier', 'dropshipper'].includes(String(adminRole))) {
       const permissionCheck = await checkStaffPermissionStatus(
-        { panel: 'Admin', module: 'AdminStaff', action: 'Permanent Delete' },
+        { panel: 'Admin', module: 'Sub User', action: 'Permanent Delete' },
         adminId
       );
       if (!permissionCheck.status) {
@@ -53,6 +54,21 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Sub User',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: 'AdminStaff deletion completed' },
+        response: {
+          status: true,
+          message: 'AdminStaff deletion completed',
+          deleted,
+          notDeleted
+        },
+        status: false
+      }, req);
+
     return NextResponse.json({
       status: true,
       message: 'AdminStaff deletion completed',
@@ -60,7 +76,17 @@ export async function DELETE(req: NextRequest) {
       notDeleted
     }, { status: 200 });
 
-  } catch {
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Sub User',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }
 }

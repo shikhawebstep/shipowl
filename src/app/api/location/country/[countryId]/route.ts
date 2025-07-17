@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { getCountryById, updateCountry, softDeleteCountry, restoreCountry } from '@/app/models/location/country';
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
 
     if (isStaffUser) {
       // mainAdminId = userCheck.admin?.admin?.id ?? adminId;
-      
+
       const options = {
         panel: 'Admin',
         module: 'Country',
@@ -214,17 +214,46 @@ export async function PUT(req: NextRequest) {
     const countryCreateResult = await updateCountry(adminId, String(adminRole), countryIdNum, countryPayload);
 
     if (countryCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Country (Location)',
+          action: 'Update',
+          data: countryCreateResult,
+          response: { status: true, message: "Country updated successfully", country: countryCreateResult.country },
+          status: true
+        }, req);
+
       logMessage('info', 'Country updated successfully:', countryCreateResult.country);
       return NextResponse.json({ status: true, message: "Country updated successfully", country: countryCreateResult.country }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Country (Location)',
+        action: 'Update',
+        data: countryCreateResult,
+        response: { status: false, error: countryCreateResult?.message || 'Country creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Country update failed', countryCreateResult?.message);
     return NextResponse.json(
       { status: false, error: countryCreateResult?.message || 'Country creation failed' },
       { status: 500 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Country (Location)',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ Country Updation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }
@@ -302,14 +331,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreCountry(adminId, String(adminRole), countryIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Country (Location)',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, country: restoreResult.country },
+          status: false
+        }, req);
+
       logMessage('info', 'Country restored successfully:', restoreResult.country);
       return NextResponse.json({ status: true, country: restoreResult.country }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Country (Location)',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'Country restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Country restore failed');
     return NextResponse.json({ status: false, error: 'Country restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Country (Location)',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ Country restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }
@@ -384,13 +443,43 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for country: ${countryIdNum}`, { adminId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Country (Location)',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `Country soft deleted successfully` },
+          status: true
+        }, req);
+
       logMessage('info', `Country soft deleted successfully: ${countryIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `Country soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Country (Location)',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'Country not found or deletion failed' },
+        status: false
+      }, req);
+
     logMessage('info', `Country not found or could not be deleted: ${countryIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'Country not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Country (Location)',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during country deletion', { error });
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }

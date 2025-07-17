@@ -482,8 +482,8 @@ export default function List() {
                                         <li className="px-4 md:hidden block py-2 hover:bg-gray-100 cursor-pointer">
                                             {canCreate && <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/supplier/sub-user/create">Add New</Link></button>}</li>
                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                        
+                                        
                                     </ul>
                                 </div>
                             )}

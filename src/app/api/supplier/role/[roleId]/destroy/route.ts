@@ -1,31 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getRoleById, deleteRole } from '@/app/models/role';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainSupplier {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    supplier?: MainSupplier;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  supplier?: MainSupplier;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    supplier?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  supplier?: SupplierStaff;
 }
 
 export async function DELETE(req: NextRequest) {
@@ -55,7 +55,7 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    const isStaff = !['supplier', 'dropshipper', 'supplier'].includes(String(supplierRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(supplierRole));
 
     if (isStaff) {
       // mainSupplierId = userCheck.supplier?.supplier?.id ?? supplierId;
@@ -99,13 +99,40 @@ export async function DELETE(req: NextRequest) {
 
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Supplier',
+          module: 'Role',
+          action: 'Permanent Delete',
+          data: result,
+          response: { status: true, message: `Role permanently deleted successfully` },
+          status: true
+        }, req);
       logMessage('info', `Role permanently deleted successfully: ${roleIdNum}`, { supplierId });
       return NextResponse.json({ status: true, message: `Role permanently deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Supplier',
+        module: 'Role',
+        action: 'Permanent Delete',
+        data: result,
+        response: { status: false, message: 'Role not found or deletion failed' },
+        status: false
+      }, req);
     logMessage('info', `Role not found or could not be deleted: ${roleIdNum}`, { supplierId });
     return NextResponse.json({ status: false, message: 'Role not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Supplier',
+        module: 'Role',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', 'Error during role deletion', { error });
     return NextResponse.json({ status: false, error, message: 'Internal server error 8' }, { status: 500 });
   }

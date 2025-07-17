@@ -65,7 +65,7 @@ export async function PATCH(req: NextRequest) {
       const options = {
         panel: 'Admin',
         module: 'Brand',
-        action: 'restore',
+        action: 'Restore',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);
@@ -104,7 +104,7 @@ export async function PATCH(req: NextRequest) {
         {
           panel: 'Admin',
           module: 'Brand',
-          action: 'restore',
+          action: 'Restore',
           data: restoreResult,
           response: { status: true, brand: restoreResult.restoredBrand },
           status: true
@@ -118,7 +118,7 @@ export async function PATCH(req: NextRequest) {
       {
         panel: 'Admin',
         module: 'Brand',
-        action: 'restore',
+        action: 'Restore',
         data: restoreResult,
         response: { status: false, error: 'Brand restore failed' },
         status: false
@@ -132,7 +132,7 @@ export async function PATCH(req: NextRequest) {
       {
         panel: 'Admin',
         module: 'Brand',
-        action: 'restore',
+        action: 'Restore',
         data: { oneLineSimpleMessage: error || 'Internal Server Error' },
         response: { status: false, error: 'Server error' },
         status: false

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { createGoodPincode, getGoodPincodesByStatus, getGoodPincodeByPincode } from '@/app/models/goodPincode';
@@ -92,13 +92,13 @@ export async function POST(req: NextRequest) {
     const extractString = (key: string) => (formData.get(key) as string) || null;
 
     const statusRaw = formData.get('status')?.toString().toLowerCase();
-    const status = ['true', '1', true, 1, 'active', 'yes'].includes(statusRaw as string | number | boolean);
+    const status = ['true', '1', true, 1, 'active'].includes(statusRaw as string | number | boolean);
 
     const pincode = extractString('pincode');
 
     const getGoodPincodeByPincodeResult = await getGoodPincodeByPincode(pincode || '');
-
-    if (!getGoodPincodeByPincodeResult?.status) {
+    logMessage(`log`, `getGoodPincodeByPincodeResult: `, getGoodPincodeByPincodeResult);
+    if (getGoodPincodeByPincodeResult?.status) {
       logMessage('warn', 'GoodPincode already exists:', getGoodPincodeByPincodeResult?.message || 'Unknown error');
       return NextResponse.json(
         { status: false, error: getGoodPincodeByPincodeResult?.message || 'GoodPincode already exists' },
@@ -135,16 +135,45 @@ export async function POST(req: NextRequest) {
     const goodPincodeCreateResult = await createGoodPincode(adminId, String(adminRole), goodPincodePayload);
 
     if (goodPincodeCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Good Pincode',
+          action: 'Create',
+          data: goodPincodeCreateResult,
+          response: { status: true, goodPincode: goodPincodeCreateResult.goodPincode },
+          status: true
+        }, req);
+
       return NextResponse.json({ status: true, goodPincode: goodPincodeCreateResult.goodPincode }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Good Pincode',
+        action: 'Create',
+        data: goodPincodeCreateResult,
+        response: { status: false, error: goodPincodeCreateResult?.message || 'GoodPincode creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'GoodPincode creation failed:', goodPincodeCreateResult?.message || 'Unknown error');
     return NextResponse.json(
       { status: false, error: goodPincodeCreateResult?.message || 'GoodPincode creation failed' },
       { status: 500 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Good Pincode',
+        action: 'Create',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'GoodPincode Creation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }

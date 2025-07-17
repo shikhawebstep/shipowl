@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getAdminStaffById, restoreAdminStaff } from '@/app/models/admin/staff';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -91,14 +91,41 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreAdminStaff(adminId, String(adminRole), Number(adminStaffId));
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Sub User',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, admin: restoreResult.restoredAdminStaff, message: 'Admin Staff restored successfully' },
+          status: false
+        }, req);
       logMessage('info', 'Admin restored successfully:', restoreResult.restoredAdminStaff);
       return NextResponse.json({ status: true, admin: restoreResult.restoredAdminStaff, message: 'Admin Staff restored successfully' }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Sub User',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'Admin restore failed' },
+        status: false
+      }, req);
     logMessage('error', 'Admin restore failed');
     return NextResponse.json({ status: false, error: 'Admin restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Sub User',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
     logMessage('error', '❌ Admin restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }

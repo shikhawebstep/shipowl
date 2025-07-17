@@ -493,10 +493,8 @@ export default function List() {
                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => exportCsv()}>
                                                 Export CSV
                                             </li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleBulkDelete()}>
-                                                Bulk Delete
-                                            </li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                            
+                                            
                                         </ul>
                                     </div>
                                 )}

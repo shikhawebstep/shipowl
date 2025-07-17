@@ -496,12 +496,12 @@ export default function List() {
 
                                         </li>
                                         <li className="md:hidden block px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                                            {canAdd && <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/sub-user/create">Add New</Link></button>}
+                                            {canAdd && <button className='bg-[#4285F4] text-white rounded-md p-2 px-8'><Link href="/admin/sub-user/create">Add New</Link></button>}
 
                                         </li>
                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                        
+                                        
                                     </ul>
                                 </div>
                             )}
@@ -538,7 +538,7 @@ export default function List() {
                         <div className="md:flex hidden justify-start gap-5 items-end">
 
                             {canViewTrashed && <button
-                                className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                                className={`p-3 py-2 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                 onClick={async () => {
                                     if (isTrashed) {
                                         setIsTrashed(false);
@@ -551,7 +551,7 @@ export default function List() {
                             >
                                 {isTrashed ? "Subuser Listing (Simple)" : "Trashed Subuser"}
                             </button>}
-                            {canAdd && <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/sub-user/create">Add New</Link></button>}
+                            {canAdd && <button className='bg-[#4285F4] text-white rounded-md p-3 py-2 px-8'><Link href="/admin/sub-user/create">Add New</Link></button>}
                         </div>
                     </div>
                 </div>

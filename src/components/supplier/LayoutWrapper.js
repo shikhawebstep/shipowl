@@ -13,7 +13,7 @@ import { ProductProviderEdit } from "./products/ProductContextEdit";
 import { ProductProvider } from "./addproducts/ProductContext";
 import { HashLoader } from "react-spinners";
 import { ImageURLProvider } from "../ImageURLContext";
-
+import { SupplierActionProvider } from '@/components/commonfunctions/SupplierMainContext'
 const authPages = new Set([
   '/',
   '/supplier/auth/login',
@@ -53,6 +53,7 @@ function LayoutWrapperInner({ children }) {
       >
         {!isAuthPage && <Header />}
         <div className="xl:p-3 md:pt-4 md:px-0">
+          <SupplierActionProvider>
           <ProductProviderEdit>
             <ProductProvider>
               <ApiProvider>
@@ -64,6 +65,7 @@ function LayoutWrapperInner({ children }) {
               </ApiProvider>
             </ProductProvider>
           </ProductProviderEdit>
+          </SupplierActionProvider>
         </div>
       </div>
     </div>

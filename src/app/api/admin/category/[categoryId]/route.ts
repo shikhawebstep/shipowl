@@ -383,7 +383,7 @@ export async function PATCH(req: NextRequest) {
       {
         panel: 'Admin',
         module: 'Category',
-        action: 'restore',
+        action: 'Restore',
         data: { oneLineSimpleMessage: error || 'Internal Server Error' },
         response: { status: false, error: 'Server error' },
         status: false

@@ -53,7 +53,7 @@ export default function InvoicePdf() {
     const generateInvoicePDF = () => {
         const doc = new jsPDF();
         const margin = 14;
-        const text = "Shipping Owl";
+        const text = "ShipOwl";
         const fontSize = 20;
         const padding = 3;
 

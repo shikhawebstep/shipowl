@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getGoodPincodeById, restoreGoodPincode } from '@/app/models/goodPincode';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
@@ -62,7 +62,7 @@ export async function PATCH(req: NextRequest) {
 
     if (isStaffUser) {
       // mainAdminId = userCheck.admin?.admin?.id ?? adminId;
-      
+
       const options = {
         panel: 'Admin',
         module: 'Good Pincode',
@@ -100,14 +100,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreGoodPincode(adminId, String(adminRole), goodPincodeIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Good Pincode',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, goodPincode: restoreResult.restoredGoodPincode },
+          status: true
+        }, req);
+
       logMessage('info', 'GoodPincode restored successfully:', restoreResult.restoredGoodPincode);
       return NextResponse.json({ status: true, goodPincode: restoreResult.restoredGoodPincode }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Good Pincode',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'GoodPincode restore failed' } ,
+        status: false
+      }, req);
 
     logMessage('error', 'GoodPincode restore failed');
     return NextResponse.json({ status: false, error: 'GoodPincode restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Good Pincode',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ GoodPincode restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }

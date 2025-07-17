@@ -96,7 +96,7 @@ export default function SmtpForm() {
         data.append("smtp_username", formData.smtp_username); // e.g., rohitwebstep@gmail.com
         data.append("smtp_password", formData.smtp_password); // e.g., app password
         data.append("from_email", formData.from_email);       // e.g., sender's email
-        data.append("from_name", formData.from_name);         // e.g., Shipping OWL
+        data.append("from_name", formData.from_name);         // e.g., ShipOwl
 
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/admin/email-config/smtp`, {
@@ -217,7 +217,7 @@ export default function SmtpForm() {
                             <label className="block mb-1 font-medium text-gray-700">From Name</label>
                             <input
                                 type="text"
-                                placeholder="Shipping OWL"
+                                placeholder="ShipOwl"
                                 value={formData.from_name}
                                 onChange={(e) => setFormData({ ...formData, from_name: e.target.value })}
                                 className="w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]"

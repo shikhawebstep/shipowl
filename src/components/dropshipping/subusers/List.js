@@ -452,8 +452,8 @@ export default function List() {
                                         <li className="px-4 block md:hidden py-2 hover:bg-gray-100 cursor-pointer">    
                                             {canCreate && <button ><Link href="/dropshipping/sub-user/create">Add New</Link></button>}</li> 
                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                        
+                                        
                                        
                                         
                                     </ul>

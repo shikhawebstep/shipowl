@@ -731,8 +731,8 @@ export default function RTO() {
                   <div className="absolute md:left-0 mt-2 w-40 right-0 bg-white rounded-md shadow-lg z-10">
                     <ul className="py-2 text-sm text-[#2B3674]">
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                      
+                      
                     </ul>
                   </div>
                 )}

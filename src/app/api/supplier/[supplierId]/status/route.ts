@@ -88,7 +88,7 @@ export async function PATCH(req: NextRequest) {
       "{{status}}": status ? 'Active' : 'Inactive',
       "{{statusColor}}": status ? 'green' : 'red',
       "{{year}}": new Date().getFullYear().toString(),
-      "{{appName}}": "Shipping OWL",
+      "{{appName}}": "ShipOwl",
     };
 
     let htmlBody = htmlTemplate?.trim() || "<p>Dear {{name}},</p><p>Your account status is now {{status}}.</p>";

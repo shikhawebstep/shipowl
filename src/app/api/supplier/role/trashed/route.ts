@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const isStaff = !['supplier', 'dropshipper', 'supplier'].includes(String(supplierRole));
+    const isStaff = !['admin', 'supplier', 'dropshipper'].includes(String(supplierRole));
 
     if (isStaff) {
       // mainSupplierId = userCheck.supplier?.supplier?.id ?? supplierId;

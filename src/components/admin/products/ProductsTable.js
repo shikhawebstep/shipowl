@@ -137,7 +137,7 @@ const ProductTable = () => {
     const handleSoftDelete = (id) => softDelete(id, () => fetchAll(setProducts, setLoading));
     const handleRestore = (id) => restore(id, () => fetchTrashed(setProducts, setLoading));
     const handleDestroy = (id) => destroy(id, () => fetchTrashed(setProducts, setLoading));
-  
+
 
 
 
@@ -267,47 +267,7 @@ const ProductTable = () => {
 
     return (
         <div className="">
-            <div className="mb-4">
 
-                <div className='flex gap-1 flex-wrap mt-3 md:mt-0 items-center'>
-                    <button
-                        onClick={handleClearFilters}
-                        className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md transition-all duration-200"
-                    >
-                        Clear Filters
-                    </button>
-                    {/* <button className="bg-[#EE5D50] text-white px-4 py-2 rounded-lg text-sm">Details for approval</button>
-                    <button className="bg-[#2B3674] text-white px-4 py-2 rounded-lg text-sm">Import Inventory</button>
-                    <button className="bg-[#05CD99] text-white px-4 py-2 rounded-lg text-sm">Export</button>
-                    <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap">Import</button> */}
-                    <button
-                        onClick={() => {
-                            const allIds = filterProducts.map(product => product.id);
-                            setSelected(allIds);
-                        }}
-                        className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
-                    >
-                        Select All
-                    </button>
-
-                    {
-                        canAdd && <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm" onClick={() => {
-                            setActiveTab('product-details');
-                            setActiveTabs('product-details')
-                        }}>
-                            <Link href="/admin/products/create">Add New</Link>
-                        </button>
-                    }
-                    {
-                        canViewTrashed && <button
-                            className={`text-sm p-2  gap-2 flex md:hidden items-center text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
-                            onClick={handleToggleTrash}
-                        >
-                            <Trash2 className="text-sm" /> {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
-                        </button>
-                    }
-                </div>
-            </div>
 
             {loading ? (
                 <div className="flex justify-center items-center h-96">
@@ -325,13 +285,39 @@ const ProductTable = () => {
                             <span className="ml-2 text-sm  text-gray-600">RTO Count</span>
                         </label>
                         <div className="flex gap-3 justify-between md:justify-end w-full  flex-wrap items-center md:mt-0 mt-4">
-                            {/* <label className="md:flex hidden items-center cursor-pointer">
-                                <input type="checkbox" className="sr-only" checked={showRtoLiveCount} onChange={() => setShowRtoLiveCount(!showRtoLiveCount)} />
-                                <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${showRtoLiveCount ? "bg-orange-500" : ""}`}>
-                                    <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${showRtoLiveCount ? "translate-x-5" : ""}`}></div>
-                                </div>
-                                <span className="ml-2  text-sm text-gray-600">Show RTO Live Count</span>
-                            </label> */}
+                            <button
+                                onClick={handleClearFilters}
+                                className="text-sm bg-gray-200 text-[#2B3674] hover:bg-gray-300 border border-gray-400 px-4 py-2 rounded-md transition-all duration-200"
+                            >
+                                Clear Filters
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    const allIds = filterProducts.map(product => product.id);
+                                    setSelected(allIds);
+                                }}
+                                className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap"
+                            >
+                                Select All
+                            </button>
+
+                            {
+                                canAdd && <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm" onClick={() => {
+                                    setActiveTab('product-details');
+                                    setActiveTabs('product-details')
+                                }}>
+                                    <Link href="/admin/products/create">Add New</Link>
+                                </button>
+                            }
+                            {
+                                canViewTrashed && <button
+                                    className={`text-sm p-2  gap-2 flex md:hidden items-center text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                    onClick={handleToggleTrash}
+                                >
+                                    <Trash2 className="text-sm" /> {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
+                                </button>
+                            }
                             {selected < 1 && <span className="font-semibold md:block hidden text-[#2B3674]">Total: {products.length} Products</span>}
                             {selected.length > 0 && (
                                 <h5 className="font-semibold text-[#2B3674] bg-[#DFE9FF] p-3 flex rounded-md gap-7">

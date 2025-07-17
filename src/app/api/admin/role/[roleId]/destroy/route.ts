@@ -13,7 +13,7 @@ interface MainAdmin {
   // other optional properties if needed
 }
 
-interface SupplierStaff {
+interface AdminStaff {
   id: number;
   name: string;
   email: string;
@@ -25,7 +25,7 @@ interface SupplierStaff {
 interface UserCheckResult {
   status: boolean;
   message?: string;
-  admin?: SupplierStaff;
+  admin?: AdminStaff;
 }
 
 export async function DELETE(req: NextRequest) {

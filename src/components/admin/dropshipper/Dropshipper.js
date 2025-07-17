@@ -289,8 +289,8 @@ const Dropshipper = () => {
                                     )}
                                     </li>
                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                    
+                                    
                                 </ul>
                             </div>
                         )}
@@ -345,7 +345,7 @@ const Dropshipper = () => {
                         {canViewTrashed && (
 
                             <button
-                                className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                className={`p-3 py-2 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                                 onClick={handleToggleTrash}
                             >
                                 {isTrashed ? "Dropshipper Listing (Simple)" : "Trashed Dropshipper"}
@@ -578,14 +578,14 @@ const Dropshipper = () => {
                                                 </button>
                                             </td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">
-                                                <button className={`p-2 cursor-pointer capitalize rounded-md px-3 text-left whitespace-nowrap text-white ${item.status?.toLowerCase() === 'inactive'
+                                                <button className={`p-2 cursor-pointer capitalize rounded-md px-3 text-left whitespace-nowrap text-white ${item.status?.toLowerCase() === 'active'
                                                     ? 'bg-green-500'
-                                                    : item.status?.toLowerCase() === 'active'
+                                                    : item.status?.toLowerCase() === 'inactive'
                                                         ? 'bg-red-500'
                                                         : 'bg-gray-300'
                                                     }`}
                                                 >
-                                                    {item.status?.toLowerCase() === 'active' ? 'inactive' : 'active' || '-'}
+                                                    {item.status?.toLowerCase()}
                                                 </button>
                                             </td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">

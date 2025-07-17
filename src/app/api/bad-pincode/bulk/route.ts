@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isUserExist } from "@/utils/auth/authUtils";
 import { getBadPincodeById, deleteBadPincode } from '@/app/models/badPincode';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
+import { ActivityLog } from '@/utils/commonUtils';
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function DELETE(req: NextRequest) {
 
     if (!['admin', 'supplier', 'dropshipper'].includes(String(adminRole))) {
       const permissionCheck = await checkStaffPermissionStatus(
-        { panel: 'Admin', module: 'BadPincode', action: 'Permanent Delete' },
+        { panel: 'Admin', module: 'Bad Pincode', action: 'Permanent Delete' },
         adminId
       );
       if (!permissionCheck.status) {
@@ -41,7 +42,7 @@ export async function DELETE(req: NextRequest) {
       const badPincode = badPincodeResult?.badPincode?.pincode ?? null;
 
       if (!badPincodeResult?.status || !badPincodeResult?.badPincode) {
-        notDeleted.push({ id: badPincodeId, name: badPincode, reason: 'BadPincode not found' });
+        notDeleted.push({ id: badPincodeId, name: badPincode, reason: 'Bad Pincode not found' });
         continue;
       }
 
@@ -53,14 +54,39 @@ export async function DELETE(req: NextRequest) {
       }
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: 'Bad Pincode deletion completed' },
+        response: {
+          status: true,
+          message: 'Bad Pincode deletion completed',
+          deleted,
+          notDeleted
+        },
+        status: true
+      }, req);
+
     return NextResponse.json({
       status: true,
-      message: 'BadPincode deletion completed',
+      message: 'Bad Pincode deletion completed',
       deleted,
       notDeleted
     }, { status: 200 });
 
-  } catch {
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Bad Pincode',
+        action: 'Permanent Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }
 }

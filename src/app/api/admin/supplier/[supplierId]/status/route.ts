@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import {
   getSupplierById,
@@ -112,7 +112,7 @@ export async function PATCH(req: NextRequest) {
       "{{status}}": status ? 'Active' : 'Inactive',
       "{{statusColor}}": status ? 'green' : 'red',
       "{{year}}": new Date().getFullYear().toString(),
-      "{{appName}}": "Shipping OWL",
+      "{{appName}}": "ShipOwl",
     };
 
     let htmlBody = htmlTemplate?.trim() || "<p>Dear {{name}},</p><p>Your account status is now {{status}}.</p>";
@@ -175,6 +175,20 @@ export async function PATCH(req: NextRequest) {
     const emailResult = await sendEmail(emailConfig, mailData);
 
     if (!emailResult.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Supplier',
+          action: 'Update',
+          data: emailResult,
+          response: {
+            status: false,
+            message: "Supplier status updated, but failed to send email notification.",
+            emailError: emailResult.error,
+          },
+          status: false
+        }, req);
+
       logMessage('error', 'Email sending failed', emailResult.error);
       return NextResponse.json({
         status: false,
@@ -183,11 +197,34 @@ export async function PATCH(req: NextRequest) {
       }, { status: 500 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Update',
+        data: emailResult,
+        response: {
+          status: true,
+          message: `Supplier status updated to ${status ? 'Active' : 'Inactive'}`,
+        },
+        status: false
+      }, req);
+
     return NextResponse.json({
       status: true,
       message: `Supplier status updated to ${status ? 'Active' : 'Inactive'}`,
     });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Unexpected error in supplier PATCH route:', error);
     return NextResponse.json(
       { status: false, error: 'Internal server error' },

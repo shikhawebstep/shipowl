@@ -98,7 +98,7 @@ export default function ManageProducts() {
 
             <div className=" w-2/12 border-b-3  border-[#F98F5C] mt-1 mb-4"></div>
             <div className="md:flex items-center gap-3 bg-white rounded-xl p-5">
-                {/* Tabs */}
+            
                 <div className="dm md:w-4/12 flex border-b overflow-auto border-[#F4F5F7]">
                     {tabs.map((tab) => (
                         <button
@@ -235,8 +235,8 @@ export default function ManageProducts() {
                                 <div className="absolute md:left-0 mt-2 w-40 right-0 bg-white rounded-md shadow-lg z-10">
                                     <ul className="py-2 text-sm text-[#2B3674]">
                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+
+
                                     </ul>
                                 </div>
                             )}

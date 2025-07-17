@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { validateFormData } from '@/utils/validateFormData';
 import { createState, getStatesByStatus } from '@/app/models/location/state';
@@ -9,26 +9,26 @@ import { getCountriesByStatus } from '@/app/models/location/country';
 import { checkStaffPermissionStatus } from '@/app/models/staffPermission';
 
 interface MainAdmin {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    // other optional properties if needed
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  // other optional properties if needed
 }
 
 interface SupplierStaff {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-    admin?: MainAdmin;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  admin?: MainAdmin;
 }
 
 interface UserCheckResult {
-    status: boolean;
-    message?: string;
-    admin?: SupplierStaff;
+  status: boolean;
+  message?: string;
+  admin?: SupplierStaff;
 }
 
 export async function POST(req: NextRequest) {
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
 
     if (isStaffUser) {
       // mainAdminId = userCheck.admin?.admin?.id ?? adminId;
-      
+
       const options = {
         panel: 'Admin',
         module: 'State',
@@ -141,17 +141,46 @@ export async function POST(req: NextRequest) {
     const stateCreateResult = await createState(adminId, String(adminRole), statePayload);
 
     if (stateCreateResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'State (Location)',
+          action: 'Create',
+          data: stateCreateResult,
+          response: { status: true, message: "State created successfully", state: stateCreateResult.state },
+          status: true
+        }, req);
+
       logMessage('info', 'State created successfully:', stateCreateResult.state);
       return NextResponse.json({ status: true, message: "State created successfully", state: stateCreateResult.state }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'State (Location)',
+        action: 'Create',
+        data: stateCreateResult,
+        response: { status: false, error: stateCreateResult?.message || 'State creation failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'State creation failed:', stateCreateResult?.message || 'Unknown error');
     return NextResponse.json(
       { status: false, error: stateCreateResult?.message || 'State creation failed' },
       { status: 500 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'State (Location)',
+        action: 'Create',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'State Creation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }

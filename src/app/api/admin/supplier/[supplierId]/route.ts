@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { logMessage } from "@/utils/commonUtils";
+import { ActivityLog, logMessage } from "@/utils/commonUtils";
 import { isUserExist } from "@/utils/auth/authUtils";
 import { saveFilesFromFormData, deleteFile } from '@/utils/saveFiles';
 import { validateFormData } from '@/utils/validateFormData';
@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
 
   try {
-    logMessage('debug', 'POST request received for supplier creation');
+    logMessage('debug', 'POST request received for supplier updation');
 
     // Extract supplierId directly from the URL path
     const supplierId = req.nextUrl.pathname.split('/').pop();
@@ -153,7 +153,7 @@ export async function PUT(req: NextRequest) {
       const options = {
         panel: 'Admin',
         module: 'Supplier',
-        action: 'View',
+        action: 'Update',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);
@@ -344,9 +344,9 @@ export async function PUT(req: NextRequest) {
 
     logMessage('info', 'Supplier payload updated:', supplierPayload);
 
-    const supplierCreateResult = await updateSupplier(adminId, String(adminRole), supplierIdNum, supplierPayload);
+    const supplierUpdateResult = await updateSupplier(adminId, String(adminRole), supplierIdNum, supplierPayload);
 
-    if (!supplierCreateResult || !supplierCreateResult.status || !supplierCreateResult.supplier) {
+    if (!supplierUpdateResult || !supplierUpdateResult.status || !supplierUpdateResult.supplier) {
       // Check if there are any uploaded files before attempting to delete
       if (Object.keys(supplierUploadedFiles).length > 0) {
         // Iterate over each field in supplierUploadedFiles
@@ -368,11 +368,22 @@ export async function PUT(req: NextRequest) {
       } else {
         logMessage('info', 'No uploaded files to delete.');
       }
-      logMessage('error', 'Supplier creation failed:', supplierCreateResult?.message || 'Unknown error');
-      return NextResponse.json({ status: false, error: supplierCreateResult?.message || 'Supplier creation failed' }, { status: 500 });
+
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Supplier',
+          action: 'Update',
+          data: supplierUpdateResult,
+          response: { status: false, error: supplierUpdateResult?.message || 'Supplier updation failed' },
+          status: false
+        }, req);
+
+      logMessage('error', 'Supplier updation failed:', supplierUpdateResult?.message || 'Unknown error');
+      return NextResponse.json({ status: false, error: supplierUpdateResult?.message || 'Supplier updation failed' }, { status: 500 });
     }
 
-    const companyUploadDir = path.join(process.cwd(), 'tmp', 'uploads', 'supplier', `${supplierCreateResult.supplier.id}`, 'company');
+    const companyUploadDir = path.join(process.cwd(), 'tmp', 'uploads', 'supplier', `${supplierUpdateResult.supplier.id}`, 'company');
     const supplierCompanyFileFields = [
       'gstDocument',
       'companyPanCardImage',
@@ -401,7 +412,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const supplierCompanyPayload = {
-      admin: { connect: { id: supplierCreateResult.supplier.id } },
+      admin: { connect: { id: supplierUpdateResult.supplier.id } },
       companyName: extractString('companyName') || '',
       brandName: extractString('brandName') || '',
       brandShortName: extractString('brandShortName') || '',
@@ -445,8 +456,8 @@ export async function PUT(req: NextRequest) {
 
     logMessage('info', 'Supplier payload updated:', supplierCompanyPayload);
 
-    const supplierCompanyCreateResult = await updateSupplierCompany(adminId, String(adminRole), supplierIdNum, supplierCompanyPayload);
-    if (!supplierCompanyCreateResult || !supplierCompanyCreateResult.status || !supplierCompanyCreateResult.supplier) {
+    const supplierCompanyUpdateResult = await updateSupplierCompany(adminId, String(adminRole), supplierIdNum, supplierCompanyPayload);
+    if (!supplierCompanyUpdateResult || !supplierCompanyUpdateResult.status || !supplierCompanyUpdateResult.supplier) {
 
       // Check if there are any uploaded files before attempting to delete
       if (Object.keys(supplierCompanyUploadedFiles).length > 0) {
@@ -470,17 +481,46 @@ export async function PUT(req: NextRequest) {
         logMessage('info', 'No uploaded files to delete.');
       }
 
-      logMessage('error', 'Supplier company creation failed', supplierCompanyCreateResult?.message);
-      return NextResponse.json({ status: false, error: supplierCompanyCreateResult?.message || 'Supplier company creation failed' }, { status: 500 });
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Supplier',
+          action: 'Update',
+          data: supplierCompanyUpdateResult,
+          response: { status: false, error: supplierCompanyUpdateResult?.message || 'Supplier company updation failed' },
+          status: false
+        }, req);
+
+      logMessage('error', 'Supplier company updation failed', supplierCompanyUpdateResult?.message);
+      return NextResponse.json({ status: false, error: supplierCompanyUpdateResult?.message || 'Supplier company updation failed' }, { status: 500 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Update',
+        data: supplierUpdateResult,
+        response: { status: true, error: supplierUpdateResult?.message || 'Supplier updated Successfuly' },
+        status: true
+      }, req);
+
     return NextResponse.json(
-      { status: true, error: supplierCreateResult?.message || 'Supplier updated Successfuly' },
+      { status: true, error: supplierUpdateResult?.message || 'Supplier updated Successfuly' },
       { status: 200 }
     );
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Internal Server Error';
-    logMessage('error', 'Supplier Creation Error:', error);
+  } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Update',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
+    logMessage('error', 'Supplier Updation Error:', error);
     return NextResponse.json({ status: false, error }, { status: 500 });
   }
 
@@ -519,7 +559,7 @@ export async function PATCH(req: NextRequest) {
       const options = {
         panel: 'Admin',
         module: 'Supplier',
-        action: 'restore',
+        action: 'Restore',
       };
 
       const staffPermissionsResult = await checkStaffPermissionStatus(options, adminId);
@@ -553,14 +593,44 @@ export async function PATCH(req: NextRequest) {
     const restoreResult = await restoreSupplier(adminId, String(adminRole), supplierIdNum);
 
     if (restoreResult?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Supplier',
+          action: 'Restore',
+          data: restoreResult,
+          response: { status: true, supplier: restoreResult.restoredSupplier },
+          status: true
+        }, req);
+
       logMessage('info', 'Supplier restored successfully:', restoreResult.restoredSupplier);
       return NextResponse.json({ status: true, supplier: restoreResult.restoredSupplier }, { status: 200 });
     }
+
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Restore',
+        data: restoreResult,
+        response: { status: false, error: 'Supplier restore failed' },
+        status: false
+      }, req);
 
     logMessage('error', 'Supplier restore failed');
     return NextResponse.json({ status: false, error: 'Supplier restore failed' }, { status: 500 });
 
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Restore',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', '❌ Supplier restore error:', error);
     return NextResponse.json({ status: false, error: 'Server error' }, { status: 500 });
   }
@@ -630,13 +700,43 @@ export async function DELETE(req: NextRequest) {
     logMessage('info', `Soft delete request for supplier: ${supplierIdNum}`, { adminId });
 
     if (result?.status) {
+      await ActivityLog(
+        {
+          panel: 'Admin',
+          module: 'Supplier',
+          action: 'Soft Delete',
+          data: result,
+          response: { status: true, message: `Supplier soft deleted successfully` },
+          status: true
+        }, req);
+
       logMessage('info', `Supplier soft deleted successfully: ${supplierIdNum}`, { adminId });
       return NextResponse.json({ status: true, message: `Supplier soft deleted successfully` }, { status: 200 });
     }
 
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Soft Delete',
+        data: result,
+        response: { status: false, message: 'Supplier not found or deletion failed' },
+        status: false
+      }, req);
+
     logMessage('info', `Supplier not found or could not be deleted: ${supplierIdNum}`, { adminId });
     return NextResponse.json({ status: false, message: 'Supplier not found or deletion failed' }, { status: 404 });
   } catch (error) {
+    await ActivityLog(
+      {
+        panel: 'Admin',
+        module: 'Supplier',
+        action: 'Soft Delete',
+        data: { oneLineSimpleMessage: error || 'Internal Server Error' },
+        response: { status: false, error: 'Server error' },
+        status: false
+      }, req);
+
     logMessage('error', 'Error during supplier deletion', { error });
     return NextResponse.json({ status: false, error: 'Internal server error' }, { status: 500 });
   }
